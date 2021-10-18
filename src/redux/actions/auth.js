@@ -24,8 +24,8 @@ export const CODE_FAILED = 'CODE_FAILED';
 export const REG_FAILED = 'REG_FAILED';
 
 export const loginUser = params => {
-  console.log('HERE');
-  console.log(params);
+  // console.log('HERE');
+  // console.log(params);
   return async dispatch => {
     dispatch(authLoading());
     try {
@@ -41,12 +41,12 @@ export const loginUser = params => {
       );
       // return res;
       if (res?.data?.logged) {
-        console.log(res);
+        // console.log(res);
         return dispatch(loginSuccess(res));
       }
       return dispatch(authFailed(res));
     } catch (err) {
-      console.log('---> catch', err.response);
+      // console.log('---> catch', err.response);
       dispatch(authFailed(err.response));
     }
   };
@@ -66,7 +66,7 @@ export const registerUser = params => {
         },
       );
       if (res?.data?.logged) {
-        console.log(res);
+        // console.log(res);
         return dispatch(registerSuccess(res));
       }
       return dispatch(registerFAILED(err.response));
@@ -77,8 +77,8 @@ export const registerUser = params => {
 };
 //Google
 export const Googlelogin = params => {
-  console.log('HERE');
-  console.log(params);
+  // console.log('HERE');
+  // console.log(params);
   return async dispatch => {
     dispatch(authLoading());
 
@@ -94,18 +94,18 @@ export const Googlelogin = params => {
         },
       );
       if (res?.data?.logged) {
-        console.log(res);
+        // console.log(res);
         return dispatch(logingoogle(res));
       }
       return dispatch(authFailed(res));
     } catch (err) {
-      console.log(err.response.data);
+      // console.log(err.response.data);
       dispatch(authFailed(err.response));
     }
   };
 };
 export const logoOut = params => {
-  console.log(params);
+  // console.log(params);
   return async dispatch => {
     dispatch(logoutUserSuccess());
   };

@@ -1,2 +1,10 @@
 export const splash = require('./images/splash.png');
 export const icon = require('./images/icon.png');
+export const passeye = require('./images/pass_eye.png');
+export const apple = require('./images/apple.png');
+export const google = require('./images/google.png');
+export const feed = require('./images/feed.png');
+export const explore = require('./images/explore.png');
+export const fav = require('./images/fav.png');
+export const music = require('./images/music.png');
+export const setting = require('./images/setting.png');

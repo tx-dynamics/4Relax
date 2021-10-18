@@ -56,7 +56,7 @@ export const authReducer = (state = initialState, action) => {
         message: action.payload.data.message,
       };
     case LOGIN_USER:
-      console.log('here');
+      // console.log('here');
       return {
         ...state,
         userData: action.payload.data.user,
@@ -68,7 +68,7 @@ export const authReducer = (state = initialState, action) => {
         errMsg: null,
       };
     case GOOGLE_LOGIN:
-      console.log('auth', action.payload.data.message);
+      // console.log('auth', action.payload.data.message);
       return {
         ...state,
         message: action.payload.data.message,

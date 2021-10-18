@@ -8,6 +8,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import Signin from '../screens/Signin';
 // import Splash from '../screens/Splash';
 import AuthenticationStack from './Auth_nav';
+import BottomTab from './bottomtab';
 
 //redux
 // import {connect} from 'react-redux';
@@ -30,9 +31,9 @@ function AppNav({}) {
           }}
         />
 
-        {/* <Stack.Screen name="Root" options={{headerShown: false}}>
+        <Stack.Screen name="Root" options={{headerShown: false}}>
           {props => <BottomTab {...props} />}
-        </Stack.Screen> */}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
