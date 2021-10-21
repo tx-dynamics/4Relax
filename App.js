@@ -7,10 +7,11 @@ import AppNav from './src/navigation/App_nav';
 import {View, YellowBox} from 'react-native';
 import theme from './src/theme';
 import {ThemeProvider} from 'react-native-elements';
-// import Orientation from "react-native-orientation-locker";
+import Orientation from "react-native-orientation-locker";
 // import {useIsFocused} from '@react-navigation/native';
 
 YellowBox.ignoreWarnings(['']);
+
 const App = () => {
   // const isFocused = useIsFocused();
 
@@ -19,7 +20,7 @@ const App = () => {
   // }, [isFocused])
 
   // function orientationLock  () {
-    // Orientation.lockToPortrait();
+    Orientation.lockToPortrait();
   // }; //end of orientationLock
 
   return (

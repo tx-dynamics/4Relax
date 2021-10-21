@@ -8,7 +8,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import Signin from '../screens/Signin';
 // import Splash from '../screens/Splash';
 import AuthenticationStack from './Auth_nav';
-import BottomTab from './bottomtab';
+import BottomTab from './tabbar';
 
 //redux
 // import {connect} from 'react-redux';
@@ -21,7 +21,10 @@ function AppNav({}) {
   useEffect(() => {}, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      // independent={true}
+    >
+
       <Stack.Navigator initialRouteName={initial}>
         <Stack.Screen
           name="Auth"

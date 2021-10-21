@@ -5,11 +5,11 @@ import Tabbar from "../components/Tabar";
 
 interface AppProps {}
 
-export default class App extends React.Component<AppProps> {
+ class App extends React.Component<AppProps> {
   render() {
     return (
       <View style={styles.container}>
-        <Tabbar />
+        <Tabbar {...this.props} />
       </View>
     );
   }
@@ -17,8 +17,11 @@ export default class App extends React.Component<AppProps> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
+    // opacity:0,
     backgroundColor: "#00303A",
     justifyContent: "flex-end",
   },
 });
+
+export default App;
