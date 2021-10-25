@@ -115,7 +115,7 @@ export default function feed() {
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{flex:0.8,alignItems:'flex-end'}}>
-                                    <TouchableOpacity  style={[styles.iconBackground,{right:16,top:12,alignSelf:'center'}]}>
+                                    <TouchableOpacity  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
                                         <Image
                                             source={item.delimg}
                                             style={styles.icon}

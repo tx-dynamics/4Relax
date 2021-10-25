@@ -2,6 +2,7 @@ import {StyleSheet, Dimensions} from 'react-native';
 import theme from '../../theme';
 import {
   responsiveHeight,
+  responsiveWidth,
   responsiveScreenHeight,
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
@@ -42,7 +43,26 @@ icon:{
     tintColor:'white',
     alignSelf:'center'
 },
-title:{alignSelf:'center',fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'white'}
+title:{alignSelf:'center',fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'white'},
+select:{fontSize:12,fontWeight:'400',fontFamily:'Lato',color:'#00000',marginLeft:responsiveWidth(1)},
+select_container:{
+    width:76,
+    height:22,
+    borderRadius:13,
+    backgroundColor:'white',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center',
+    bottom:responsiveHeight(1),
+    marginLeft:responsiveWidth(1.5)
+},
+    price:{
+        textAlign:'center',
+        color:'black',
+        fontSize:10,
+        fontWeight:'700',
+        fontFamily:'Roboto'
+    }
 
 })
 
