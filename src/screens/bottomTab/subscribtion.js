@@ -36,7 +36,9 @@ export default function setting(props) {
                 <View style={{marginTop:responsiveHeight(2),width:57,height:22,borderRadius:13,backgroundColor:'white',alignItems:'center',justifyContent:'center'}}>
                     <Text style={{fontWeight:'500',fontSize:10,fontFamily:'Lato',color:'#000'}} >Monthly</Text>
                 </View>
-                <Text style={{fontSize:12,fontWeight:'500',fontFamily:'Lato',color:'#000',marginTop:responsiveHeight(2.8)}} >Have an activation code?</Text>
+                <TouchableOpacity onPress={()=> props.navigation.navigate('Activation')} >
+                    <Text style={{fontSize:12,fontWeight:'500',fontFamily:'Lato',color:'#000',marginTop:responsiveHeight(2.8)}} >Have an activation code?</Text>
+                </TouchableOpacity>
                 <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(3)}}>
                     <Image
                         source={check}

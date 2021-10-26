@@ -62,8 +62,26 @@ select_container:{
         fontSize:10,
         fontWeight:'700',
         fontFamily:'Roboto'
+    },
+    setting_btn:{
+        height:52,
+        width:'100%',
+        borderRadius:10,
+        marginTop:responsiveWidth(5),
+        justifyContent:'center'
+    },
+    code_cont:{
+        height:32,
+        width:84,
+        backgroundColor:'#fff',
+        borderRadius:2
+    },
+    code:{
+        paddingTop:2,
+        marginLeft:2,
+        paddingBottom:2,
+        color:'black'
     }
-
 })
 
 export default styles;

@@ -10,6 +10,7 @@ import {
   import LinearGradient from 'react-native-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
+import Soundplayer from './playing'
 
 const data =[
     {
@@ -36,18 +37,22 @@ const list = [
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
         unloc:require('../../assets/images/lock.png'),
+        download:require('../../assets/images/download.png')
 
     },
     {
         image:require('../../assets/images/m2.png'),
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
-        pause:require('../../assets/images/pause.png')
+        pause:require('../../assets/images/pause.png'),
+        play:require('../../assets/images/play.png'),
+
     },
     {
         image:require('../../assets/images/m3.png'),
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
+        unloc:require('../../assets/images/lock.png'),
         download:require('../../assets/images/download.png')
     },
     {
@@ -55,30 +60,40 @@ const list = [
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
         play:require('../../assets/images/play.png'),
+        pause:require('../../assets/images/pause.png'),
+
     },
     {
         image:require('../../assets/images/m5.png'),
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
         play:require('../../assets/images/play.png'),
+        pause:require('../../assets/images/pause.png'),
+
     },
     {
         image:require('../../assets/images/m1.png'),
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
         unloc:require('../../assets/images/lock.png'),
+        download:require('../../assets/images/download.png')
+
     },
     {
         image:require('../../assets/images/m1.png'),
         favimg:require('../../assets/images/fav.png'),
         delimg:require('../../assets/images/del.png'),
         unloc:require('../../assets/images/lock.png'),
+        download:require('../../assets/images/download.png')
+
     }
 ]
 
 export default function feed() {
 
     const [selected,setSelected ] =  useState(false)
+    const [isplaying,setisplaying ] =  useState(false)
+    const [islock,setislock ] =  useState(false)
 
     return (
         <View style={{flex:1,backgroundColor:'#00303A'}}>
@@ -115,81 +130,92 @@ export default function feed() {
                   </View>
                   }/>
             </ImageBackground>
-            <FlatList
-                style={{width:'100%'}}
-                numColumns={'2'}
-                showsVerticalScrollIndicator={false}
-                data={list}
-                renderItem={({ item, index }) =>
-                    <View style={{margin:6,alignItems:'center'}}>
-                        <ImageBackground
-                            source={item.image}
-                            borderRadius={15}
-                            style={{width:190,height:178}}
-                        >
-                            <View style={{flexDirection:'row',flex:0.3}}>
-                                <View style={{flex:0.29}}>
-                                    <TouchableOpacity  style={[styles.iconBackground,{left:16,top:12}]}>
-                                        <Image
-                                            source={item.favimg}
-                                            style={[styles.icon,{}]}
-                                        />
-                                    </TouchableOpacity>
+            {/* <View style={{marginBottom:responsiveHeight(35)}}> */}
+                <FlatList
+                    style={{width:'100%'}}
+                    numColumns={'2'}
+                    showsVerticalScrollIndicator={false}
+                    data={list}
+                    renderItem={({ item, index }) =>
+                        <View style={{margin:6,alignItems:'center'}}>
+                            <ImageBackground
+                                source={item.image}
+                                borderRadius={15}
+                                style={{width:190,height:178}}
+                            >
+                                <View style={{flexDirection:'row',flex:0.3}}>
+                                    <View style={{flex:0.29}}>
+                                        <TouchableOpacity  style={[styles.iconBackground,{left:16,top:12}]}>
+                                            <Image
+                                                source={item.favimg}
+                                                style={[styles.icon,{}]}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{flex:0.8,alignItems:'flex-end'}}>
+                                        <TouchableOpacity  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
+                                            <Image
+                                                source={item.delimg}
+                                                style={styles.icon}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                                <View style={{flex:0.8,alignItems:'flex-end'}}>
-                                    <TouchableOpacity  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
-                                        <Image
-                                            source={item.delimg}
-                                            style={styles.icon}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style={{flex:0.4}}></View>
-                            <View style={{flex:0.3,width:'100%',alignItems:'center'}} >
-                            {item.unloc?
-                                <TouchableOpacity  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                    <Image
-                                        source={item.unloc}
-                                        style={[styles.icon,{width:15,height:19}]}
-                                    />
-                                </TouchableOpacity>
-                            :
-                            <>
-                                {item.play?
-                                    <TouchableOpacity  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                        <Image
-                                            source={item.play}
-                                            style={[styles.icon,{width:22,height:22}]}
-                                        />
-                                    </TouchableOpacity>
-                                :
+                                <View style={{flex:0.4}}></View>
+                                <View style={{flex:0.3,width:'100%',alignItems:'center'}} >
+                                {item.unloc?
                                 <>
-                                {item.pause?
-                                    <TouchableOpacity  style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
-                                        <Image
-                                            source={item.pause}
-                                            style={[styles.icon,{width:22.67,height:22.67}]}
-                                        />
-                                    </TouchableOpacity>
-                                :
-                                    <TouchableOpacity style={{justifyContent:'center',top:5}}  >
+                                    {!islock?
+                                        <TouchableOpacity onPress={()=> setislock(!islock)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                            <Image
+                                                source={item.unloc}
+                                                style={[styles.icon,{width:15,height:19}]}
+                                            />
+                                        </TouchableOpacity>
+                                    :
+                                    <TouchableOpacity onPress={()=> setislock(!islock)} style={{justifyContent:'center',top:5}}  >
                                         <Image
                                             source={item.download}
                                             style={[styles.icon,{width:34,height:34,}]}
                                         />
                                     </TouchableOpacity>
-                                }
+                                    }
                                 </>
-                                }
-                            </>
-                            }
+                                    
+                                :
+                                // <>
+                                //     {item.play?
+                                    <>
+                                        {!isplaying?
+                                            <TouchableOpacity onPress={()=> setisplaying(!isplaying)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                <Image
+                                                    source={item.play}
+                                                    style={[styles.icon,{width:22,height:22}]}
+                                                />
+                                            </TouchableOpacity>
+                                            :
+                                            <TouchableOpacity onPress={()=> setisplaying(!isplaying)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
+                                                <Image
+                                                    source={item.pause}
+                                                    style={[styles.icon,{width:22.67,height:22.67}]}
+                                                />
+                                            </TouchableOpacity>
+                                        }
+                                    </>
                                 
-                            </View>
-                        </ImageBackground>
-                    </View>
-                }
-            />
+                                // </>
+                                }
+                                    
+                                </View>
+                            </ImageBackground>
+                        </View>
+                    }
+                />
+            {/* </View> */}
+            {isplaying?
+                <Soundplayer/>
+                :
+            null}   
 
         </View>
     )

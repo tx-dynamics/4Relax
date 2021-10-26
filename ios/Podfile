@@ -12,6 +12,8 @@ target 'Four_Relax' do
     :hermes_enabled => false
   )
 
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
   target 'Four_RelaxTests' do
     inherit! :complete
     # Pods for testing

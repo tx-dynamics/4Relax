@@ -36,7 +36,7 @@ export default function setting(props) {
                 <Text style={[styles.title,{fontSize:12,top:12}]} >Version 1.0.1</Text>
                 <LinearGradient
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
-                    style={{height:52,width:'100%',borderRadius:10,marginTop:responsiveWidth(5),justifyContent:'center'}}
+                    style={styles.setting_btn}
                     >
                     <TouchableOpacity onPress={()=> props.navigation.navigate('Subscription')}  style={{flexDirection:'row',alignItems:'center'}}>
                         <Image
@@ -54,7 +54,7 @@ export default function setting(props) {
 
                 <LinearGradient
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
-                    style={{height:52,width:'100%',borderRadius:10,marginTop:responsiveWidth(5),justifyContent:'center'}}
+                    style={styles.setting_btn}
                     >
                         <View style={{flexDirection:'row'}}>
                             <TouchableOpacity style={{flexDirection:'row',alignItems:'center',width:'95%'}}>
@@ -79,7 +79,7 @@ export default function setting(props) {
 
                 <LinearGradient
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
-                    style={{height:52,width:'100%',borderRadius:10,marginTop:responsiveWidth(5),justifyContent:'center'}}
+                    style={styles.setting_btn}
                     >
                     <TouchableOpacity onPress={()=> props.navigation.navigate('Downloads')} style={{flexDirection:'row',alignItems:'center'}}>
                         <Image
@@ -97,7 +97,7 @@ export default function setting(props) {
 
                 <LinearGradient
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
-                    style={{height:52,width:'100%',borderRadius:10,marginTop:responsiveWidth(5),justifyContent:'center'}}
+                    style={styles.setting_btn}
                     >
                     <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}>
                         <Image

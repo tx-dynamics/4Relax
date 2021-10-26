@@ -27,3 +27,11 @@ export const option = require('./images/option.png');
 export const green = require('./images/green.png');
 export const lokc = require('./images/lokc.png');
 export const select = require('./images/selected.png');
+export const left = require('./images/left.png');
+export const pause = require('./images/pause.png');
+export const play = require('./images/play.png');
+export const del = require('./images/del.png');
+export const QRcode = require('./images/qr.png');
+export const bg = require('./images/m3.png');
+export const shuffle = require('./images/shuffle.png');
+
