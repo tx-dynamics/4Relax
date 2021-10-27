@@ -5,10 +5,12 @@ import {logo,cover,play,pause} from '../../assets'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 
 
-export default function playing() {
+export default function playing({props,onPres}) {
     return (
         <View style={{width:'100%',height:67,borderRadius:15,backgroundColor:'#012229',bottom:7,alignSelf: 'flex-end'}}>
-            <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >Meditate - Defeat your stress</Text>
+            <TouchableOpacity onPress={onPres} >
+                <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >Meditate - Defeat your stress</Text>
+            </TouchableOpacity>
             <View style={{flexDirection:'row',marginTop:8}}>
                 <View style={{flex:2}}>
                     <View style={{width:'90%',height:2,borderColor:'white',backgroundColor:'white',marginLeft:15}}/>

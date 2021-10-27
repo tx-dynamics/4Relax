@@ -167,7 +167,7 @@ export default class PlayerScreen extends React.Component{
                     }} >
                         <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(5)}} >
                             <View style={{flex:0.98}}>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
                                     <Image
                                         source={left}
                                         style={{width:7,height:14}}

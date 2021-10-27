@@ -30,7 +30,7 @@ export const loginUser = params => {
     dispatch(authLoading());
     try {
       const res = await axios.post(
-        `${BASE_URL}auth/login`,
+        `${BASE_URL}api/relax/user/login`,
         JSON.stringify(params),
         {
           headers: {
@@ -40,8 +40,8 @@ export const loginUser = params => {
         },
       );
       // return res;
-      if (res?.data?.logged) {
-        // console.log(res);
+      if (res?.data) {
+        console.log(res);
         return dispatch(loginSuccess(res));
       }
       return dispatch(authFailed(res));
@@ -56,7 +56,7 @@ export const registerUser = params => {
   return async dispatch => {
     try {
       const res = await axios.post(
-        `${BASE_URL}auth/signup`,
+        `${BASE_URL}api/relax/user/signup`,
         JSON.stringify(params),
         {
           headers: {
@@ -65,10 +65,14 @@ export const registerUser = params => {
           },
         },
       );
-      if (res?.data?.logged) {
-        // console.log(res);
+      if(res?.data){
+        console.log(res?.data);
         return dispatch(registerSuccess(res));
       }
+      // if (res?.data?.logged) {
+      //   console.log("calledddd************  " + res);
+      //   return dispatch(registerSuccess(res));
+      // }
       return dispatch(registerFAILED(err.response));
     } catch (err) {
       dispatch(registerFAILED(err.response));

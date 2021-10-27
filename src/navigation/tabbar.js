@@ -60,18 +60,18 @@ const setting = () => {
 const feed = () => {
   return (
     <Stack.Navigator>
-      
+      <Stack.Screen
+        name="Home"
+        component={Feed}
+        options={{headerShown: false}}
+      />      
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
       />
       
-      <Stack.Screen
-        name="Home"
-        component={Feed}
-        options={{headerShown: false}}
-      />
+
 
     </Stack.Navigator>
   );

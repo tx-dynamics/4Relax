@@ -30,7 +30,6 @@ const initialState = {
   isSuccess: false,
   errMsg: null,
   userData: null,
-  joinGroupData: null,
   status: '',
 };
 

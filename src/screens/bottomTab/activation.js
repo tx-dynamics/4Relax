@@ -40,7 +40,7 @@ export default function downloads(props) {
                     
                 }
                 centerComponent={
-                    <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff'}} >DOWNLOADS</Text>
+                    <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff'}} >ACTIVATION</Text>
                 }
             />
             

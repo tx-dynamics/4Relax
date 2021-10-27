@@ -89,7 +89,7 @@ const list = [
     }
 ]
 
-export default function feed() {
+export default function feed(props) {
 
     const [selected,setSelected ] =  useState(false)
     const [isplaying,setisplaying ] =  useState(false)
@@ -213,7 +213,7 @@ export default function feed() {
                 />
             {/* </View> */}
             {isplaying?
-                <Soundplayer/>
+                <Soundplayer onPres={()=>props.navigation.navigate('AudioPlayer')} />
                 :
             null}   
 
