@@ -89,7 +89,7 @@ export default function feed() {
                 <Text style={styles.title}>FAVORITES</Text>
                 <Image
                     source={logo}
-                    style={styles.img}
+                    style={[styles.img,{marginTop:responsiveHeight(15)}]}
                 />
                 
             </ImageBackground>
@@ -99,11 +99,11 @@ export default function feed() {
                 showsVerticalScrollIndicator={false}
                 data={list}
                 renderItem={({ item, index }) =>
-                    <View style={{margin:6,alignItems:'center'}}>
+                    <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                         <ImageBackground
                             source={item.image}
                             borderRadius={15}
-                            style={{width:190,height:178}}
+                            style={{width:'100%',height:178}}
                         >
                             <View style={{flexDirection:'row',flex:0.3}}>
                                 <View style={{flex:0.29}}>

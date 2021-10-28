@@ -47,7 +47,7 @@ export default function downloads(props) {
             <View style={{alignItems:'center',width:'90%',alignSelf:'center',marginTop:responsiveHeight(5)}}>
                 
                 <Text style={[styles.title,{fontSize:14,fontWeight:'500'}]} >Enter the code below or scan QR code</Text>
-                <View style={{width:'70%',flexDirection:'row',marginTop:responsiveHeight(3)}}>
+                <View style={{width:'100%',flexDirection:'row',alignSelf:'center',justifyContent:'center',marginTop:responsiveHeight(3)}}>
                     <View style={styles.code_cont} >
                         <TextInput
                             style={styles.code}

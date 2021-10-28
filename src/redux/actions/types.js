@@ -17,26 +17,22 @@ export const CREATE_ACTIVITY = 'CREATE_ACTIVITY';
 export const GET_ACTIVITY = 'GET_ACTIVITY';
 export const DELETE_ACTIVITY = 'DELETE_ACTIVITY';
 export const UPDATE_ACTIVITY = 'UPDATE_ACTIVITY';
-//group
-export const CREATE_GROUP = 'CREATE_GROUP';
-export const UPDATE_GROUP = 'GET_GROUP';
-export const JOIN_GROUP = 'JOIN_GROUP';
-export const LEAVE_GROUP = 'LEAVE_GROUP';
-export const INVITE_GROUP = 'INVITE_GROUP';
-export const RESPOND_INVITE_GROUP = 'RESPOND_INVITE_GROUP';
-export const REMOVE_PEOPLE_GROUP = 'REMOVE_PEOPLE_GROUP';
-export const SEND_MESSAGE_GROUP = 'SEND_MESSAGE_GROUP';
-export const GET_ALL_GROUP = 'GET_ALL_GROUP';
-export const GET_ALL_INVITE_GROUP = 'GET_ALL_INVITE_GROUP';
-export const GET_ALL_MESSAGE_GROUP = 'GET_ALL_MESSAGE_GROUP';
-export const GET_ALL_CHAT_GROUP = 'GET_ALL_CHAT_GROUP';
-//prayer
-export const CREATE_PRAYER = 'CREATE_PRAYER';
-export const GET_PRAYER = 'GET_PRAYER';
-export const DELETE_PRAYER = 'DELETE_PRAYER';
-export const UPDATE_PRAYER = 'UPDATE_PRAYER';
-//CHAT
-export const SEND_MSG = 'SEND_MSG';
-export const GET_CHAT = 'GET_CHAT';
-export const DELETE_CHAT = 'DELETE_CHAT';
-export const UPDATE_CHAT = 'UPDATE_CHAT';
+
+
+//mUSIC
+export const GET_MUSIC = 'GET_MUSIC';
+
+
+
+//STORIES
+// export const CREATE_PRAYER = 'CREATE_PRAYER';
+export const GET_STORIES = 'GET_STORIES';
+// export const DELETE_PRAYER = 'DELETE_PRAYER';
+// export const UPDATE_PRAYER = 'UPDATE_PRAYER';
+
+
+//MEDITATION
+// export const SEND_MSG = 'SEND_MSG';
+export const GET_MEDITATIONS = 'GET_MEDITATIONS';
+// export const DELETE_CHAT = 'DELETE_CHAT';
+// export const UPDATE_CHAT = 'UPDATE_CHAT';

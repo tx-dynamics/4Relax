@@ -48,6 +48,7 @@ const  SignUp = (props) => {
     const [confirmpass,setconfirmpass] = useState('');
     const [fullName,setfullName] = useState('');
     const [switchEye,setswitchEye] = useState(false);
+    const [conswitchEye,setCoswitchEye] = useState(false);
     const [emailMessage, setemailMessage] = useState('');
     const [passwordMessage, setpasswordMessage] = useState('');
     const [confirmMessage, setconfirmMessage] = useState('');
@@ -240,16 +241,21 @@ const  SignUp = (props) => {
                         />
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
                         <Text style={[styles.labelstyle,{marginTop:20}]}>Password</Text>
-                        <TextInput
-                            value={password}
-                            onChangeText={value => setPassword(value)}
-                            placeholder='********'
-                            placeholderTextColor={'#CCCCCC'}
-                            secureTextEntry={switchEye? true : false}
-                            style={[styles.input,{
-                              borderBottomColor: passwordMessage !== '' ? 'tomato' : '#CCCCCC'
-                            }]}
-                        />
+                        <View style={{
+                          borderBottomColor: confirmMessage !== '' ? 'tomato' : '#CCCCCC',borderBottomWidth:1
+                        }} >
+                          <TextInput
+                              value={password}
+                              onChangeText={value => setPassword(value)}
+                              placeholder='********'
+                              placeholderTextColor={'#CCCCCC'}
+                              secureTextEntry={!switchEye? true : false}
+                              style={[styles.input,{
+                                width:'90%',borderBottomWidth:0
+                              }]}
+                          />
+                        </View>
+                        
                         <View style={{width:'100%',alignItems:'flex-end',bottom:responsiveHeight(2.5)}}> 
                         {switchEye?
                             <TouchableOpacity
@@ -274,20 +280,23 @@ const  SignUp = (props) => {
                         </View>
                         {passwordMessage !== '' && <Errors errors={passwordMessage} />}
                         <Text style={[styles.labelstyle,{marginTop:10}]}>Confirm Password</Text>
+                        <View style={{
+                          borderBottomColor: confirmMessage !== '' ? 'tomato' : '#CCCCCC',borderBottomWidth:1
+                        }} >
                         <TextInput
                             value={confirmpass}
                             onChangeText={value => setconfirmpass(value)}
                             placeholder='********'
                             placeholderTextColor={'#CCCCCC'}
-                            secureTextEntry={switchEye? true : false}
-                            style={[styles.input,{
-                              borderBottomColor: confirmMessage !== '' ? 'tomato' : '#CCCCCC'
-                            }]}
+                            secureTextEntry={!conswitchEye? true : false}
+                            style={[styles.input,{width:'90%',borderBottomWidth:0}]}
                         />
+                        </View>
+                        
                         <View style={{width:'100%',alignItems:'flex-end',bottom:responsiveHeight(2.5)}}> 
-                        {switchEye?
+                        {conswitchEye?
                             <TouchableOpacity
-                                onPress={()=> setswitchEye(false)}
+                                onPress={()=> setCoswitchEye(false)}
                                 
                             >
                                 <Image
@@ -297,7 +306,7 @@ const  SignUp = (props) => {
                             </TouchableOpacity>
                             :
                             <TouchableOpacity
-                                onPress={()=> setswitchEye(true)}
+                                onPress={()=> setCoswitchEye(true)}
                             >
                                 <Image
                                     source={passeye}

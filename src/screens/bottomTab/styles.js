@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     img:{
         width:69,
         height:23,
-        top:104,
+        // marginTop:responsiveHeight(13),
         alignSelf:'flex-end',
         right:12
     },

@@ -8,7 +8,7 @@ import {
     responsiveWidth,
   } from 'react-native-responsive-dimensions';
   import LinearGradient from 'react-native-linear-gradient';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 
 
@@ -21,6 +21,7 @@ export default function setting(props) {
         <LinearGradient
         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
         style={{flex:1}}>
+            <ScrollView showsVerticalScrollIndicator={false}>
             <TouchableOpacity onPress={()=> props.navigation.goBack()}>
                 <Image
                     source={cross}
@@ -143,13 +144,14 @@ export default function setting(props) {
 
                 <LinearGradient
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
-                    style={{width:'100%',height:48,borderRadius:10,marginTop:responsiveHeight(6),justifyContent:'center'}}>
-                        <TouchableOpacity>
+                    style={{width:'100%',height:48,borderRadius:10,marginTop:responsiveHeight(6),marginBottom:responsiveHeight(5),justifyContent:'center'}}>
+                        <TouchableOpacity onPress={()=> props.navigation.navigate('Activation')}>
                             <Text style={[styles.price,{fontWeight:'500',fontSize:14,color:'#ffff'}]} >I have an activation code</Text>
                         </TouchableOpacity>
                 </LinearGradient>                                
 
             </View>
+            </ScrollView>
         </LinearGradient>
     )
 }

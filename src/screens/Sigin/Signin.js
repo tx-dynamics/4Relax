@@ -150,16 +150,21 @@ const Signin  =  props => {
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
 
                         <Text style={[styles.labelstyle,{fontSize:16,fontFamily:'Poppins',top:30}]}>Password</Text>
-                        <TextInput
+                        <View style={{
+                          borderBottomColor: passwordMessage !== '' ? 'tomato' : '#CCCCCC',borderBottomWidth:1
+                        }} >
+                          <TextInput
                             value={password}
                             onChangeText={value => setPassword(value)}
                             placeholder='********'
                             placeholderTextColor={'#CCCCCC'}
-                            secureTextEntry={switchEye? true : false}
+                            secureTextEntry={!switchEye? true : false}
                             style={[styles.input,{marginTop:responsiveHeight(3.8),
-                                borderBottomColor:passwordMessage !== '' ? 'tomato' : '#CCCCCC'
+                                borderBottomWidth:0
                             }]}
                         />
+                        </View>
+                        
                         <View style={{width:'100%',alignItems:'flex-end',bottom:responsiveHeight(2.5)}}> 
                         {switchEye?
                             <TouchableOpacity

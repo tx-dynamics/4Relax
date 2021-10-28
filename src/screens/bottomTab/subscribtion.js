@@ -8,7 +8,7 @@ import {
     responsiveWidth,
   } from 'react-native-responsive-dimensions';
   import LinearGradient from 'react-native-linear-gradient';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 
 
@@ -21,6 +21,7 @@ export default function setting(props) {
         <LinearGradient
         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
         style={{flex:1}}>
+            <ScrollView showsVerticalScrollIndicator={false} >
             <TouchableOpacity onPress={()=> props.navigation.goBack()}>
                 <Image
                     source={cross}
@@ -44,21 +45,21 @@ export default function setting(props) {
                         source={check}
                         style={{width:25,height:25}}
                     />
-                    <Text style={{width:178,fontWeight:'400',fontSize:14,marginLeft:responsiveWidth(3)}} >Access to 100+ sleep sounds to clam you down</Text>
+                    <Text style={{width:178,fontWeight:'400',color:'white',fontSize:14,marginLeft:responsiveWidth(3)}} >Access to 100+ sleep sounds to clam you down</Text>
                 </View>
                 <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(3)}}>
                     <Image
                         source={check}
                         style={{width:25,height:25}}
                     />
-                    <Text style={{width:178,fontWeight:'400',fontSize:14,marginLeft:responsiveWidth(3)}} >A colllection of sleep stories to help you sleep better</Text>
+                    <Text style={{width:178,fontWeight:'400',color:'white',fontSize:14,marginLeft:responsiveWidth(3)}} >A colllection of sleep stories to help you sleep better</Text>
                 </View>
                 <View style={{flexDirection:'row',alignItems:'center',marginTop:responsiveHeight(3)}}>
                     <Image
                         source={check}
                         style={{width:25,height:25}}
                     />
-                    <Text style={{width:220,fontWeight:'400',fontSize:14,marginLeft:responsiveWidth(3)}} >100+ guided sleep meditation to reduce anxiety and stres levels</Text>
+                    <Text style={{width:220,fontWeight:'400',color:'white',fontSize:14,marginLeft:responsiveWidth(3)}} >100+ guided sleep meditation to reduce anxiety and stres levels</Text>
                 </View>
             </View>
             <View style={{flexDirection:'row',marginTop:responsiveHeight(10),alignItems:'center',alignSelf:'center'}} >
@@ -72,20 +73,20 @@ export default function setting(props) {
                                 style={{width:18.4,height:4.4,marginTop:responsiveHeight(1.8),marginLeft:responsiveWidth(1.5)}}
                             />
                         </TouchableOpacity>
-                        <Text style={{marginLeft:responsiveWidth(1.4),fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >For a month</Text>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(2)}}>
+                        <Text style={{marginLeft:responsiveWidth(1.4),color:'white',fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >For a month</Text>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1.5)}}>
                             <Image
                                 source={green}
                                 style={{width:9.99,height:11,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
                         </View>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.9),alignItems:'center',marginTop:responsiveHeight(1.2)}}>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.9),alignItems:'center',marginTop:responsiveHeight(1)}}>
                             <Image
                                 source={lokc}
                                 style={{width:6.72,height:9.67,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(2.5)}} >Meditation</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(2.5)}} >Meditation</Text>
                         </View>
                     </View>
                     <View style={{width:76,height:22,borderRadius:13,backgroundColor:'white',flexDirection:'row',alignItems:'center',justifyContent:'center',alignSelf:'center',marginTop:responsiveHeight(1.2)}}>
@@ -107,20 +108,20 @@ export default function setting(props) {
                                 style={{width:18.4,height:4.4,marginTop:responsiveHeight(1.8),marginLeft:responsiveWidth(1.5)}}
                             />
                         </TouchableOpacity>
-                        <Text style={{marginLeft:responsiveWidth(1.4),fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >For a year</Text>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(2)}}>
+                        <Text style={{marginLeft:responsiveWidth(1.4),color:'white',fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >For a year</Text>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1.5)}}>
                             <Image
                                 source={green}
-                                style={{width:9.99,height:9.99,alignSelf:'center'}}
+                                style={{width:9.99,height:11,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
                         </View>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1.2)}}>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1)}}>
                             <Image
                                 source={green}
-                                style={{width:9.99,height:9.99,alignSelf:'center'}}
+                                style={{width:9.99,height:11,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Meditation</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Meditation</Text>
                         </View>
                     </View>
 
@@ -136,27 +137,28 @@ export default function setting(props) {
                                 style={{width:18.4,height:4.4,marginTop:responsiveHeight(1.8),marginLeft:responsiveWidth(1.5)}}
                             />
                         </TouchableOpacity>
-                        <Text style={{marginLeft:responsiveWidth(1.4),fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >Lifetime Plan</Text>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(2)}}>
+                        <Text style={{marginLeft:responsiveWidth(1.4),color:'white',fontWeight:'500',fontFamily:'Lato',fontSize:14,marginTop:responsiveHeight(3)}} >Lifetime Plan</Text>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1.5)}}>
                             <Image
                                 source={green}
-                                style={{width:9.99,height:9.99,alignSelf:'center'}}
+                                style={{width:9.99,height:11,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Sounds</Text>
                         </View>
-                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1.2)}}>
+                        <View style={{flexDirection:'row',marginLeft:responsiveWidth(1.4),alignItems:'center',marginTop:responsiveHeight(1)}}>
                             <Image
                                 source={green}
-                                style={{width:9.99,height:9.99,alignSelf:'center'}}
+                                style={{width:9.99,height:11,alignSelf:'center'}}
                             />
-                            <Text style={{fontSize:12,fontWeight:'400',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Meditation</Text>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'white',fontFamily:'Lato',marginLeft:responsiveWidth(1.8)}} >Meditation</Text>
                         </View>
                     </View>
 
                 </LinearGradient>
 
             </View>
-            <Text style={{alignSelf:'center',fontFamily:'Lato',fontWeight:'600',fontSize:12,marginTop:responsiveHeight(7.9)}} >Try a week free and then null/month</Text>
+            <Text style={{alignSelf:'center',fontFamily:'Lato',color:'white',fontWeight:'600',fontSize:12,marginTop:responsiveHeight(6),marginBottom:responsiveHeight(5)}} >Try a week free and then null/month</Text>
+            </ScrollView>
         </LinearGradient>
     )
 }

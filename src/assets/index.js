@@ -34,4 +34,6 @@ export const del = require('./images/del.png');
 export const QRcode = require('./images/qr.png');
 export const bg = require('./images/m3.png');
 export const shuffle = require('./images/shuffle.png');
+export const unloc = require('./images/lock.png');
+export const download = require('./images/download.png');
 

@@ -1,6 +1,5 @@
-import React,{useState} from 'react'
-import {View,Text,ImageBackground,Image,FlatList} from 'react-native'
-import {logo,cover} from '../../assets'
+import React,{useState,useEffect} from 'react'
+import {View,Text,ImageBackground,Image,FlatList, Dimensions} from 'react-native'
 import {
     responsiveHeight,
     responsiveScreenHeight,
@@ -11,6 +10,10 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 import Soundplayer from './playing'
+import {connect} from 'react-redux';
+import {useIsFocused} from '@react-navigation/native';
+import {get_allmeditation} from '../../redux/actions/meditation';
+import {unloc,pause,play,download,fav,logo,del,cover} from '../../assets'
 
 const data =[
     {
@@ -89,11 +92,35 @@ const list = [
     }
 ]
 
-export default function feed(props) {
+ const feed = (props) => {
 
+    const isFocused = useIsFocused();
     const [selected,setSelected ] =  useState(false)
     const [isplaying,setisplaying ] =  useState(false)
     const [islock,setislock ] =  useState(false)
+    const [item,setitem ] =  useState()
+    const [meditations,setmeditations ] =  useState()
+
+    useEffect(() => {
+        getMeditation()
+    }, [isFocused])
+    
+    async function getMeditation() {
+        try {
+          const res = await props.get_allmeditation();
+          console.log('group_data', res);
+          if (res?.data) {
+            setmeditations(res?.data);
+          }
+        //   setloadingGroup(false);
+        } catch (err) {
+        //   setloadingGroup(false);
+          alert(err);
+        }
+        // if (props?.all_group_data) {
+        //   setgroupDetail(props?.all_group_data[0]);
+        // }
+      }
 
     return (
         <View style={{flex:1,backgroundColor:'#00303A'}}>
@@ -102,6 +129,7 @@ export default function feed(props) {
                 style={styles.imgBackground}
             >
                 <Text style={styles.title}>MEDITATION</Text>
+                <View style={{height:'50%'}} />
                 <Image
                     source={logo}
                     style={styles.img}
@@ -112,7 +140,7 @@ export default function feed(props) {
                   showsHorizontalScrollIndicator={false}
                   data={data}
                   renderItem={({ item, index }) =>
-                  <View style={{top:responsiveHeight(14)}}>
+                  <View style={{marginTop:responsiveHeight(1)}}>
                       {item.selected?
                        <LinearGradient
                         colors={['rgba(0, 194, 255, 1)',  'rgba(0, 194, 255, 0.6)']}
@@ -135,27 +163,29 @@ export default function feed(props) {
                     style={{width:'100%'}}
                     numColumns={'2'}
                     showsVerticalScrollIndicator={false}
-                    data={list}
+                    data={meditations}
                     renderItem={({ item, index }) =>
-                        <View style={{margin:6,alignItems:'center'}}>
+                        <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                             <ImageBackground
-                                source={item.image}
+                                source={{uri:item.coverPic}}
                                 borderRadius={15}
-                                style={{width:190,height:178}}
+                                style={{width:'100%',height:178}}
                             >
                                 <View style={{flexDirection:'row',flex:0.3}}>
                                     <View style={{flex:0.29}}>
                                         <TouchableOpacity  style={[styles.iconBackground,{left:16,top:12}]}>
                                             <Image
-                                                source={item.favimg}
-                                                style={[styles.icon,{}]}
+                                                source={fav}
+                                                style={[styles.icon,{
+                                                    tintColor: item.liked? '#FF4040' :'white'
+                                                }]}
                                             />
                                         </TouchableOpacity>
                                     </View>
                                     <View style={{flex:0.8,alignItems:'flex-end'}}>
                                         <TouchableOpacity  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
                                             <Image
-                                                source={item.delimg}
+                                                source={del}
                                                 style={styles.icon}
                                             />
                                         </TouchableOpacity>
@@ -168,14 +198,14 @@ export default function feed(props) {
                                     {!islock?
                                         <TouchableOpacity onPress={()=> setislock(!islock)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                             <Image
-                                                source={item.unloc}
+                                                source={unloc}
                                                 style={[styles.icon,{width:15,height:19}]}
                                             />
                                         </TouchableOpacity>
                                     :
                                     <TouchableOpacity onPress={()=> setislock(!islock)} style={{justifyContent:'center',top:5}}  >
                                         <Image
-                                            source={item.download}
+                                            source={download}
                                             style={[styles.icon,{width:34,height:34,}]}
                                         />
                                     </TouchableOpacity>
@@ -187,16 +217,20 @@ export default function feed(props) {
                                 //     {item.play?
                                     <>
                                         {!isplaying?
-                                            <TouchableOpacity onPress={()=> setisplaying(!isplaying)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                            <TouchableOpacity onPress={()=> {
+                                                setitem(item)
+                                                setisplaying(!isplaying)
+                                                }}
+                                                style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                 <Image
-                                                    source={item.play}
+                                                    source={play}
                                                     style={[styles.icon,{width:22,height:22}]}
                                                 />
                                             </TouchableOpacity>
                                             :
                                             <TouchableOpacity onPress={()=> setisplaying(!isplaying)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
                                                 <Image
-                                                    source={item.pause}
+                                                    source={pause}
                                                     style={[styles.icon,{width:22.67,height:22.67}]}
                                                 />
                                             </TouchableOpacity>
@@ -213,10 +247,21 @@ export default function feed(props) {
                 />
             {/* </View> */}
             {isplaying?
-                <Soundplayer onPres={()=>props.navigation.navigate('AudioPlayer')} />
+                <Soundplayer single={item} onPres={()=>props.navigation.navigate('AudioPlayer')} />
                 :
             null}   
 
         </View>
     )
 }
+const mapStateToProps = state => {
+    const {userData} = state.auth;
+    
+    return {
+      userData,
+    };
+  };
+  export default connect(mapStateToProps, {
+    get_allmeditation,
+  })(feed);
+  
