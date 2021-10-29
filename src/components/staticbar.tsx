@@ -28,6 +28,7 @@ export default class StaticTabbar extends React.PureComponent<StaticTabbarProps>
 
   onPress = (index: number) => {
     const { value, tabs } = this.props;
+    // console.log(index+" " +value +" "+ tabs )
     const tabWidth = width / tabs.length;
     Animated.sequence([
       Animated.parallel(

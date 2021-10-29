@@ -147,7 +147,7 @@ const  SignUp = (props) => {
             if (res?.payload?.data) {
               console.log('called if signup')
               setLoading(false);
-              props.navigation.navigate('Root');
+              props.navigation.navigate('Signin');
               Snackbar.show({
                 text: 'Signup succesfully',
                 backgroundColor: '#018CAB',
@@ -352,7 +352,7 @@ const  SignUp = (props) => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <View style={{top:responsiveHeight(10),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                        <View style={{marginTop:responsiveHeight(6),marginBottom:responsiveHeight(4),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
                             <Text style={[styles.labelstyle,{fontSize:12}]}>Already have an account ? </Text>
                             <TouchableOpacity onPress={()=> props.navigation.goBack()}>
                                 <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign In</Text>

@@ -58,7 +58,7 @@ export const authReducer = (state = initialState, action) => {
       // console.log('here');
       return {
         ...state,
-        userData: action.payload.data.user,
+        userData: action.payload.data,
         token: action.payload.data.token,
         isLoggedIn: true,
         isLoading: false,

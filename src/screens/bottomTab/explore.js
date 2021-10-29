@@ -10,30 +10,34 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 import {useIsFocused} from '@react-navigation/native';
-import {get_allStories} from '../../redux/actions/stories';
+import {get_allStories,set_fav} from '../../redux/actions/stories';
 import {connect} from 'react-redux';
 import {unloc,pause,play,download,fav,logo,del,stories} from '../../assets'
 import Soundplayer from './playing'
+import Snackbar from 'react-native-snackbar';
 
 const data =[
     {
+        id:0,
         name:'Meditate',
         selected:false
     },
     {
-        name:'Sleep',
+        id:1,
+        name:'sleep',
         selected:true
     },
     {
+        id:2,
         name:'Calm',
         selected:false
     },
     {
+        id:3,
         name:'Calm Sound',
         selected:false
     },
 ]
-
 
 
     const story = (props) => {
@@ -43,18 +47,40 @@ const data =[
     const isFocused = useIsFocused();
     const [item,setitem ] =  useState();
     const [meditations,setmeditations ] =  useState();
+    const [category,setcategory ] =  useState(data)
 
     useEffect(() => {
         getStories()
     }, [isFocused])
     
-    async function getStories() {
+    async function getStories(cate = '') {
         try {
           const res = await props.get_allStories();
-          console.log('group_data', res);
+        //   console.log('group_data', res);
           if (res?.data) {
-            setmeditations(res?.data);
-          }
+            if(cate === ''){
+              setmeditations(res?.data)
+            }else{
+              //   alert('calling cate')
+              setmeditations()
+
+              var filtered = []; 
+              res?.data.map((item)=>{
+                  filtered.push(item)
+              })
+             
+              var getFilter = [];
+
+              filtered.map((item)=>{
+                  if(item.trackCategory === cate){
+                      getFilter.push(item);
+                  }else{
+                      setmeditations()
+                  }
+              })
+              setmeditations(getFilter)
+            }
+        }
         //   setloadingGroup(false);
         } catch (err) {
         //   setloadingGroup(false);
@@ -64,6 +90,79 @@ const data =[
         //   setgroupDetail(props?.all_group_data[0]);
         // }
       }
+
+      async function  favourities(item){
+        const params = {
+            trackId: item._id,
+            trackType: "meditation",
+            trackFile:item.trackFile,
+            coverPic:item.coverPic,
+            userId:props?.userData?.token
+          };
+            // console.log(params)
+          try {
+            const res = await props.set_fav(params);
+            // console.log('group_data', res);
+            if (res?.data) {
+                console.log(res?.data)
+                getStories()
+                Snackbar.show({
+                    text: res?.data,
+                    backgroundColor: '#018CAB',
+                    textColor: 'white',
+                  });
+            //   setmeditations(res?.data);
+            }
+          //   setloadingGroup(false);
+          } catch (err) {
+          //   setloadingGroup(false);
+            alert(err);
+          }
+    }
+
+    async function getcate(item,id){
+        console.log(item.selected)
+        if(item.selected){
+            // alert('called if')
+                const    res = category.map((item) => {
+                if (item.id === id) {
+                  // console.log('Item-image==>',item.loadimage)
+                  return {
+                    ...item,
+                    selected: false,
+                  };
+                } else {
+                  return {
+                    ...item,
+                    // loadimage: false,
+                  };
+                }
+              });
+              setcategory(res);
+
+            }else{
+            const res = category.map((item) => {
+                if (item.id === id) {
+                  // console.log('Item-image==>',item.loadimage)
+                //   alert(item.name)
+                getStories(item.name)
+                  return {
+                    ...item,
+                    selected: true,
+                  };
+                } else {
+                  return {
+                    ...item,
+                    selected: false,
+                  };
+                }
+              });
+          setcategory(res);
+
+        }
+        
+      
+    }
 
     return (
         <View style={{flex:1,backgroundColor:'#00303A'}}>
@@ -81,7 +180,7 @@ const data =[
                   style={{width:'100%'}}
                   horizontal={true}
                   showsHorizontalScrollIndicator={false}
-                  data={data}
+                  data={category}
                   renderItem={({ item, index }) =>
                   <View style={{marginTop:responsiveHeight(1)}}>
                       {item.selected?
@@ -89,12 +188,12 @@ const data =[
                         colors={['rgba(0, 194, 255, 1)',  'rgba(0, 194, 255, 0.6)']}
                        style={styles.cate}
                        >
-                            <TouchableOpacity>
+                            <TouchableOpacity  onPress={()=> getcate(item,item.id) } >
                                 <Text style={{color:'black'}}>{item.name}</Text>
                             </TouchableOpacity>
                         </LinearGradient>
                       :
-                      <TouchableOpacity style={[styles.cate,{backgroundColor:'white'}]}>
+                      <TouchableOpacity  onPress={()=> getcate(item,item.id) } style={[styles.cate,{backgroundColor:'white'}]}>
                             <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
                         </TouchableOpacity>
                       }
@@ -115,11 +214,11 @@ const data =[
                             >
                                 <View style={{flexDirection:'row',flex:0.3}}>
                                     <View style={{flex:0.29}}>
-                                        <TouchableOpacity  style={[styles.iconBackground,{left:16,top:12}]}>
+                                        <TouchableOpacity onPress={()=> favourities(item)}  style={[styles.iconBackground,{left:16,top:12}]}>
                                             <Image
                                                 source={fav}
                                                 style={[styles.icon,{
-                                                    tintColor: item.liked? '#FF4040' :'white'
+                                                    tintColor: item.liked === 'no'? 'white' :'#FF4040'
                                                 }]}
                                             />
                                         </TouchableOpacity>
@@ -204,5 +303,5 @@ const mapStateToProps = state => {
     };
   };
   export default connect(mapStateToProps, {
-    get_allStories,
+    get_allStories,set_fav
   })(story);

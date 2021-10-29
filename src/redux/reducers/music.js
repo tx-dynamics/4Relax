@@ -1,5 +1,5 @@
 import {LOADING_MEDITATION, MEDITATION_FAILED} from '../actions/meditation';
-import {DELETE_CHAT, GET_MUSIC, SEND_MSG, UPLOAD_DOCS} from '../actions/types';
+import {DELETE_CHAT, GET_MUSIC,SET_FAV, SEND_MSG, UPLOAD_DOCS} from '../actions/types';
 
 const initialState = {
   userId: '',
@@ -24,6 +24,18 @@ export const ChatReducer = (state = initialState, action) => {
         message: null,
       };
     case GET_MUSIC:
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        isSuccess: true,
+        errMsg: null,
+        message: '',
+        msg: action.payload,
+
+      };
+
+      case SET_FAV:
       return {
         ...state,
         isLoading: false,

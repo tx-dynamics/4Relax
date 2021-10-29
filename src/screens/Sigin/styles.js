@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     fontSize:18,
     fontWeight:'500',
     fontFamily:'Lato',
-    color:'white'
+    color:'#FFFFFF'
   },
   loginbtn:{
     height:48,

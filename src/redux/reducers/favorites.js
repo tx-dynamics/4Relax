@@ -1,5 +1,5 @@
-import {LOADING_MEDITATION, MEDITATION_FAILED} from '../actions/meditation';
-import {DELETE_CHAT, GET_MEDITATIONS, SET_FAV, UPLOAD_DOCS} from '../actions/types';
+import {LOADING_FAVORITES, MEDITATION_FAILED} from '../actions/meditation';
+import {DELETE_CHAT, GET_FAVORITES, SET_FAV, UPLOAD_DOCS} from '../actions/types';
 
 const initialState = {
   userId: '',
@@ -12,9 +12,9 @@ const initialState = {
   status: '',
   msg: null,
 };
-export const MeditationReducer = (state = initialState, action) => {
+export const FavoritesReducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOADING_MEDITATION:
+    case LOADING_FAVORITES:
       return {
         ...state,
         isLoading: true,
@@ -23,7 +23,7 @@ export const MeditationReducer = (state = initialState, action) => {
         errMsg: null,
         message: null,
       };
-    case GET_MEDITATIONS:
+    case GET_FAVORITES:
       return {
         ...state,
         isLoading: false,

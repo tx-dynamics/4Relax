@@ -121,14 +121,8 @@ const logingoogle = res => ({
   type: GOOGLE_LOGIN,
   payload: res,
 });
-const creategroup = res => ({
-  type: CREATE_GROUP,
-  payload: res,
-});
-const groupFail = res => ({
-  type: GROUP_FAIL,
-  payload: res,
-});
+
+
 const authLoading = () => ({
   type: AUTH_LOADING,
 });

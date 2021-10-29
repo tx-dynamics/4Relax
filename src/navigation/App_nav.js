@@ -3,7 +3,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import {View, LogBox, PermissionsAndroid, NativeModules} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
+// import { StripeProvider } from '@stripe/stripe-react-native';
 
 // import Signin from '../screens/Signin';
 // import Splash from '../screens/Splash';
@@ -24,20 +24,25 @@ function AppNav({}) {
     <NavigationContainer
       // independent={true}
     >
+      {/* <StripeProvider
+      publishableKey={publishableKey}
+      merchantIdentifier="merchant.identifier"
+    > */}
 
-      <Stack.Navigator initialRouteName={initial}>
-        <Stack.Screen
-          name="Auth"
-          component={AuthenticationStack}
-          options={{
-            headerShown: false,
-          }}
-        />
+        <Stack.Navigator initialRouteName={initial}>
+          <Stack.Screen
+            name="Auth"
+            component={AuthenticationStack}
+            options={{
+              headerShown: false,
+            }}
+          />
 
-        <Stack.Screen name="Root" options={{headerShown: false}}>
-          {props => <BottomTab {...props} />}
-        </Stack.Screen>
+          <Stack.Screen name="Root" options={{headerShown: false}}>
+            {props => <BottomTab {...props} />}
+          </Stack.Screen>
       </Stack.Navigator>
+      {/* </StripeProvider> */}
     </NavigationContainer>
   );
 }

@@ -18,16 +18,16 @@ export default function playing({props,onPres,single}) {
     
     useEffect(() => {
             // alert('called')
-            play();
+            // play();
             
-            var timeout = setInterval(() => {
-                if(sound && sound.isLoaded() && playState == 'playing' && !sliderEditing){
-                    sound.getCurrentTime((seconds, isPlaying) => {
-                       setplaySeconds(seconds)
-                        // this.setState({playSeconds:seconds});
-                    })
-                }
-            }, 100);
+            // var timeout = setInterval(() => {
+            //     if(sound && sound.isLoaded() && playState == 'playing' && !sliderEditing){
+            //         sound.getCurrentTime((seconds, isPlaying) => {
+            //            setplaySeconds(seconds)
+            //             // this.setState({playSeconds:seconds});
+            //         })
+            //     }
+            // }, 100);
     }, [])
 
 
@@ -46,7 +46,7 @@ export default function playing({props,onPres,single}) {
     }
      async function play  () {
         // alert("bad")
-        var sound = new Sound({uri : single.musicFile}, (error) => {
+        var sound = new Sound({uri : single.trackFile}, (error) => {
         // alert("bad2")
             
             if (error) {
@@ -101,7 +101,7 @@ export default function playing({props,onPres,single}) {
     return (
         <View style={{width:'100%',height:87,borderRadius:15,backgroundColor:'#012229',bottom:7,alignSelf: 'flex-end'}}>
             <TouchableOpacity onPress={onPres} >
-                <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{single.musicName}</Text>
+                <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{single.trackName? single.trackName : single.trackType}</Text>
             </TouchableOpacity>
             <View style={{flexDirection:'row',marginTop:8}}>
                 <View style={{flex:2}}>

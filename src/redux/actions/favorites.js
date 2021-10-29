@@ -1,16 +1,16 @@
 import axios from 'axios';
 import {BASE_URL} from '../base-url';
-import {GET_ALL_MESSAGE_GROUP, GET_STORIES,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
+import {GET_ALL_MESSAGE_GROUP, GET_FAVORITES,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
 //Local Types
-export const STORIES_FAILED = 'STORIES_FAILED';
-export const LOADING_STORIES = 'LOADING_STORIES';
+export const FAVORITES_FAILED = 'FAVORITES_FAILED';
+export const LOADING_FAVORITES = 'LOADING_FAVORITES';
 
-export const get_allStories = () => {
+export const get_allFAVORITES = () => {
 //   console.log(rid);
   return async dispatch => {
     // dispatch(chatLoading());
     try {
-      const res = await axios.get(`${BASE_URL}api/relax/stories/getAll`, {
+      const res = await axios.get(`${BASE_URL}api/relax/favorites/getAll`, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export const get_allStories = () => {
       return res;
     } catch (err) {
       console.log(err.response.data);
-      dispatch(chatFailed(err.response));
+      dispatch(meditatFailed(err.response));
     }
   };
 };
@@ -51,7 +51,7 @@ export const set_fav = params => {
 //helper
 
 const getmsg = res => ({
-  type: GET_STORIES,
+  type: GET_FAVORITES,
   payload: res,
 });
 
@@ -61,10 +61,10 @@ const getfav = res => ({
 });
 
 const meditatLoading = () => ({
-  type: LOADING_STORIES,
+  type: LOADING_FAVORITES,
 });
 
 const meditatFailed = res => ({
-  type: STORIES_FAILED,
+  type: FAVORITES_FAILED,
   payload: res,
 });

@@ -22,7 +22,8 @@ export const UPDATE_ACTIVITY = 'UPDATE_ACTIVITY';
 //mUSIC
 export const GET_MUSIC = 'GET_MUSIC';
 
-
+//FAVORITES
+export const GET_FAVORITES = 'GET_FAVORITES';
 
 //STORIES
 // export const CREATE_PRAYER = 'CREATE_PRAYER';
@@ -34,5 +35,7 @@ export const GET_STORIES = 'GET_STORIES';
 //MEDITATION
 // export const SEND_MSG = 'SEND_MSG';
 export const GET_MEDITATIONS = 'GET_MEDITATIONS';
+export const SET_FAV = 'SET_FAV';
+
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';
