@@ -1,11 +1,11 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect,useRef} from 'react'
 import {View,Text,TouchableOpacity,Slider,Image} from 'react-native'
 import styles from './styles'
 import {logo,cover,play,pause} from '../../assets'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import Sound from 'react-native-sound';
 
-const sliderEditing = false;
+// const sliderEditing = false;
 const img_pause = require('../../assets/images/pause.png');
 const img_play = require('../../assets/images/play.png');
 
@@ -13,31 +13,52 @@ export default function playing({props,onPres,single}) {
     const [playState,setplayState ] =  useState('paused')
     const [playSeconds,setplaySeconds ] =  useState(0)
     const [duration,setduration ] =  useState(0)
-    const sliderEditing = false;
-    const sound = '';
+    const [sound,setSound ] =  useState()
+    const [sliderEditing,setsliderEditing ] =  useState(false)
+    var timeout ;
     
     useEffect(() => {
             // alert('called')
-            // play();
-            
-            // var timeout = setInterval(() => {
-            //     if(sound && sound.isLoaded() && playState == 'playing' && !sliderEditing){
-            //         sound.getCurrentTime((seconds, isPlaying) => {
-            //            setplaySeconds(seconds)
-            //             // this.setState({playSeconds:seconds});
-            //         })
-            //     }
-            // }, 100);
-    }, [])
+            // console.log(sound)
 
+            play();
+            setTimeout(() => {
+                timeout = setInterval(() => {
+                    // console.log(sound)
+                    if(sound && sound.isLoaded() && playState == 'playing' && !sliderEditing){
+                        alert("fokfofkorkfor")
+                        sound.getCurrentTime((seconds, isPlaying) => {
+                            alert(seconds)
+                            setplaySeconds(seconds)
+                            // this.setState({playSeconds:seconds});
+                        })
+                    }   
+                }, 100);    
+            }, 1000);
+            
+            
+    }, [uncheck])
+
+    const uncheck =()=>{
+        if(sound){
+            sound.release();
+            sound = null;
+        }
+        if(timeout){
+            clearInterval(timeout);
+        }
+    }
 
     const onSliderEditStart = () => {
-        sliderEditing = true;
+        setsliderEditing(true)
     }
     const onSliderEditEnd = () => {
-        sliderEditing = false;
+        // sliderEditing = false;
+        setsliderEditing(false)
+
     }
     const onSliderEditing = value => {
+        // console.log("value"+value)
         if(sound){
             sound.setCurrentTime(value);
             setplaySeconds(value)
@@ -56,10 +77,22 @@ export default function playing({props,onPres,single}) {
             }else{
                 setplayState('playing')
                 setduration(sound.getDuration())
+                // console.log()
+                // setTimeout(() => {
+                //     getCurrent(sound)
+                // }, 100);
                 // this.setState({playState:'playing', duration:this.});
                 sound.play(playComplete);
             }
         });
+        setSound(sound)
+        // getCurrent()
+        
+        
+    }
+
+    const getCurrent = () => {
+        
     }
 
     const  playComplete = (success) => {
@@ -105,16 +138,16 @@ export default function playing({props,onPres,single}) {
             </TouchableOpacity>
             <View style={{flexDirection:'row',marginTop:8}}>
                 <View style={{flex:2}}>
-                    <View style={{marginLeft:15}}>
+                    <View style={{flexDirection:'row',marginLeft:15}}>
                         <Slider
                             onTouchStart={onSliderEditStart}
                             // onTouchMove={() => console.log('onTouchMove')}
                             onTouchEnd={onSliderEditEnd}
                             // onTouchEndCapture={() => console.log('onTouchEndCapture')}
                             // onTouchCancel={() => console.log('onTouchCancel')}
-                            onValueChange={onSliderEditing}
+                            onValueChange={(value)=>onSliderEditing(value)}
                             value={playSeconds} maximumValue={duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
-                            style={{ width:'90%',alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                            style={{ flex:1,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                     </View>
                     <View style={{flexDirection:'row',marginTop:responsiveHeight(0.4),marginLeft:responsiveWidth(4)}}>
                         <View style={{flex:0.94}}>

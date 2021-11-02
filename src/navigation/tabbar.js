@@ -17,6 +17,7 @@ import Packages from '../screens/bottomTab/sub_packages'
 import Downloads from '../screens/bottomTab/donloads'
 import Activation from '../screens/bottomTab/activation'
 import AudioPlayer from '../screens/bottomTab/soundplayer'
+import Stripe from '../screens/bottomTab/payment_method/mian'
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
@@ -52,6 +53,12 @@ const setting = () => {
         component={Activation}
         options={{headerShown: false}}
       />    
+
+      <Stack.Screen
+        name="Stripe"
+        component={Stripe}
+        options={{headerShown: false}}
+      />
 
     </Stack.Navigator>
   );

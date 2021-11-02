@@ -41,12 +41,12 @@ export default class PlayerScreen extends React.Component{
     }
 
     componentDidMount(){
-        // alert('called')
         this.play();
         
         this.timeout = setInterval(() => {
             if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
                 this.sound.getCurrentTime((seconds, isPlaying) => {
+                    console.log(seconds)
                     this.setState({playSeconds:seconds});
                 })
             }
