@@ -41,7 +41,7 @@ export const loginUser = params => {
       );
       // return res;
       if (res?.data) {
-        console.log(res);
+        // console.log(res);
         return dispatch(loginSuccess(res));
       }
       return dispatch(authFailed(res));
@@ -66,7 +66,7 @@ export const registerUser = params => {
         },
       );
       if(res?.data){
-        console.log(res?.data);
+        // console.log(res?.data);
         return dispatch(registerSuccess(res));
       }
       // if (res?.data?.logged) {
@@ -103,7 +103,7 @@ export const Googlelogin = params => {
       }
       return dispatch(authFailed(res));
     } catch (err) {
-      // console.log(err.response.data);
+      console.log(err.response.data);
       dispatch(authFailed(err.response));
     }
   };

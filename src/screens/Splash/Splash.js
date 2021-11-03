@@ -20,8 +20,8 @@ class Splash extends Component {
   };
   splashDone = () => {
     setTimeout(() => {
-      // this.props.navigation.navigate(this.props.isLoggedIn ? 'Root' : 'Signin');
-      this.props.navigation.navigate('Signin');
+      this.props.navigation.replace(this.props.isLoggedIn ? 'Root' : 'Signin');
+      // this.props.navigation.navigate('Signin');
     }, 3000);
   };
 
@@ -43,11 +43,9 @@ class Splash extends Component {
     );
   }
 }
-// const mapStateToProps = state => {
-//   const {status, message, interest, isLoading, errMsg, isSuccess, isLoggedIn} =
-//     state.auth;
-//   return {status, message, isLoading, errMsg, isSuccess, interest, isLoggedIn};
-// };
+const mapStateToProps = state => {
+  const {isLoggedIn} = state.auth;
+  return {isLoggedIn};
+};
 
-// export default connect(mapStateToProps)(Splash);
-export default Splash;
+export default connect(mapStateToProps)(Splash);

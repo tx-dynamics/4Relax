@@ -13,19 +13,18 @@ export default function playing({props,onPres,single}) {
     const [playState,setplayState ] =  useState('paused')
     const [playSeconds,setplaySeconds ] =  useState(0)
     const [duration,setduration ] =  useState(0)
-    const [sound,setSound ] =  useState()
+    const sound = single.trackFile;
     const [sliderEditing,setsliderEditing ] =  useState(false)
-    var timeout ;
+    const [timeout,setTimeout ] =  useState()
     
     useEffect(() => {
             // alert('called')
             // console.log(sound)
 
             play();
-            setTimeout(() => {
-                timeout = setInterval(() => {
+                var timeout = setInterval(() => {
                     // console.log(sound)
-                    if(sound && sound.isLoaded() && playState == 'playing' && !sliderEditing){
+                    if(sound &&  playState == 'playing' && !sliderEditing){
                         alert("fokfofkorkfor")
                         sound.getCurrentTime((seconds, isPlaying) => {
                             alert(seconds)
@@ -34,20 +33,28 @@ export default function playing({props,onPres,single}) {
                         })
                     }   
                 }, 100);    
-            }, 1000);
+            // setTimeout(timeout)
+            return () =>{
+                if(sound){
+                    sound.release();
+                    sound = null;
+                }
+                if(timeout){
+                    clearInterval(timeout);
+                }
+            }
             
-            
-    }, [uncheck])
+    }, [])
 
-    const uncheck =()=>{
-        if(sound){
-            sound.release();
-            sound = null;
-        }
-        if(timeout){
-            clearInterval(timeout);
-        }
-    }
+    // const uncheck =()=>{
+    //     if(sound){
+    //         sound.release();
+    //         sound = null;
+    //     }
+    //     if(timeout){
+    //         clearInterval(timeout);
+    //     }
+    // }
 
     const onSliderEditStart = () => {
         setsliderEditing(true)
@@ -58,7 +65,7 @@ export default function playing({props,onPres,single}) {
 
     }
     const onSliderEditing = value => {
-        // console.log("value"+value)
+        console.log("value"+value)
         if(sound){
             sound.setCurrentTime(value);
             setplaySeconds(value)
@@ -67,7 +74,8 @@ export default function playing({props,onPres,single}) {
     }
      async function play  () {
         // alert("bad")
-        var sound = new Sound({uri : single.trackFile}, (error) => {
+        
+        var music = new Sound({uri : sound}, (error) => {
         // alert("bad2")
             
             if (error) {
@@ -76,18 +84,17 @@ export default function playing({props,onPres,single}) {
                 setplayState('paused')
             }else{
                 setplayState('playing')
-                setduration(sound.getDuration())
+                setduration(music.getDuration())
                 // console.log()
                 // setTimeout(() => {
                 //     getCurrent(sound)
                 // }, 100);
                 // this.setState({playState:'playing', duration:this.});
-                sound.play(playComplete);
+                music.play(playComplete);
             }
         });
-        setSound(sound)
+        // setSound(sound)
         // getCurrent()
-        
         
     }
 
@@ -145,7 +152,7 @@ export default function playing({props,onPres,single}) {
                             onTouchEnd={onSliderEditEnd}
                             // onTouchEndCapture={() => console.log('onTouchEndCapture')}
                             // onTouchCancel={() => console.log('onTouchCancel')}
-                            onValueChange={(value)=>onSliderEditing(value)}
+                            onValueChange={onSliderEditing}
                             value={playSeconds} maximumValue={duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
                             style={{ flex:1,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                     </View>

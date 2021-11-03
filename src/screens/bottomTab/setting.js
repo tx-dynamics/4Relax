@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import {View,Text,ImageBackground,Image,FlatList,Switch} from 'react-native'
-import {logo,settin,product,right,contact,notification,share,rate,info} from '../../assets'
+import {logo,settin,product,right,contact,notification,share,rate,info,logout} from '../../assets'
 import {
     responsiveHeight,
     responsiveScreenHeight,
@@ -10,13 +10,21 @@ import {
   import LinearGradient from 'react-native-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
+import {logoOut} from '../../redux/actions/auth';
+import {connect} from 'react-redux';
 
 
-export default function setting(props) {
+function setting(props) {
 
     const [selected,setSelected ] =  useState(false)
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
+    async function onlogout() {
+        await props.logoOut();
+        props.navigation.navigate('Auth', {screen: 'Signin'});
+      }
+
     return (
         <LinearGradient
         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
@@ -25,7 +33,24 @@ export default function setting(props) {
                 source={settin}
                 style={styles.imgBackground}
             >
-                <Text style={styles.title}>SETTINGS</Text>
+                <View style={{flexDirection:'row'}}>
+                    <View style={{flex:0.8}} >
+                        <Text style={[styles.title,{marginRight:responsiveWidth(6)}]}>SETTINGS</Text>
+                    </View>
+                    <TouchableOpacity onPress={()=> {
+                        props.logoOut(),
+                        props.navigation.replace('Auth', {screen: 'Signin'})
+                    }} 
+                    style={{justifyContent:'center',alignItems:'center',flex:1}} >
+                    <Image
+                        source={logout}
+                        style={{width:30,height:30,tintColor:'#000A0D',marginTop:responsiveHeight(1),marginRight:responsiveWidth(1)}}
+                    />
+                    </TouchableOpacity>
+                    
+                </View>
+                <View style={{height:'50%'}} />
+
                 <Image
                     source={logo}
                     style={styles.img}
@@ -157,3 +182,8 @@ export default function setting(props) {
         </LinearGradient>
     )
 }
+const mapStateToProps = state => {
+    const {status, message, isLoading, errMsg, isSuccess, token} = state.auth;
+    return {status, message, isLoading, errMsg, isSuccess, token};
+  };
+  export default connect(mapStateToProps, {logoOut})(setting);

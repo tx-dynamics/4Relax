@@ -36,4 +36,5 @@ export const bg = require('./images/m3.png');
 export const shuffle = require('./images/shuffle.png');
 export const unloc = require('./images/lock.png');
 export const download = require('./images/download.png');
+export const logout = require('./images/log-out.png');
 

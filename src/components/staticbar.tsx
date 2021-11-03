@@ -2,8 +2,9 @@ import * as React from "react";
 import {
   View, StyleSheet,Image, TouchableWithoutFeedback, Animated, Dimensions,
 } from "react-native";
-import { music,feed,fav,setting,explore} from "../assets";
+// import { music,feed,fav,setting,explore} from "../assets";
 import LinearGradient from 'react-native-linear-gradient';
+
 
 const { width } = Dimensions.get("window");
 
@@ -17,8 +18,10 @@ interface StaticTabbarProps {
   value: Animated.Value;
 }
 
-export default class StaticTabbar extends React.PureComponent<StaticTabbarProps> {
+class StaticTabbar extends React.PureComponent<StaticTabbarProps> {
   values: Animated.Value[] = [];
+
+  
 
   constructor(props: StaticTabbarProps) {
     super(props);
@@ -27,8 +30,11 @@ export default class StaticTabbar extends React.PureComponent<StaticTabbarProps>
   }
 
   onPress = (index: number) => {
+    // if(index === 0){
+    //   alert(index);
+    // }
     const { value, tabs } = this.props;
-    // console.log(index+" " +value +" "+ tabs )
+    console.log(index )
     const tabWidth = width / tabs.length;
     Animated.sequence([
       Animated.parallel(
@@ -51,10 +57,13 @@ export default class StaticTabbar extends React.PureComponent<StaticTabbarProps>
     ]).start();
   }
 
+  
+
   render() {
     const { onPress } = this;
     const { tabs, value } = this.props;
     return (
+      
       <View style={styles.container}>
         {
           tabs.map((tab, key) => {
@@ -76,8 +85,11 @@ export default class StaticTabbar extends React.PureComponent<StaticTabbarProps>
               extrapolate: "clamp",
             });
             return (
+
               <React.Fragment {...{ key }}>
-                <TouchableWithoutFeedback onPress={() => onPress(key)}>
+                <TouchableWithoutFeedback onPress={() => {
+                  onPress(key)
+                }}>
                   <Animated.View style={[styles.tab, { opacity }]}>
                     {/* <Icon name={tab.name} color="black" size={25} /> */}
                     <Image source={tab.name} style={tab.style}  />
@@ -135,3 +147,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+export default StaticTabbar

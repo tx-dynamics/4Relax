@@ -4,10 +4,6 @@ import {View, LogBox, PermissionsAndroid, NativeModules} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-// import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-
-// const Tab = createMaterialBottomTabNavigator();
-
 
 
 import BottomTab from './bottomtab'
@@ -88,22 +84,25 @@ const feed = () => {
   );
 };
 
-function Tabbar({navigation}) {
+const   Tabbar = () =>{
+// alert("key ="+ JSON.stringify(key));
+// if(key === 0){
+    return (
+        <NavigationContainer independent={true}>
+            <Stack.Navigator>
+                 <Stack.Screen name="Home" component={setting} options={{headerShown: false}}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+// }else{
+//     <NavigationContainer independent={true}>
+//         <Stack.Navigator>
+//             <Stack.Screen name="Home" component={feed} />
+//         </Stack.Navigator>
+//     </NavigationContainer>
+// }
 
-
-  return (
-      <NavigationContainer independent={true}>
-        <Tab.Navigator
-          tabBarPosition={'bottom'} 
-          tabBar={(props) => <BottomTab {...props} />}>
-              <Tab.Screen name="Home" component={feed} />
-              <Tab.Screen name="Explore" component={Explore} />
-              <Tab.Screen name="Music" component={Music} />
-              <Tab.Screen name="Fav" component={Fav} />
-              <Tab.Screen name="Setting" component={setting} />
-        </Tab.Navigator>
-    </NavigationContainer>
-  );
+  
 }
 
 
