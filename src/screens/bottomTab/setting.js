@@ -39,7 +39,7 @@ function setting(props) {
                     </View>
                     <TouchableOpacity onPress={()=> {
                         props.logoOut(),
-                        props.navigation.replace('Auth', {screen: 'Signin'})
+                        props.navigation.replace('Auth',{screen: 'Signin'})
                     }} 
                     style={{justifyContent:'center',alignItems:'center',flex:1}} >
                     <Image

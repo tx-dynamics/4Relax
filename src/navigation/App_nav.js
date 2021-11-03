@@ -22,7 +22,7 @@ function AppNav({}) {
 
   return (
     <NavigationContainer
-      // independent={true}
+      independent={true}
     >
       {/* <StripeProvider
       publishableKey={publishableKey}
