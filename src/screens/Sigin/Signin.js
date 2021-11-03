@@ -90,7 +90,7 @@ const Signin  =  props => {
             } else {
               setLoading(false);
               setemailMessage('Kindly enter correct email');
-              P;
+              // P;
               return false;
             }
           } else {
@@ -140,7 +140,7 @@ const Signin  =  props => {
                         <Text style={styles.labelstyle}>Email</Text>
                         <TextInput
                             value={email}
-                            onChangeText={value => setEmail(value)}
+                            onChangeText={value => setEmail(value.trim())}
                             placeholder='Sample@gmail.com'
                             placeholderTextColor={'#CCCCCC'}
                             style={[styles.input,{

@@ -94,6 +94,7 @@ function Tabbar({navigation}) {
   return (
       <NavigationContainer independent={true}>
         <Tab.Navigator
+        independent={true}
           tabBarPosition={'bottom'} 
           tabBar={(props) => <BottomTab {...props} />}>
               <Tab.Screen name="Home" component={feed} />
