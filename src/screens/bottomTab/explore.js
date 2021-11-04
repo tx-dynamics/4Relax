@@ -15,6 +15,7 @@ import {connect} from 'react-redux';
 import {unloc,pause,play,download,fav,logo,del,stories} from '../../assets'
 import Soundplayer from './playing'
 import Snackbar from 'react-native-snackbar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const data =[
     {
@@ -51,21 +52,30 @@ const data =[
 
     useEffect(() => {
         getStories()
+        setisplaying (false)
+
     }, [isFocused])
     
     async function getStories(cate = '') {
         try {
           const res = await props.get_allStories();
-        //   console.log('group_data', res);
-          if (res?.data) {
+          var posts = res?.data
+
+          posts.map((item)=>{
+            return {
+                ...item,
+                isplaying: false,
+              };
+          })
+          if (posts) {
             if(cate === ''){
-              setmeditations(res?.data)
+              setmeditations(posts)
             }else{
               //   alert('calling cate')
               setmeditations()
 
               var filtered = []; 
-              res?.data.map((item)=>{
+              posts.map((item)=>{
                   filtered.push(item)
               })
              
@@ -164,6 +174,63 @@ const data =[
       
     }
 
+    const setData = async (single,id) => {
+      // console.log(item.trackName)
+      setisplaying(false)
+      setTimeout(() => {
+          if(single.isplaying){
+              const res = meditations.map((item)=>{
+                  // console.log(item._id === id)
+                  if(item._id === id){
+                      return {
+                          ...item,
+                          isplaying: false,
+                        };
+                  } else {
+                      return {
+                          ...item,
+                          // isplaying: false,
+                        };
+                  }
+              })
+              setmeditations(res)
+              setisplaying(false)
+  
+          }else{
+  
+              const res = meditations.map((item)=>{
+                  // console.log(item._id === id)
+                  if(item._id === id){
+                      return {
+                          ...item,
+                          isplaying: true,
+                        };
+                  } else {
+                      return {
+                          ...item,
+                          isplaying: false,
+                        };
+                  }
+              })
+              setmeditations(res)
+              setisplaying(true)
+  
+          }    
+      }, 500);
+      
+      
+          try {
+              await AsyncStorage.setItem("single_item",JSON.stringify({...single,type:'stories'}))
+
+          } catch (e) {
+           alert("calling itself"+e)
+          }
+      // alert('called set data')
+              
+              // var data = await AsyncStorage.getItem("single_item")
+              // console.log(JSON.parse(data).trackName) 
+  }
+
     return (
         <View style={{flex:1,backgroundColor:'#00303A'}}>
             <ImageBackground
@@ -257,22 +324,19 @@ const data =[
                                 // <>
                                 //     {item.play?
                                     <>
-                                        {!isplaying?
-                                            <TouchableOpacity onPress={()=> {
-                                                setitem(item)
-                                                setisplaying(!isplaying)
-                                                }}
+                                        {item.isplaying?
+                                            <TouchableOpacity onPress={()=> setData(item,item._id)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
+                                                <Image
+                                                    source={pause}
+                                                    style={[styles.icon,{width:22.67,height:22.67}]}
+                                                />
+                                            </TouchableOpacity>
+                                            :
+                                            <TouchableOpacity onPress={()=> setData(item,item._id)}
                                                 style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                 <Image
                                                     source={play}
                                                     style={[styles.icon,{width:22,height:22}]}
-                                                />
-                                            </TouchableOpacity>
-                                            :
-                                            <TouchableOpacity onPress={()=> setisplaying(!isplaying)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
-                                                <Image
-                                                    source={pause}
-                                                    style={[styles.icon,{width:22.67,height:22.67}]}
                                                 />
                                             </TouchableOpacity>
                                         }
@@ -288,7 +352,7 @@ const data =[
                 />
             {/* </View> */}
             {isplaying?
-                <Soundplayer single={item} onPres={()=>props.navigation.navigate('AudioPlayer')} />
+                <Soundplayer navigation={props.navigation} />
                 :
             null} 
 

@@ -12,7 +12,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 import Soundplayer from './playing'
 import Sound from 'react-native-sound';
-
+import axios from 'axios';
+import {BASE_URL} from '../../redux/base-url';
 
 // const img_speaker = require('./resources/ui_speaker.png');
 
@@ -35,23 +36,125 @@ export default class PlayerScreen extends React.Component{
         this.state = {
             playState:'paused', //playing, paused
             playSeconds:0,
-            duration:0
+            duration:0,
+            single:{}
         }
         this.sliderEditing = false;
     }
 
     componentDidMount(){
-        this.play();
+
+        var id = this.props.route.params.single._id
+        var fav = this.props.route.params.single
+        var type = this.props.route.params.single.type
+        var tracktype = this.props.route.params.single.trackType
+        // this.setState({single:id})
+        // console.log(fav)
+
+
+
+        this.getSingle(id,fav,type,tracktype);
         
         this.timeout = setInterval(() => {
             if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
                 this.sound.getCurrentTime((seconds, isPlaying) => {
-                    console.log(seconds)
+                    // console.log(seconds)
                     this.setState({playSeconds:seconds});
                 })
             }
-        }, 100);
+        }, 800);
     }
+
+    getSingle = async (id,fav,type,tracktype) => {
+        if(type === 'meditation'){
+            alert('meditation')
+        try {
+            // alert('called')
+            const res = await axios.get(`${BASE_URL}api/relax/meditation/getSingle/${id}`, {
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+            });
+            // console.log(res?.data)
+            if(res?.data){
+                this.setState({single:res?.data})
+                setTimeout(() => {
+                    this.play()
+                }, 500);
+            }
+          } catch (err) {
+            console.log("error found : "+err);
+          }
+        }else if(type === 'Sounds'){
+            try {
+                    alert('Sounds')
+                const res = await axios.get(`${BASE_URL}api/relax/sounds/getSingle/${id}`, {
+                    headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    },
+                });
+                // console.log(res?.data)
+                if(res?.data){
+                    this.setState({single:res?.data})
+                    setTimeout(() => {
+                        this.play()
+                    }, 500);
+                }
+                } catch (err) {
+                console.log("error found : "+err);
+                }
+        }else if(type === 'stories'){
+            try {
+                    alert('stories')
+                const res = await axios.get(`${BASE_URL}api/relax/stories/getSingle/${id}`, {
+                    headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    },
+                });
+                // console.log(res?.data)
+                if(res?.data){
+                    this.setState({single:res?.data})
+                    setTimeout(() => {
+                        this.play()
+                    }, 500);
+                }
+                } catch (err) {
+                console.log("error found : "+err);
+                }
+        }else if(tracktype){
+            try {
+                    alert('fav : '+tracktype)
+                    if(fav){
+                        this.setState({single:fav})
+                        setTimeout(() => {
+                            this.play()
+                        }, 500);
+                    }
+                // const res = await axios.get(`${BASE_URL}api/relax/sounds/getSingle/${id}`, {
+                //     headers: {
+                //     Accept: 'application/json',
+                //     'Content-Type': 'application/json',
+                //     },
+                // });
+                // // console.log(res?.data)
+                // if(res?.data){
+                //     this.setState({single:res?.data})
+                //     setTimeout(() => {
+                //         this.play()
+                //     }, 500);
+                // }
+                } catch (err) {
+                console.log("error found : "+err);
+                }
+        }else{
+            alert('not found')
+
+        }
+    }
+
     componentWillUnmount(){
         if(this.sound){
             this.sound.release();
@@ -90,7 +193,7 @@ export default class PlayerScreen extends React.Component{
             // }
             // console.log('[Play]', filepath);
     
-            this.sound = new Sound(sound_test, (error) => {
+            this.sound = new Sound({uri:this.state.single.trackFile}, (error) => {
                 // alert("bad")
                 
                 if (error) {
@@ -149,14 +252,14 @@ export default class PlayerScreen extends React.Component{
     }
 
     render(){
-
+        const {single} = this.state
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
 
         return (
-            <View style={{flex:1}}>
+            <View style={{flex:1,backgroundColor:'#00303A'}}>
                 <ImageBackground
-                    source={bg}
+                    source={{uri: single.coverPic}}
                     
                     style={[styles.imgBackground,{height:'100%',alignItems:'center'}]}
                 >
@@ -165,7 +268,7 @@ export default class PlayerScreen extends React.Component{
                         width:'100%',
                         backgroundColor: '#00000080',
                     }} >
-                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(5)}} >
+                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(2)}} >
                             <View style={{flex:0.98}}>
                                 <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
                                     <Image
@@ -183,8 +286,8 @@ export default class PlayerScreen extends React.Component{
                             </TouchableOpacity>
                         </View>
                         <View style={{alignItems:'center',marginTop:responsiveHeight(6)}} >
-                            <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato'}} >Meditation - Defeat the tress</Text>
-                            <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato'}} >5 Minute Guided Sleep Meditation</Text>
+                            <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato'}} >{single.trackName? single.trackName : single.trackType}</Text>
+                            <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato'}} >{single.trackType}</Text>
                         </View>
                         
 
@@ -212,10 +315,18 @@ export default class PlayerScreen extends React.Component{
                         </View>
                         <View style={{flexDirection:'row', justifyContent:'center',alignItems:'center',marginTop:responsiveHeight(3.5)}}>
                             <View style={{flex:0.2}} >
+                                {single.trackName?
                                 <Image
                                     source={fav}
-                                    style={{width:20,height:18,alignSelf:'center',tintColor:'#FF5959'}}
+                                    style={{width:20,height:18,alignSelf:'center',  tintColor:single.liked ?'#FF5959':'#FFFFFF'}}
                                 />
+                                :
+                                <Image
+                                    source={fav}
+                                    style={{width:20,height:18,alignSelf:'center',  tintColor:'#FF5959'}}
+                                />
+                                }
+                                
                             </View>
                             <View style={{flex:0.6,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
                                 <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
