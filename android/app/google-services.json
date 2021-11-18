@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "504019171585",
+    "project_id": "relax-21c00",
+    "storage_bucket": "relax-21c00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504019171585:android:00ed3a518c9565898b0300",
+        "android_client_info": {
+          "package_name": "com.four_relax"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504019171585-v4giee3nevkhg38gstbq3jijjmv904q5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjnTiKmkS7WGe7WvPDqEIZ0P7uOYRhVDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504019171585-v4giee3nevkhg38gstbq3jijjmv904q5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
