@@ -48,7 +48,14 @@ export default class PlayerScreen extends React.Component{
     }
 
     componentDidMount(){
-        
+        // this.props.navigation.addListener(
+        //     'willBlur',
+        //     payload => {
+        //         // this.sound.stop();
+        //       // callback when component comes into view
+        //       alert('willFocus', payload);
+        //     }
+        //   );
         this.CheckConnectivity()
         console.log(this.props.navigation);
         // this.props.navigation.addListener(
@@ -74,10 +81,14 @@ export default class PlayerScreen extends React.Component{
                 })
             }
         }, 1000);
-        
+        // this.props.navigation.addListener(
+        //     'willBlur' ,() => {
+        //         this.sound.stop();
+        //     })
 
     }
 
+  
     CheckConnectivity  ()  {
         // For Android devices
         NetInfo.fetch().then((state) => {
@@ -200,6 +211,8 @@ export default class PlayerScreen extends React.Component{
             }
         }
     }
+
+
 
     componentWillUnmount(){
         // this.didBlurSubscription.remove()

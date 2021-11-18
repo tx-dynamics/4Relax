@@ -111,7 +111,6 @@ const data =[
       var ImagePath = [];
       RNFetchBlob.fs.isDir(dir).then((isDir)=>{
         if(isDir){
-          
           RNFS.readDir(dir).then(files => {
             // return console.log(files[0].isFile)
             files.map((item)=>{
@@ -137,7 +136,8 @@ const data =[
               // alert("called internal medi")
               setInternal(meditation)
               let cate = ''
-              getStories(cate,meditation)
+              let cover = ''
+              getStories(cate,cover,meditation)
     
             }else{
               
@@ -157,9 +157,10 @@ const data =[
           //   backgroundColor: '#018CAB',
           //   textColor: 'tomato',
           // });
-          let cate = '';
+              let cate = ''
+              let cover = '';
           let meditation = []
-          getStories(cate,meditation)
+          getStories(cate,cover,meditation)
         }
       })
      
@@ -169,7 +170,7 @@ const data =[
 
     }
 
-    async function getStories(cate = '',stories) {
+    async function getStories(cate = '',cover = '',stories) {
         const params = {
             userId: props?.userData?._id
         }
@@ -205,7 +206,7 @@ const data =[
               filtered.map((item)=>{
                 // console.log(item.trackCategory === cate)
                   if(item.trackCategory === cate){
-                      getFilter.push(item);
+                      getFilter.push({...item,cover});
                   }else{
                       return
                   }
@@ -284,8 +285,9 @@ const data =[
             if (res?.data) {
                 console.log(res?.data)
                 let cat = '';
+                let cover = '';
                 let story = internal;
-                getStories(cat,story)
+                getStories(cat,cover,story)
                 Snackbar.show({
                     text: res?.data,
                     backgroundColor: '#018CAB',
@@ -335,7 +337,7 @@ const data =[
                 //   alert(item.name)
                 let story = internal
                 setRefreshing(true)
-                getStories(item.name,story)
+                getStories(item.name,item.coverPic,story)
                   return {
                     ...item,
                     selected: true,
@@ -839,7 +841,13 @@ const data =[
                           renderItem={({ item, index }) =>
                               <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                                   <ImageBackground
-                                      source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
+                                      source={{uri : item.cover?
+                                        item.cover
+                                      : 
+                                        connection?
+                                          item.coverPic 
+                                        :
+                                          'file://' + item.coverPic}}
                                       borderRadius={4}
                                       style={{width:'100%',height:178}}
                                   >

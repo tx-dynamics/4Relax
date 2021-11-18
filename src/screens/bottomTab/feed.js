@@ -120,7 +120,8 @@ var RNFS = require('react-native-fs');
               // alert("called internal medi")
               setInternal(meditation)
               let cate = ''
-              getMeditation(cate,meditation)
+              let cover = ''
+              getMeditation(cate,cover,meditation)
     
             }else{
               // console.log(meditation)
@@ -140,8 +141,9 @@ var RNFS = require('react-native-fs');
           //   textColor: 'white',
           // });
           let cate = '';
+          let cover = '';
           let meditation = []
-          getMeditation(cate,meditation)
+          getMeditation(cate,cover,meditation)
         }
       })
      
@@ -152,7 +154,7 @@ var RNFS = require('react-native-fs');
     }
 
 
-    async function getMeditation( cate = '' , meditation  ) {
+    async function getMeditation( cate = '',cover = '' , meditation  ) {
       // return console.log(cate+""+ meditation)
         // setRefreshing(true);
         const params = {
@@ -191,9 +193,9 @@ var RNFS = require('react-native-fs');
                 filtered.map((item)=>{
                   // let str =item.trackCategory 
                   // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
-                  console.log(item.trackCategory === cate)
+                  // console.log(item.trackCategory === cate)
                     if(item.trackCategory === cate){
-                        getFilter.push(item);
+                        getFilter.push({...item,cover});
                     }else{
                       return
                       
@@ -279,8 +281,9 @@ var RNFS = require('react-native-fs');
           if (res?.data) {
               // console.log(res?.data)
               let cat = '';
+              let cover = '';
               let medi = internal
-              getMeditation(cat,medi)
+              getMeditation(cat,cover,medi)
               Snackbar.show({
                   text: res?.data,
                   backgroundColor: '#018CAB',
@@ -330,8 +333,9 @@ var RNFS = require('react-native-fs');
             const res = category.map((item) => {
                 if (item._id === id) {
                 let medi = internal
+                // console.log();
                 setRefreshing(true)
-                  getMeditation(item.name,medi)
+                  getMeditation(item.name,item.coverPic,medi)
                   return {
                     ...item,
                     selected: true,
@@ -876,7 +880,14 @@ var RNFS = require('react-native-fs');
                                         // </View>
                                           } */}
                                       <ImageBackground
-                                      source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
+                                      source={{uri :
+                                        item.cover?
+                                          item.cover
+                                        : 
+                                          connection?
+                                            item.coverPic 
+                                          :
+                                            'file://' + item.coverPic}}
                                       borderRadius={4}
                                       style={{width:'100%',height:178}}
                                   >

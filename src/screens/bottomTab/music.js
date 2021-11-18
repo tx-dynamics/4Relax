@@ -20,29 +20,6 @@ import RNFetchBlob from 'rn-fetch-blob'
 import NetInfo from "@react-native-community/netinfo";
 var RNFS = require('react-native-fs');
 
-const data =[
-    {
-        id:0,
-        name:'Meditate',
-        selected:false
-    },
-    {
-        id:1,
-        name:'sleep',
-        selected:true
-    },
-    {
-        id:2,
-        name:'Calm',
-        selected:false
-    },
-    {
-        id:3,
-        name:'Calm Sound',
-        selected:false
-    },
-]
-
     const music = (props) => {
 
     const [selected,setSelected ] =  useState(false)
@@ -110,6 +87,7 @@ const data =[
       var ImagePath = [];
       RNFetchBlob.fs.isDir(dir).then((isDir)=>{
         if(isDir){
+          // alert('called itslef')
           
           RNFS.readDir(dir).then(files => {
             // return console.log(files[0].isFile)
@@ -136,7 +114,8 @@ const data =[
               // alert("called internal medi")
               setInternal(meditation)
               let cate = ''
-              getMusic(cate,meditation)
+              let cover = ''
+              getMusic(cate,cover,meditation)
     
             }else{
               console.log(meditation)
@@ -156,14 +135,15 @@ const data =[
           //   textColor: 'tomato',
           // });
           let cate = '';
+          let cover = ''
           let meditation = []
-          getMusic(cate,meditation)
+          getMusic(cate,cover,meditation)
         }
       })
      
     }
 
-    async function getMusic(cate = '',sounds) {
+    async function getMusic(cate = '',cover = '',sounds) {
         const params = {
             userId: props?.userData?._id
         }
@@ -185,23 +165,21 @@ const data =[
               setmeditations([])
 
               var filtered = []; 
+              setcateEmp(false)
               posts.map((item)=>{
                   filtered.push(item)
               })
              
               var getFilter = [];
-              setcateEmp(false)
 
               filtered.map((item)=>{
                   if(item.trackCategory === cate){
-                      getFilter.push(item);
+                      getFilter.push({...item,cover});
                   }else{
-                    
                     return
                   }
               })
               if(getFilter.length < 1){
-                  
                 setcateEmp(true)
                 setmeditations([])
               }else{
@@ -213,7 +191,7 @@ const data =[
         } catch (err) {
           setRefreshing(false);
           //   setloadingGroup(false);
-          alert(err)
+          // alert(err)
           console.log(err);
         }
         
@@ -222,6 +200,7 @@ const data =[
     function checkData(posts,sounds){
       console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
       if(sounds.length > 0){
+
         let trueData = [];
         let fasleData = [];
         posts.map(item=>{
@@ -275,8 +254,9 @@ const data =[
             if (res?.data) {
                 console.log(res?.data)
                 let cat = '';
+                let cover = '';
                 let sound = internal
-                getMusic(cat,sound)
+                getMusic(cat,cover,sound)
                 Snackbar.show({
                     text: res?.data,
                     backgroundColor: '#018CAB',
@@ -327,7 +307,7 @@ const data =[
                 //   alert(item.name)
                 let sound = internal
                 setRefreshing(true)
-                getMusic(item.name,sound)
+                getMusic(item.name,item.coverPic,sound)
                   return {
                     ...item,
                     selected: true,
@@ -837,7 +817,13 @@ const data =[
                                 renderItem={({ item, index }) =>
                                     <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                                         <ImageBackground
-                                            source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
+                                            source={{uri :  item.cover?
+                                              item.cover
+                                            : 
+                                              connection?
+                                                item.coverPic 
+                                              :
+                                                'file://' + item.coverPic}}
                                             borderRadius={4}
                                             style={{width:'100%',height:178}}
                                         >
