@@ -83,6 +83,29 @@ export const forgotpassword = params => {
 };
 
 
+export const googleLoginApi = params => {
+  return async dispatch => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}api/relax/user/loginWithGoogle`,
+        JSON.stringify(params),
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      if(res?.data){
+        // console.log(res?.data);
+        return dispatch(registerSuccess(res));
+      }
+      return dispatch(registerFAILED(err.response));
+    } catch (err) {
+      dispatch(registerFAILED(err.response));
+    }
+  };
+}
 export const registerUser = params => {
   return async dispatch => {
     try {
@@ -100,16 +123,13 @@ export const registerUser = params => {
         // console.log(res?.data);
         return dispatch(registerSuccess(res));
       }
-      // if (res?.data?.logged) {
-      //   console.log("calledddd************  " + res);
-      //   return dispatch(registerSuccess(res));
-      // }
       return dispatch(registerFAILED(err.response));
     } catch (err) {
       dispatch(registerFAILED(err.response));
     }
   };
-};
+}
+
 //Google
 export const Googlelogin = params => {
   // console.log('HERE');
