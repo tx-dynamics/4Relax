@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         right:12
     },
     cate:{
-        marginLeft:12,
+        // marginLeft:12,
         marginRight:12,
         width:88,
         height:35,
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
 },
     iconBackground:{
+        marginLeft:responsiveWidth(2),
         width:24,
         height:24,
         borderRadius:25,

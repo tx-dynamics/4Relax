@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   input:{
     borderBottomWidth:1,
-    borderBottomColor:theme.colors.primary,
+    borderBottomColor:'#CCCCCC',
     fontSize:12,
     fontWeight:'500',
     color:theme.colors.secondary,

@@ -31,14 +31,11 @@ import LinearGradient from 'react-native-linear-gradient';
 // } from '@react-native-google-signin/google-signin';
 import {connect} from 'react-redux';
 import {
-    loginUser,
-    Googlelogin,
-    logoOut,
-    authFailed,
+  forgotpassword
   } from '../../redux/actions/auth';
 import {useIsFocused} from '@react-navigation/native';
 
-const Signin  =  props => {
+const Forgot  =  props => {
 
     const [loading, setLoading] = useState(false);
     const [email,setEmail] = useState('');
@@ -52,29 +49,27 @@ const Signin  =  props => {
 
     async function onLogin() {
         setemailMessage('');
-        setpasswordMessage('');
         try {
-          if (email !== '' && password !== '') {
+          if (email !== '') {
             const params = {
               email: email,
-              password: password,
             };
             const re =
               /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             const emailValid = re.test(email);
     
             if (emailValid) {
-              const res = await props.loginUser(params);
+              const res = await props.forgotpassword(params);
               setemailMessage('');
               setpasswordMessage('');
               console.log('api respone', res);
               //res?.data?.logged
               if (res?.payload?.data) {
                 setLoading(false);
-                navigation.replace('Root');
+                navigation.replace('Signin');
                 console.log('tokens', props.token);
                 Snackbar.show({
-                  text: 'Sign in succesfully',
+                  text: 'Email sent successfully',
                   backgroundColor: '#018CAB',
                   textColor: 'white',
                 });
@@ -82,7 +77,7 @@ const Signin  =  props => {
                 authFailed(res);
                 setLoading(false);
                 Snackbar.show({
-                  text: 'Invalid Email and Password',
+                  text: 'Invalid Email ',
                   backgroundColor: '#F14336',
                   textColor: 'white',
                 });
@@ -95,17 +90,14 @@ const Signin  =  props => {
             }
           } else {
             setLoading(false);
-            if (email === '' && password === '') {
-              setemailMessage('Kindly enter email');
+            if (email === '') {
               setpasswordMessage('Kindly enter password');
             }
     
             if (email === '') {
               setemailMessage('Kindly enter email');
             }
-            if (password === '') {
-              setpasswordMessage('Kindly enter password');
-            }
+           
             return false;
           }
         } catch (err) {
@@ -149,55 +141,16 @@ const Signin  =  props => {
                         />
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
 
-                        <Text style={[styles.labelstyle,{fontSize:16,fontFamily:'Poppins',top:30}]}>Password</Text>
-                        <View style={{
-                          borderBottomColor: passwordMessage !== '' ? 'tomato' : theme.colors.secondary,borderBottomWidth:1
-                        }} >
-                          <TextInput
-                            value={password}
-                            onChangeText={value => setPassword(value)}
-                            placeholder='********'
-                            placeholderTextColor={theme.colors.secondary}
-                            secureTextEntry={!switchEye? true : false}
-                            style={[styles.input,{marginTop:responsiveHeight(3.8),
-                                borderBottomWidth:0,width:'90%'
-                            }]}
-                        />
-                        </View>
                         
-                        <View style={{width:'100%',alignItems:'flex-end',bottom:responsiveHeight(2.5)}}> 
-                        {switchEye?
-                            <TouchableOpacity
-                                onPress={()=> setswitchEye(false)}
-                                
-                            >
-                                <Image
-                                    source={passeye}
-                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
-                                />
-                            </TouchableOpacity>
-                            :
-                            <TouchableOpacity
-                                onPress={()=> setswitchEye(true)}
-                            >
-                                <Image
-                                    source={passeye}
-                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
-                                />
-                            </TouchableOpacity>
-                        }
-                        {passwordMessage !== '' && <Errors errors={passwordMessage} />}
-
-                        </View>
+                        
+                       
                         <View
                             style={{width:'100%',alignItems:'flex-end'}}
                         >
-                            <TouchableOpacity onPress={()=>props.navigation.navigate('Forgot')}>
-                                <Text style={[styles.labelstyle,{fontFamily:'Poppins',fontSize:14,top:30}]}>Forgot Password?</Text>
-                            </TouchableOpacity>
+                            
                         </View> 
                         <View
-                            style={{top:responsiveHeight(10)}}
+                            style={{marginTop:responsiveHeight(40)}}
                         >
                             <TouchableOpacity onPress={()=>{
                                 setLoading(true),
@@ -210,16 +163,16 @@ const Signin  =  props => {
                                          {loading ? (
                                             <ActivityIndicator animating color={'white'} size={25} />
                                             ) : (
-                                            <Text style={[styles.labelstyle,{fontWeight:'700'}]}>Sign In</Text>
+                                            <Text style={[styles.labelstyle,{fontWeight:'700'}]}>Send Email</Text>
                                             )
                                         }
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
-                        <View style={{top:responsiveHeight(14),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
-                            <Text style={[styles.labelstyle,{fontSize:12}]}>Don't have an account ? </Text>
-                            <TouchableOpacity onPress={()=> props.navigation.navigate('Signup')}>
-                                <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign Up</Text>
+                        <View style={{top:responsiveHeight(4),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                            {/* <Text style={[styles.labelstyle,{fontSize:12}]}>Don't have an account ? </Text> */}
+                            <TouchableOpacity onPress={()=> props.navigation.replace('Signin')}>
+                                <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign In</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -236,8 +189,8 @@ const mapStateToProps = state => {
       state.auth;
     return {status, message, isLoading, errMsg, isSuccess, token, islogin};
   };
-  export default connect(mapStateToProps, {loginUser, Googlelogin, logoOut})(
-    Signin,
+  export default connect(mapStateToProps, {forgotpassword})(
+    Forgot,
   );
   export function Errors({errors}) {
     return (

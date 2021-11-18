@@ -1,5 +1,5 @@
 import React,{useState} from 'react'
-import {View,Text,ImageBackground,Image,Slider,FlatList, Dimensions} from 'react-native'
+import {View,Text,ImageBackground,Image,Slider,FlatList, Dimensions, ActivityIndicator} from 'react-native'
 import {logo,shuffle,bg,left,pause,play,del} from '../../assets'
 import {
     responsiveHeight,
@@ -14,6 +14,8 @@ import Soundplayer from './playing'
 import Sound from 'react-native-sound';
 import axios from 'axios';
 import {BASE_URL} from '../../redux/base-url';
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const img_speaker = require('./resources/ui_speaker.png');
 
@@ -37,22 +39,31 @@ export default class PlayerScreen extends React.Component{
             playState:'paused', //playing, paused
             playSeconds:0,
             duration:0,
-            single:{}
+            single:{},
+            connection:false,
+            isLoading:true,
+            don:false,
         }
         this.sliderEditing = false;
     }
 
     componentDidMount(){
-
+        
+        this.CheckConnectivity()
+        console.log(this.props.navigation);
+        // this.props.navigation.addListener(
+        //     'didBlur',
+        //     () => this.sound.pause()
+        //   )
         var id = this.props.route.params.single._id
         var fav = this.props.route.params.single
         var type = this.props.route.params.single.type
         var tracktype = this.props.route.params.single.trackType
         // this.setState({single:id})
-        // console.log(fav)
+        // console.log("***********************************777777777")
+        // console.log(id)
 
-
-
+        
         this.getSingle(id,fav,type,tracktype);
         
         this.timeout = setInterval(() => {
@@ -62,21 +73,40 @@ export default class PlayerScreen extends React.Component{
                     this.setState({playSeconds:seconds});
                 })
             }
-        }, 800);
+        }, 1000);
+        
+
     }
 
+    CheckConnectivity  ()  {
+        // For Android devices
+        NetInfo.fetch().then((state) => {
+          this.setState({connection:state.isConnected})
+          console.log("Connection type", state.type);
+          console.log("Is connected?", state.isConnected,state.isInternetReachable);
+          
+        });
+      };
+
     getSingle = async (id,fav,type,tracktype) => {
+        let userId = await AsyncStorage.getItem('userId');
+        console.log("***************************",userId)
+        const params = {
+            userId : userId
+        }
+        if(id){
         if(type === 'meditation'){
-            alert('meditation')
+            // alert('meditation')
         try {
-            // alert('called')
-            const res = await axios.get(`${BASE_URL}api/relax/meditation/getSingle/${id}`, {
+            // alert('called meditation')
+            const res = await axios.post(`${BASE_URL}api/relax/meditation/getSingle/${id}`,JSON.stringify(params), {
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
               },
             });
-            // console.log(res?.data)
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            console.log(res?.data)
             if(res?.data){
                 this.setState({single:res?.data})
                 setTimeout(() => {
@@ -88,8 +118,8 @@ export default class PlayerScreen extends React.Component{
           }
         }else if(type === 'Sounds'){
             try {
-                    alert('Sounds')
-                const res = await axios.get(`${BASE_URL}api/relax/sounds/getSingle/${id}`, {
+                    // alert('Sounds')
+                const res = await axios.post(`${BASE_URL}api/relax/sounds/getSingle/${id}`,JSON.stringify(params), {
                     headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -107,8 +137,8 @@ export default class PlayerScreen extends React.Component{
                 }
         }else if(type === 'stories'){
             try {
-                    alert('stories')
-                const res = await axios.get(`${BASE_URL}api/relax/stories/getSingle/${id}`, {
+                    // alert('stories')
+                const res = await axios.post(`${BASE_URL}api/relax/stories/getSingle/${id}`,JSON.stringify(params), {
                     headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -126,7 +156,7 @@ export default class PlayerScreen extends React.Component{
                 }
         }else if(tracktype){
             try {
-                    alert('fav : '+tracktype)
+                    // alert('fav : '+tracktype)
                     if(fav){
                         this.setState({single:fav})
                         setTimeout(() => {
@@ -153,11 +183,30 @@ export default class PlayerScreen extends React.Component{
             alert('not found')
 
         }
+        }else{
+            try {
+                // alert('fav : '+tracktype)
+                this.setState({don:true})
+                console.log(fav);
+                if(fav){
+                    this.setState({single:fav})
+                    setTimeout(() => {
+                        this.play()
+                    }, 500);
+                }
+            
+            } catch (err) {
+            console.log("error found : "+err);
+            }
+        }
     }
 
     componentWillUnmount(){
+        // this.didBlurSubscription.remove()
+        // alert('called')
         if(this.sound){
             this.sound.release();
+            this.sound.stop();
             this.sound = null;
         }
         if(this.timeout){
@@ -201,7 +250,7 @@ export default class PlayerScreen extends React.Component{
                     Alert.alert('Notice', 'audio file error. (Error code : 1)');
                     this.setState({playState:'paused'});
                 }else{
-                    this.setState({playState:'playing', duration:this.sound.getDuration()});
+                    this.setState({playState:'playing',isLoading:false, duration:this.sound.getDuration()});
                     this.sound.play(this.playComplete);
                 }
             });    
@@ -258,8 +307,16 @@ export default class PlayerScreen extends React.Component{
 
         return (
             <View style={{flex:1,backgroundColor:'#00303A'}}>
-                <ImageBackground
-                    source={{uri: single.coverPic}}
+                
+                 <ImageBackground
+                    source={{uri: 
+                        this.state.don?
+                            'file://' + single.coverPic
+                        :
+                        this.state.connection?
+                            single.coverPic 
+                            :
+                            'file://' + single.coverPic}}
                     
                     style={[styles.imgBackground,{height:'100%',alignItems:'center'}]}
                 >
@@ -268,7 +325,7 @@ export default class PlayerScreen extends React.Component{
                         width:'100%',
                         backgroundColor: '#00000080',
                     }} >
-                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(2)}} >
+                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(4)}} >
                             <View style={{flex:0.98}}>
                                 <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
                                     <Image
@@ -278,82 +335,93 @@ export default class PlayerScreen extends React.Component{
                                 </TouchableOpacity>
                                 
                             </View>
-                            <TouchableOpacity style={{width:32,height:32,borderRadius:50,backgroundColor:'rgba(31, 26, 21, 0.56)',alignItems:'center'}} >
+                            {/* <TouchableOpacity style={{width:32,height:32,borderRadius:50,backgroundColor:'rgba(31, 26, 21, 0.56)',alignItems:'center'}} >
                                 <Image
                                     source={del}
                                     style={{width:16,height:16,alignSelf:'center',marginTop:responsiveHeight(1)}}
                                 />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={{alignItems:'center',marginTop:responsiveHeight(6)}} >
-                            <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato'}} >{single.trackName? single.trackName : single.trackType}</Text>
-                            <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato'}} >{single.trackType}</Text>
+                            {/* <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato'}} >{single.trackName? single.trackName : single.trackType}</Text> */}
+                            {/* <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato'}} >{single.trackType}</Text> */}
                         </View>
                         
-
-                        <View style={{marginTop:responsiveHeight(52)}}>
-                            <View style={{flexDirection:'row',flex:1,marginVertical:15, marginHorizontal:15,}}>
-                                <Slider
-                                    onTouchStart={this.onSliderEditStart}
-                                    // onTouchMove={() => console.log('onTouchMove')}
-                                    onTouchEnd={this.onSliderEditEnd}
-                                    // onTouchEndCapture={() => console.log('onTouchEndCapture')}
-                                    // onTouchCancel={() => console.log('onTouchCancel')}
-                                    onValueChange={this.onSliderEditing}
-                                    value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
-                                    style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                        {this.state.isLoading?
+                            <View style={{alignItems:'center',justifyContent:'center',flex:1}} >
+                                <ActivityIndicator style={{alignSelf:'center'}} size={'large'} color={'white'} />
                             </View>
-                            <View style={{flexDirection:'row'}}>
-                                <View style={{flex:0.96,marginLeft:responsiveWidth(5)}}>
-                                    <Text style={{color:'white'}}>{currentTimeString}</Text>
+                        :
+                            <>
+                                <View style={{marginTop:responsiveHeight(60)}}>
+                                <View style={{flexDirection:'row',flex:1,marginVertical:15, }}>
+                                    <Slider
+                                        onTouchStart={this.onSliderEditStart}
+                                        // onTouchMove={() => console.log('onTouchMove')}
+                                        onTouchEnd={this.onSliderEditEnd}
+                                        // onTouchEndCapture={() => console.log('onTouchEndCapture')}
+                                        // onTouchCancel={() => console.log('onTouchCancel')}
+                                        onValueChange={this.onSliderEditing}
+                                        value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
+                                        style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                                 </View>
-                                <View>
-                                    <Text style={{color:'white', alignSelf:'center'}}>{durationString}</Text>
+                                <View style={{flexDirection:'row'}}>
+                                    <View style={{flex:0.96,marginLeft:responsiveWidth(3.2)}}>
+                                        <Text style={{color:'white'}}>{currentTimeString}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={{color:'white', alignSelf:'center'}}>{durationString}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                            
-                        </View>
-                        <View style={{flexDirection:'row', justifyContent:'center',alignItems:'center',marginTop:responsiveHeight(3.5)}}>
-                            <View style={{flex:0.2}} >
-                                {single.trackName?
-                                <Image
-                                    source={fav}
-                                    style={{width:20,height:18,alignSelf:'center',  tintColor:single.liked ?'#FF5959':'#FFFFFF'}}
-                                />
-                                :
-                                <Image
-                                    source={fav}
-                                    style={{width:20,height:18,alignSelf:'center',  tintColor:'#FF5959'}}
-                                />
-                                }
                                 
-                            </View>
-                            <View style={{flex:0.6,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
-                                <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
-                                    <Image source={img_playjumpleft} style={{width:16, height:20}}/>
-                                    <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:6}}>20</Text>
-                                </TouchableOpacity>
-                                {this.state.playState == 'playing' && 
-                                <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
-                                    <Image source={img_pause} style={{width:42.88, height:42.88}}/>
-                                </TouchableOpacity>}
-                                {this.state.playState == 'paused' && 
-                                <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
-                                    <Image source={img_play} style={{width:42.88, height:42.88}}/>
-                                </TouchableOpacity>}
-                                <TouchableOpacity onPress={this.jumpNext15Seconds} style={{justifyContent:'center',alignItems:'center'}}>
-                                    <Image source={img_playjumpright} style={{width:16, height:20}}/>
-                                    <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:6}}>20</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{flex:0.2}} >
-                                <Image
-                                    source={shuffle}
-                                    style={{width:19,height:17,alignSelf:'center'}}
-                                />
-                            </View>
-                        </View>
-
+                                </View>
+                                <View style={{flexDirection:'row', justifyContent:'center',alignItems:'center',marginTop:responsiveHeight(3.5)}}>
+                                <View style={{flex:0.17}} >
+                                    {/* {single.trackName? */}
+                                    {/* <Text>{single.liked}</Text> */}
+                                    <Image
+                                        source={fav}
+                                        style={{width:20,height:18,alignSelf:'center',  tintColor:single.liked === 'no'? 'white' :'#FF4040'}}
+                                    />
+                                    {/* // :
+                                    // <Image
+                                    //     source={fav}
+                                    //     style={{width:20,height:18,alignSelf:'center',  tintColor:'#FF5959'}}
+                                    // />
+                                    } */}
+                                    
+                                </View>
+                                <View style={{flex:0.8,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
+                                    <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{}}>
+                                        <Image source={img_playjumpleft} style={{width:16, height:20}}/>
+                                        <View style={{position:'absolute',top:responsiveHeight(1),bottom:0,left:0,right:0,alignSelf:'center'}} >
+                                            <Text style={{textAlign:'center' ,color:'white', fontSize:6}}>20</Text>
+                                        </View>
+                                    </TouchableOpacity> 
+                                    {this.state.playState == 'playing' && 
+                                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
+                                        <Image source={img_pause} style={{width:42.88, height:42.88}}/>
+                                    </TouchableOpacity>}
+                                    {this.state.playState == 'paused' && 
+                                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
+                                        <Image source={img_play} style={{width:42.88, height:42.88}}/>
+                                    </TouchableOpacity>}
+                                    <TouchableOpacity onPress={this.jumpNext15Seconds} style={{}}>
+                                        <Image source={img_playjumpright} style={{width:16, height:20}}/>
+                                        <View style={{position:'absolute',top:responsiveHeight(1),bottom:0,left:0,right:0,alignSelf:'center'}} >
+                                            <Text style={{textAlign:'center' , color:'white', fontSize:6}}>20</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{flex:0.15}} >
+                                    <Image
+                                        source={shuffle}
+                                        style={{width:19,height:17,alignSelf:'center'}}
+                                    />
+                                </View>
+                                </View>
+                            </>
+                        }
                 </View>
                 </ImageBackground>
                 

@@ -7,10 +7,11 @@ import {
   LOGIN_USER,
   REGISTER_USER,
   LOGOUT_USER,
-  CONFIRM_EMAIL,
+  FORGOT_PASS,
   CONFIRM_CODE,
   CREATE_GROUP,
   GOOGLE_LOGIN,
+  UPDATE_USER,
   GOOGLE_SIGNUP,
   GOOGLE_FAIL,
   GROUP_FAIL,
@@ -51,6 +52,36 @@ export const loginUser = params => {
     }
   };
 };
+
+export const forgotpassword = params => {
+  // console.log('HERE');
+  // console.log(params);
+  return async dispatch => {
+    dispatch(authLoading());
+    try {
+      const res = await axios.post(
+        `${BASE_URL}api/relax/user/forgotPassword`,
+        JSON.stringify(params),
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      // return res;
+      if (res?.data) {
+        // console.log(res);
+        return dispatch(forgotSuccess(res));
+      }
+      return dispatch(authFailed(res));
+    } catch (err) {
+      // console.log('---> catch', err.response);
+      dispatch(authFailed(err.response));
+    }
+  };
+};
+
 
 export const registerUser = params => {
   return async dispatch => {
@@ -122,6 +153,35 @@ const logingoogle = res => ({
   payload: res,
 });
 
+export const get_paymentResponse = (params) => {
+  //   console.log(rid);
+    return async dispatch => {
+      // dispatch(chatLoading());
+      try {
+        const res = await axios.post(`${BASE_URL}api/relax/user/payment`,
+        JSON.stringify(params), {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        // if (res?.data) {
+          // console.log("HeERE======================>",res?.data?.updatedUser);
+          dispatch(paymentSuccess(res));
+        // }
+        // return dispatch(subsFailed(res));
+        return res;
+      } catch (err) {
+        console.log(err.response.data);
+        dispatch(subsFailed(err.response));
+      }
+    };
+  };
+  //helper
+  export const paymentSuccess = res => ({
+    type: UPDATE_USER,
+    payload: res,
+  });
 
 const authLoading = () => ({
   type: AUTH_LOADING,
@@ -136,6 +196,11 @@ export const authFailed = err => ({
 });
 export const loginSuccess = res => ({
   type: LOGIN_USER,
+  payload: res,
+});
+
+export const forgotSuccess = res => ({
+  type: FORGOT_PASS,
   payload: res,
 });
 

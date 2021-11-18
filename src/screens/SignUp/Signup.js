@@ -26,6 +26,8 @@ import {
   responsiveHeight,
   responsiveScreenHeight,
   responsiveScreenWidth,
+  responsiveWidth,
+  
 } from 'react-native-responsive-dimensions';
 import LinearGradient from 'react-native-linear-gradient';
 // import {
@@ -113,7 +115,7 @@ const  SignUp = (props) => {
           // play services not available or outdated
         } else {
           // some other error happened
-          alert(error);
+          console.log(error);
         }
       }
     }
@@ -123,6 +125,7 @@ const  SignUp = (props) => {
       setconfirmMessage('');
       setemailMessage('');
       setfNameMessage('');
+      setpasswordMessage('');
       setconfirmMessage('');
       if (
         password !== '' &&
@@ -136,40 +139,51 @@ const  SignUp = (props) => {
           email: email,
           password: password,
         };
-        if (password === confirmpass) {
-          const re =
-            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          const emailValid = re.test(email);
-  
-          if (emailValid) {
-            const res = await props.registerUser(params);
-            console.log('Api response', res?.data);
-            if (res?.payload?.data) {
-              console.log('called if signup')
-              setLoading(false);
-              props.navigation.navigate('Signin');
-              Snackbar.show({
-                text: 'Signup succesfully',
-                backgroundColor: '#018CAB',
-                textColor: 'white',
-              });
+        if(ValidateName(fullName)) {
+            // alert('Called name ')
+          if(password.length > 6 || password.length === 6){
+            if (password === confirmpass) {
+              const re =
+                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+              const emailValid = re.test(email);
+      
+              if (emailValid) {
+                const res = await props.registerUser(params);
+                console.log('Api response', res?.data);
+                if (res?.payload?.data) {
+                  console.log('called if signup')
+                  setLoading(false);
+                  props.navigation.navigate('Signin');
+                  Snackbar.show({
+                    text: 'Signup succesfully',
+                    backgroundColor: '#018CAB',
+                    textColor: 'white',
+                  });
+                } else {
+                  console.log('called else signup')
+                  setLoading(false);
+                  Snackbar.show({
+                    text: 'This email already exists',
+                    backgroundColor: '#018CAB',
+                    textColor: 'white',
+                  });
+                }
+              } else {
+                setLoading(false);
+                setemailMessage('Kindly enter correct email');
+              }
             } else {
-              console.log('called else signup')
               setLoading(false);
-              Snackbar.show({
-                text: 'This email already exists',
-                backgroundColor: '#018CAB',
-                textColor: 'white',
-              });
+              setconfirmMessage('Both passwords Must be match');
             }
-          } else {
+          }else{
             setLoading(false);
-            setemailMessage('Kindly enter correct email');
-          }
-        } else {
-          setLoading(false);
-          setconfirmMessage('Both passwords Must be match');
-        }
+            setpasswordMessage('Password length must be 6 characters minimum');
+          }      
+      }else{
+        setLoading(false);
+        setfNameMessage('Full name should only be letters');
+      }
       } else {
         setLoading(false);
         if (
@@ -189,9 +203,10 @@ const  SignUp = (props) => {
         if (password === '') {
           setpasswordMessage('Kindly enter password');
         }
-        if (fullName) {
+        if (fullName === '') {
           setfNameMessage('Kindly enter full name');
         }
+        
         if (confirmpass === '') {
           setconfirmMessage('Kindly enter confirm password');
         }
@@ -199,8 +214,22 @@ const  SignUp = (props) => {
       }
       }
 
+      const validatefirstname = (lastname) => {
+        if (/(?=[A-Za-z])/.test(lastname)) {
+          return false;
+        }
+        return true;
+      }
 
-
+      const ValidateName = (Name) => {
+        var regExp = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+        var name = Name.match(regExp);
+        if (name) {
+    
+          return true;
+        }
+        return false;
+      }
 
     return (
         // <View style={{flex:1}}>
@@ -223,9 +252,9 @@ const  SignUp = (props) => {
                             value={fullName}
                             onChangeText={value => setfullName(value)}
                             placeholder='Full Name'
-                            placeholderTextColor={'#CCCCCC'}
+                            placeholderTextColor={theme.colors.secondary}
                             style={[styles.input,{
-                                borderBottomColor: fNameMessage !== '' ? 'tomato' : '#CCCCCC'
+                                borderBottomColor: fNameMessage !== '' ? 'tomato' : theme.colors.secondary
                             }]}
                         />
                        {fNameMessage !== '' && <Errors errors={fNameMessage} />}
@@ -234,21 +263,21 @@ const  SignUp = (props) => {
                             value={email}
                             onChangeText={value => setEmail(value)}
                             placeholder='Sample@gmail.com'
-                            placeholderTextColor={'#CCCCCC'}
+                            placeholderTextColor={theme.colors.secondary}
                             style={[styles.input,{
-                              borderBottomColor: emailMessage !== '' ? 'tomato' : '#CCCCCC'
+                              borderBottomColor: emailMessage !== '' ? 'tomato' : theme.colors.secondary
                             }]}
                         />
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
                         <Text style={[styles.labelstyle,{marginTop:20}]}>Password</Text>
                         <View style={{
-                          borderBottomColor: confirmMessage !== '' ? 'tomato' : '#CCCCCC',borderBottomWidth:1
+                          borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary,borderBottomWidth:1
                         }} >
                           <TextInput
                               value={password}
                               onChangeText={value => setPassword(value)}
                               placeholder='********'
-                              placeholderTextColor={'#CCCCCC'}
+                              placeholderTextColor={theme.colors.secondary}
                               secureTextEntry={!switchEye? true : false}
                               style={[styles.input,{
                                 width:'90%',borderBottomWidth:0
@@ -264,7 +293,7 @@ const  SignUp = (props) => {
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:16,height:16,marginRight:10}}
+                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
                                 />
                             </TouchableOpacity>
                             :
@@ -273,7 +302,7 @@ const  SignUp = (props) => {
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:16,height:16,marginRight:10}}
+                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
                                 />
                             </TouchableOpacity>
                         }
@@ -281,13 +310,13 @@ const  SignUp = (props) => {
                         {passwordMessage !== '' && <Errors errors={passwordMessage} />}
                         <Text style={[styles.labelstyle,{marginTop:10}]}>Confirm Password</Text>
                         <View style={{
-                          borderBottomColor: confirmMessage !== '' ? 'tomato' : '#CCCCCC',borderBottomWidth:1
+                          borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary,borderBottomWidth:1
                         }} >
                         <TextInput
                             value={confirmpass}
                             onChangeText={value => setconfirmpass(value)}
                             placeholder='********'
-                            placeholderTextColor={'#CCCCCC'}
+                            placeholderTextColor={theme.colors.secondary}
                             secureTextEntry={!conswitchEye? true : false}
                             style={[styles.input,{width:'90%',borderBottomWidth:0}]}
                         />
@@ -301,7 +330,7 @@ const  SignUp = (props) => {
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:16,height:16,marginRight:10}}
+                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
                                 />
                             </TouchableOpacity>
                             :
@@ -310,7 +339,7 @@ const  SignUp = (props) => {
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:16,height:16,marginRight:10}}
+                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
                                 />
                             </TouchableOpacity>
                         }

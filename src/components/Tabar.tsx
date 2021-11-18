@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {Component} from "react";
 import {
   SafeAreaView, StyleSheet, Dimensions, View, Animated,
 } from "react-native";
@@ -70,10 +70,16 @@ const d = getPath();
 interface TabbarProps {}
 
 // eslint-disable-next-line react/prefer-stateless-function
-export default class Tabbar extends React.PureComponent<TabbarProps> {
+export default class Tabbar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
   value = new Animated.Value(0);
 
   render() {
+    const navigation = this.props
+    
     const { value } = this;
     const translateX = value.interpolate({
       inputRange: [0, width],
@@ -93,7 +99,7 @@ export default class Tabbar extends React.PureComponent<TabbarProps> {
         </AnimatedSvg>
           
           <View style={StyleSheet.absoluteFill}>
-            <StaticTabbar {...{ tabs, value }} />
+            <StaticTabbar {...{ tabs, value,navigation }} />
           </View>
         </View>
         <SafeAreaView style={styles.container} />

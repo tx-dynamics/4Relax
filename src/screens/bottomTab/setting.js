@@ -1,5 +1,5 @@
 import React,{useState} from 'react'
-import {View,Text,ImageBackground,Image,FlatList,Switch} from 'react-native'
+import {View,Text,ImageBackground,Image,FlatList,Share,Switch} from 'react-native'
 import {logo,settin,product,right,contact,notification,share,rate,info,logout} from '../../assets'
 import {
     responsiveHeight,
@@ -12,6 +12,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 import {logoOut} from '../../redux/actions/auth';
 import {connect} from 'react-redux';
+import theme from '../../theme';
 
 
 function setting(props) {
@@ -25,6 +26,26 @@ function setting(props) {
         props.navigation.navigate('Auth', {screen: 'Signin'});
       }
 
+       async function onShare  () {
+        try {
+          const result = await Share.share({
+            message:
+              "Share your experience with your friends",
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+
     return (
         <LinearGradient
         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
@@ -33,22 +54,7 @@ function setting(props) {
                 source={settin}
                 style={styles.imgBackground}
             >
-                <View style={{flexDirection:'row'}}>
-                    <View style={{flex:0.8}} >
-                        <Text style={[styles.title,{marginRight:responsiveWidth(6)}]}>SETTINGS</Text>
-                    </View>
-                    <TouchableOpacity onPress={()=> {
-                        props.logoOut(),
-                        props.navigation.replace('Auth',{screen: 'Signin'})
-                    }} 
-                    style={{justifyContent:'center',alignItems:'center',flex:1}} >
-                    <Image
-                        source={logout}
-                        style={{width:30,height:30,tintColor:'#000A0D',marginTop:responsiveHeight(1),marginRight:responsiveWidth(1)}}
-                    />
-                    </TouchableOpacity>
-                    
-                </View>
+                <Text style={styles.title}>SETTINGS</Text>
                 <View style={{height:'50%'}} />
 
                 <Image
@@ -68,7 +74,7 @@ function setting(props) {
                             source={product}
                             style={{width:16,height:16,left:10}}
                         />
-                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%'}} >Subscription</Text>
+                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%',color:theme.colors.primary}} >Subscription</Text>
                         <Image
                             source={right}
                             style={{width:5,height:10}}
@@ -87,7 +93,7 @@ function setting(props) {
                                     source={notification}
                                     style={{width:16,height:16,left:10}}
                                 />
-                                <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'82%'}} >Norifications</Text>
+                                <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'80%',color:theme.colors.primary}} >Notifications</Text>
                             </TouchableOpacity>
                             <View style={{width:'20%'}}>
                                 <Switch
@@ -111,7 +117,7 @@ function setting(props) {
                             source={product}
                             style={{width:16,height:16,left:10}}
                         />
-                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%'}} >Downloads</Text>
+                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%',color:theme.colors.primary}} >Downloads</Text>
                         <Image
                             source={right}
                             style={{width:5,height:10}}
@@ -124,12 +130,12 @@ function setting(props) {
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                     style={styles.setting_btn}
                     >
-                    <TouchableOpacity onPress={()=>props.navigation.navigate('Stripe')} style={{flexDirection:'row',alignItems:'center'}}>
+                    <TouchableOpacity onPress={()=>{alert('Will navigate to any info or link provided by client')}} style={{flexDirection:'row',alignItems:'center'}}>
                         <Image
                             source={contact}
                             style={{width:16,height:16,left:10}}
                         />
-                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%'}} >Contact us</Text>
+                        <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'88%',color:theme.colors.primary}} >Contact us</Text>
                         <Image
                             source={right}
                             style={{width:5,height:10}}
@@ -145,7 +151,7 @@ function setting(props) {
                     style={{width:51.3,height:51.3,borderRadius:100,alignItems:'center',justifyContent:'center'}}
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
                 >
-                    <TouchableOpacity style={{}}>
+                    <TouchableOpacity onPress={()=>{alert('Any info provided by client')}} style={{}}>
                         <Image 
                             source={info}
                             style={{width:13.92,height:21.6}}
@@ -157,7 +163,7 @@ function setting(props) {
                     style={{width:51.3,height:51.3,borderRadius:100,alignItems:'center',justifyContent:'center',marginLeft:responsiveWidth(6)}}
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
                 >
-                    <TouchableOpacity style={{}}>
+                    <TouchableOpacity onPress={()=>onShare()} style={{}}>
                         <Image 
                             source={share}
                             style={{width:19.05,height:20.04}}
@@ -169,10 +175,26 @@ function setting(props) {
                     style={{width:51.3,height:51.3,borderRadius:100,alignItems:'center',justifyContent:'center',marginLeft:responsiveWidth(6)}}
                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
                 >
-                    <TouchableOpacity style={{}}>
+                    <TouchableOpacity onPress={()=>{alert('Will be handled after placing it on Google play store')}} style={{}}>
                         <Image 
                             source={rate}
                             style={{width:17.07,height:17.21    }}
+                        />
+                    </TouchableOpacity>
+                </LinearGradient>
+
+                <LinearGradient 
+                    style={{width:51.3,height:51.3,borderRadius:100,alignItems:'center',justifyContent:'center',marginLeft:responsiveWidth(6)}}
+                    start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
+                >
+                    <TouchableOpacity  onPress={()=> {
+                        props.logoOut()
+                        props.navigation.replace('Auth', {screen: 'Signin'})
+                        // props.navigation.replace('Signin')
+                    }}  style={{}}>
+                        <Image
+                            source={logout}
+                            style={{width:30,height:30,tintColor:'#FFFFFF'}}
                         />
                     </TouchableOpacity>
                 </LinearGradient>

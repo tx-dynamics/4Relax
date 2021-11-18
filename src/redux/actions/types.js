@@ -36,6 +36,11 @@ export const GET_STORIES = 'GET_STORIES';
 // export const SEND_MSG = 'SEND_MSG';
 export const GET_MEDITATIONS = 'GET_MEDITATIONS';
 export const SET_FAV = 'SET_FAV';
+export const GET_CATEGORIES = 'GET_CATEGORIES';
+export const GET_SUBSCRIPTION = 'GET_SUBSCRIPTION';
+export const PAYMENT = 'PAYMENT';
+export const UPDATE_USER = 'UPDATE_USER';
+export const FORGOT_PASS = 'FORGOT_PASS';
 
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';

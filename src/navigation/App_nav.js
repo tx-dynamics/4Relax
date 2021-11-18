@@ -22,14 +22,16 @@ function AppNav({}) {
 
   return (
     <NavigationContainer
-      independent={true}
+      // independent={true}
     >
       {/* <StripeProvider
       publishableKey={publishableKey}
       merchantIdentifier="merchant.identifier"
     > */}
 
-        <Stack.Navigator initialRouteName={initial}>
+        <Stack.Navigator 
+          // independent={true}
+          initialRouteName={initial}>
           <Stack.Screen
             name="Auth"
             component={AuthenticationStack}

@@ -4,10 +4,6 @@ import {View, LogBox, PermissionsAndroid, NativeModules} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-// import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-
-// const Tab = createMaterialBottomTabNavigator();
-
 
 
 import BottomTab from './bottomtab'
@@ -21,7 +17,8 @@ import Packages from '../screens/bottomTab/sub_packages'
 import Downloads from '../screens/bottomTab/donloads'
 import Activation from '../screens/bottomTab/activation'
 import AudioPlayer from '../screens/bottomTab/soundplayer'
-import Stripe from '../screens/bottomTab/payment_method/mian'
+import Payment from '../screens/bottomTab/payment'
+import AuthenticationStack from './Auth_nav';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
@@ -59,11 +56,20 @@ const setting = () => {
       />    
 
       <Stack.Screen
-        name="Stripe"
-        component={Stripe}
+        name="Payment"
+        component={Payment}
         options={{headerShown: false}}
       />
-
+      <Stack.Screen
+        name="AudioPlayer"
+        component={AudioPlayer}
+        options={{headerShown: false}}
+      />
+      {/* <Stack.Screen
+        name="Auth"
+        component={AuthenticationStack}
+        options={{headerShown: false}}
+      /> */}
     </Stack.Navigator>
   );
 };
@@ -81,6 +87,34 @@ const feed = () => {
         component={AudioPlayer}
         options={{headerShown: false}}
       />
+      <Stack.Screen
+        name="Packages"
+        component={Packages}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Payment"
+        component={Payment}
+        options={{headerShown: false}}
+      />
+
+    </Stack.Navigator>
+  );
+};
+
+const explore = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Explore"
+        component={Explore}
+        options={{headerShown: false}}
+      />      
+      <Stack.Screen
+        name="AudioPlayer"
+        component={AudioPlayer}
+        options={{headerShown: false}}
+      />
       
 
 
@@ -88,22 +122,63 @@ const feed = () => {
   );
 };
 
-function Tabbar({navigation}) {
-
-
+const music = () => {
   return (
-      <NavigationContainer independent={true}>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Music"
+        component={Music}
+        options={{headerShown: false}}
+      />      
+      <Stack.Screen
+        name="AudioPlayer"
+        component={AudioPlayer}
+        options={{headerShown: false}}
+      />
+      
+
+
+    </Stack.Navigator>
+  );
+}
+
+const favor = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Fav"
+        component={Fav}
+        options={{headerShown: false}}
+      />      
+      <Stack.Screen
+        name="AudioPlayer"
+        component={AudioPlayer}
+        options={{headerShown: false}}
+      />
+      
+
+
+    </Stack.Navigator>
+  );
+}
+
+function Tabbar({navigation,props}) {
+
+console.log(navigation);
+  return (
+      // <NavigationContainer independent={true}>
         <Tab.Navigator
         independent={true}
+        swipeEnabled={false}
           tabBarPosition={'bottom'} 
           tabBar={(props) => <BottomTab {...props} />}>
               <Tab.Screen name="Home" component={feed} />
-              <Tab.Screen name="Explore" component={Explore} />
-              <Tab.Screen name="Music" component={Music} />
-              <Tab.Screen name="Fav" component={Fav} />
+              <Tab.Screen name="Explore" component={explore} />
+              <Tab.Screen name="Music" component={music} />
+              <Tab.Screen name="Fav" component={favor} />
               <Tab.Screen name="Setting" component={setting} />
         </Tab.Navigator>
-    </NavigationContainer>
+    // </NavigationContainer>
   );
 }
 

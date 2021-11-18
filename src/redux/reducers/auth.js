@@ -10,11 +10,12 @@ import {
   REGISTER_USER,
   LOGIN_USER,
   LOGOUT_USER,
-  GET_INTEREST,
+  FORGOT_PASS,
   CONFIRM_EMAIL,
   CONFIRM_CODE,
   CREATE_GROUP,
   GOOGLE_LOGIN,
+  UPDATE_USER,
   GOOGLE_SIGNUP,
   GOOGLE_FAIL,
   GROUP_FAIL,
@@ -54,6 +55,17 @@ export const authReducer = (state = initialState, action) => {
         isLoggedIn: false,
         message: action.payload.data.message,
       };
+      case  FORGOT_PASS:
+        // console.log('auth', action.payload.data.message);
+        return {
+          ...state,
+          isLoading: false,
+          isError: true,
+          isSuccess: false,
+          errMsg: action.payload,
+          isLoggedIn: false,
+          message: action.payload.data.message,
+        };
     case LOGIN_USER:
       // console.log('here');
       return {
@@ -142,7 +154,18 @@ export const authReducer = (state = initialState, action) => {
         message: action.payload.data.message,
         isSuccess: false,
       };
-
+    case UPDATE_USER:
+      console.log('here=============>');
+      return {
+        ...state,
+        userData: action.payload.data.updatedUser,
+        token: action.payload.data.token,
+        isLoggedIn: true,
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        errMsg: null,
+      };
     default:
       return state;
   }

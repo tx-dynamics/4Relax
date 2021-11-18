@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
   },
   input:{
     borderBottomWidth:1,
-    borderBottomColor:'#CCCCCC',
+    borderBottomColor:theme.colors.secondary,
     fontSize:12,
     fontWeight:'500',
-    colors:'#CCCCCC',
+    color:theme.colors.secondary,
     paddingBottom:0,
     fontFamily:'Lato'
   },
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     fontSize:18,
     fontWeight:'500',
     fontFamily:'Lato',
-    color:'white'
+    color:theme.colors.primary
   },
   loginbtn:{
     height:48,

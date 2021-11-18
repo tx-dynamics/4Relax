@@ -188,7 +188,7 @@
 
 
 import React,{useState,useEffect,useRef} from 'react'
-import {View,Text,TouchableOpacity,Slider,ActivityIndicator,Image} from 'react-native'
+import {View,Text,Alert,TouchableOpacity,Slider,ActivityIndicator,Image} from 'react-native'
 import styles from './styles'
 import {logo,cover,play,pause} from '../../assets'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
@@ -247,6 +247,9 @@ export default class PlayerScreen extends React.Component{
 
     getData = async()=>{
         var data = await AsyncStorage.getItem("single_item")
+        
+        // uid = (JSON.parse(userId))
+        // return console.log(JSON.parse(userId))
         this.setState({item:JSON.parse(data)})
         // return console.log(JSON.parse(data))
         setTimeout(() => {
@@ -298,12 +301,13 @@ export default class PlayerScreen extends React.Component{
                 // alert("bad")
                 
                 if (error) {
-                    console.log('failed to load the sound', error);
-                    Alert.alert('Notice', 'audio file error. (Error code : 1)');
+                    // console.log('failed to load the sound', error);
+                    // Alert.alert('Notice', 'audio file error. (Error code : 1)');
                     this.setState({playState:'paused'});
                 }else{
-                    this.setState({playState:'playing', duration:this.sound.getDuration(),isLoading:false});
-                    this.sound.play(this.playComplete);
+                    // alert("else called")
+                    this.setState({playState:'paused', duration:this.sound.getDuration(),isLoading:false});
+                    this.sound.pause(this.playComplete);
                 }
             });    
         }
@@ -313,8 +317,8 @@ export default class PlayerScreen extends React.Component{
             if (success) {
                 console.log('successfully finished playing');
             } else {
-                console.log('playback failed due to audio decoding errors');
-                Alert.alert('Notice', 'audio file error. (Error code : 2)');
+                // console.log('playback failed due to audio decoding errors');
+                // Alert.alert('Notice', 'audio file error. (Error code : 2)');
             }
             this.setState({playState:'paused', playSeconds:0});
             this.sound.setCurrentTime(0);
@@ -358,7 +362,7 @@ export default class PlayerScreen extends React.Component{
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
     return (
-        <View style={{width:'100%',height:87,borderRadius:15,backgroundColor:'#012229',bottom:7,alignSelf: 'flex-end'}}>
+        <View style={{width:'100%',height:87,borderRadius:15,backgroundColor:'#012229',bottom:responsiveHeight(1.5),alignSelf: 'flex-end'}}>
             {this.state.isLoading?
                 <ActivityIndicator size={'large'} color={'white'} style={{marginTop:responsiveHeight(3.5),alignSelf:'center',justifyContent:'center'}} />
             :
@@ -367,12 +371,12 @@ export default class PlayerScreen extends React.Component{
                 {this.pause(),
                 this.props.navigation.navigate('AudioPlayer',{single:item})
                 }}>
-                <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{item.trackName? item.trackName : item.trackType}</Text>
+                <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:responsiveHeight(1),marginLeft:responsiveWidth(5)}]} >{item.trackName? item.trackName : item.trackType}</Text>
                 {/* <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{single.trackName? single.trackName : single.trackType}</Text> */}
             </TouchableOpacity>
-            <View style={{flexDirection:'row',marginTop:8}}>
+            <View style={{flexDirection:'row',marginTop:responsiveHeight(1.5)}}>
                 <View style={{flex:2}}>
-                    <View style={{flexDirection:'row',marginLeft:15}}>
+                    <View style={{flexDirection:'row',marginLeft:responsiveWidth(2.5)}}>
                         <Slider
                             onTouchStart={this.onSliderEditStart}
                             // onTouchMove={() => console.log('onTouchMove')}
@@ -380,27 +384,27 @@ export default class PlayerScreen extends React.Component{
                             // onTouchEndCapture={() => console.log('onTouchEndCapture')}
                             // onTouchCancel={() => console.log('onTouchCancel')}
                             onValueChange={this.onSliderEditing}
-                            value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
-                            style={{ flex:1,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                            value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='#FFFFFF' minimumTrackTintColor='#7497FF'  thumbTintColor='white' 
+                            style={{ flex:0.98,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                     </View>
-                    <View style={{flexDirection:'row',marginTop:responsiveHeight(0.4),marginLeft:responsiveWidth(4)}}>
+                    <View style={{flexDirection:'row',marginTop:responsiveHeight(0.4),marginLeft:responsiveWidth(5)}}>
                         <View style={{flex:0.94}}>
                             <Text style={{fontSize:14,fontWeight:'400',fontFamily:'Lato',color:'white'}} >{currentTimeString}</Text>
                         </View>
-                        <View>
+                        <View style={{marginRight:responsiveWidth(1)}} >
                             <Text style={{fontSize:14,fontWeight:'400',fontFamily:'Lato',color:'white'}} >{durationString}</Text>
                         </View>
                     </View>
                 </View>
                 {this.state.playState == 'playing' &&
-                <TouchableOpacity onPress={()=>this.pause()} style={{flex:0.25,justifyContent:'center',marginBottom:responsiveHeight(8)}}>
+                <TouchableOpacity onPress={()=>this.pause()} style={{flex:0.25,marginLeft:responsiveWidth(1),marginRight:responsiveWidth(3),justifyContent:'center',marginBottom:responsiveHeight(9)}}>
                     <Image 
                         source={img_pause}
                         style={{width:32,height:32}}
                     />
                 </TouchableOpacity>}
                 {this.state.playState == 'paused' &&
-                <TouchableOpacity onPress={()=>this.play()} style={{flex:0.25,justifyContent:'center',marginBottom:responsiveHeight(8)}}>
+                <TouchableOpacity onPress={()=>this.play()} style={{flex:0.25,marginLeft:responsiveWidth(1),marginRight:responsiveWidth(3),justifyContent:'center',marginBottom:responsiveHeight(9)}}>
                     <Image 
                         source={img_play}
                         style={{width:32,height:32}}

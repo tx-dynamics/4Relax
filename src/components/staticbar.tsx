@@ -25,16 +25,37 @@ class StaticTabbar extends React.PureComponent<StaticTabbarProps> {
 
   constructor(props: StaticTabbarProps) {
     super(props);
+    console.log(this.props);
+    
     const { tabs } = this.props;
     this.values = tabs.map((tab, index) => new Animated.Value(index === 0 ? 1 : 0));
   }
 
   onPress = (index: number) => {
-    // if(index === 0){
-    //   alert(index);
-    // }
+    if(index === 0){
+      // alert(index);
+      this.props.navigation.navigate("Home")
+
+    }else if (index === 1){
+        // alert(index)
+        this.props.navigation.navigate("Explore")
+  
+      }
+      else if (index === 2){
+        // alert(index)
+        this.props.navigation.navigate("Music")
+  
+      }else if (index === 3){
+        // alert(index)
+        this.props.navigation.navigate("Fav")
+      }
+      else {
+        // alert(index)
+        this.props.navigation.navigate("Setting")
+  
+      }
     const { value, tabs } = this.props;
-    console.log(index )
+    console.log('Here==>',index);
     const tabWidth = width / tabs.length;
     Animated.sequence([
       Animated.parallel(
@@ -55,6 +76,7 @@ class StaticTabbar extends React.PureComponent<StaticTabbarProps> {
         }),
       ]),
     ]).start();
+    
   }
 
   

@@ -5,12 +5,14 @@ import {GET_ALL_MESSAGE_GROUP, GET_FAVORITES,SET_FAV, SEND_MSG, UPLOAD_DOCS} fro
 export const FAVORITES_FAILED = 'FAVORITES_FAILED';
 export const LOADING_FAVORITES = 'LOADING_FAVORITES';
 
-export const get_allFAVORITES = () => {
-//   console.log(rid);
+export const get_allFAVORITES = params => {
+  
   return async dispatch => {
     // dispatch(chatLoading());
     try {
-      const res = await axios.get(`${BASE_URL}api/relax/favorites/getAll`, {
+      const res = await axios.post(`${BASE_URL}api/relax/favorites/getAll`,
+      JSON.stringify(params), 
+      {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
