@@ -24,7 +24,9 @@ const styles = StyleSheet.create({
     cate:{
         // marginLeft:12,
         marginRight:12,
-        width:88,
+        // width:88,
+        paddingLeft:10,
+        paddingRight:10,
         height:35,
         borderRadius:19,
         justifyContent:'center',

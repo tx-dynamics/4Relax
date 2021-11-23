@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
   input:{
     borderBottomWidth:1,
     borderBottomColor:theme.colors.primary,
-    fontSize:12,
-    fontWeight:'500',
+    fontSize:18,
+    // fontWeight:'500',
     color:theme.colors.secondary,
     paddingBottom:0,
     fontFamily:'Lato'
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     borderRadius:8,
     alignItems:'center',
     justifyContent:'center',
-    // elevation:20,
-    // shadowOffset:5
+    elevation:20,
+    shadowOffset:5
   }
 })
 

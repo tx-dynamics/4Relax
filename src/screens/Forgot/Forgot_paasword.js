@@ -44,6 +44,7 @@ const Forgot  =  props => {
     const [emailMessage, setemailMessage] = useState('');
     const [passwordMessage, setpasswordMessage] = useState('');
     const navigation = props.navigation;
+    const [placeholder, setplaceholder] = useState('Sample@gmail.com');
 
     
 
@@ -120,8 +121,8 @@ const Forgot  =  props => {
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled">
                 <LinearGradient
-                start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']}
-                style={{height:Dimensions.get('window').height}}
+                  start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']}
+                  style={{height:Dimensions.get('window').height}}
                 >
                     <Image
                         source={icon}
@@ -133,7 +134,10 @@ const Forgot  =  props => {
                         <TextInput
                             value={email}
                             onChangeText={value => setEmail(value.trim())}
-                            placeholder='Sample@gmail.com'
+                            // placeholder='Sample@gmail.com'
+                            placeholder={placeholder}
+                            onBlur={()=>email === ''? setplaceholder("Sample@gmail.com"): null}
+                            onFocus={() => setplaceholder('')}
                             placeholderTextColor={theme.colors.secondary}
                             style={[styles.input,{
                                 borderBottomColor:emailMessage !== '' ? 'tomato' : theme.colors.secondary
@@ -169,7 +173,7 @@ const Forgot  =  props => {
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
-                        <View style={{top:responsiveHeight(4),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                        <View style={{top:responsiveHeight(8),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
                             {/* <Text style={[styles.labelstyle,{fontSize:12}]}>Don't have an account ? </Text> */}
                             <TouchableOpacity onPress={()=> props.navigation.replace('Signin')}>
                                 <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign In</Text>

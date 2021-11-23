@@ -19,28 +19,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'rn-fetch-blob'
 import NetInfo from "@react-native-community/netinfo";
 var RNFS = require('react-native-fs');
-const data =[
-    {
-        id:0,
-        name:'Meditate',
-        selected:false
-    },
-    {
-        id:1,
-        name:'sleep',
-        selected:true
-    },
-    {
-        id:2,
-        name:'Calm',
-        selected:false
-    },
-    {
-        id:3,
-        name:'Calm Sound',
-        selected:false
-    },
-]
 
 
     const story = (props) => {
@@ -50,27 +28,63 @@ const data =[
     const isFocused = useIsFocused();
     const [item,setitem ] =  useState();
     const [meditations,setmeditations ] =  useState([]);
-    const [internal,setInternal ] =  useState()
-    const [refreshing, setRefreshing] = useState(false);
+    const [internal,setInternal ] =  useState([])
+    const [refreshing, setRefreshing] = useState(true);
     const [category,setcategory ] =  useState([])
     const [connection,setConnect ] =  useState(false)
     const [islock,setislock ] =  useState(false)
     const [cateEmp,setcateEmp ] =  useState(false)
 
     useEffect(() => {
-        CheckConnectivity()
-        get_category()
+        // CheckConnectivity()
+        checkInternet()
         setcateEmp(false)
         setisplaying (false)
+        requestToPermissions()
 
     }, [isFocused])
     
+    async function checkInternet (){
+      NetInfo.fetch().then((state) => {
+        // setConnect(state.isConnected)
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected,state.isInternetReachable);
+        //if (Platform.OS === "android") {
+          if (state.isConnected) {
+            get_category()
+          } else {
+            let cat = '';
+            CheckConnectivity(cat)
+          }
+        
+      });
+    }
+
     async function get_category(){
       try {
         const res = await props.get_categories();
         var posts = res?.data
         
-        setcategory(posts)
+        var rest = posts.map((item,index)=>{
+          if(index === 0){
+              return {
+                ...item,
+                selected: true,
+              }
+            }else{
+              return {
+                ...item,
+                selected: false,
+              }
+            }
+          
+        })
+        var first = posts[0];
+        var seleted = {...first,selected:true}
+        // alert(seleted.name);
+        setcategory(rest)
+
+        CheckConnectivity(seleted.name)
         
 
 
@@ -81,7 +95,7 @@ const data =[
       }
     }
 
-    function CheckConnectivity  ()  {
+    function CheckConnectivity  (cat = '')  {
       setisplaying(false)
       setRefreshing(true);
       // For Android devices
@@ -91,20 +105,20 @@ const data =[
         console.log("Is connected?", state.isConnected,state.isInternetReachable);
         //if (Platform.OS === "android") {
           if (state.isConnected) {
-            getFiles(state)
+            getFiles(state,cat)
           } else {
-            getFiles(state)
-            Snackbar.show({
-              text: 'You are not Connected to Internet, Continuing Offline!',
-              backgroundColor: '#018CAB',
-              textColor: 'white',
-            });
+            getFiles(state,cat)
+            // Snackbar.show({
+            //   text: 'You are not Connected to Internet, Continuing Offline!',
+            //   backgroundColor: '#018CAB',
+            //   textColor: 'white',
+            // });
           }
         
       });
     };
 
-    function getFiles(state){
+    function getFiles(state,cat){
       let dir = RNFS.DownloadDirectoryPath + '/FourRelax/stories'
       var meditation = [];
       var filePath = [];
@@ -135,7 +149,7 @@ const data =[
               console.log(meditation)
               // alert("called internal medi")
               setInternal(meditation)
-              let cate = ''
+              let cate = cat
               let cover = ''
               getStories(cate,cover,meditation)
     
@@ -157,7 +171,7 @@ const data =[
           //   backgroundColor: '#018CAB',
           //   textColor: 'tomato',
           // });
-              let cate = ''
+              let cate = cat
               let cover = '';
           let meditation = []
           getStories(cate,cover,meditation)
@@ -205,8 +219,8 @@ const data =[
 
               filtered.map((item)=>{
                 // console.log(item.trackCategory === cate)
-                  if(item.trackCategory === cate){
-                      getFilter.push({...item,cover});
+                  if(item.trackCategory.name === cate){
+                      getFilter.push(item);
                   }else{
                       return
                   }
@@ -275,7 +289,7 @@ const data =[
             trackType: "stories",
             trackName: item.trackName,
             trackFile:item.trackFile,
-            coverPic:item.coverPic,
+            coverPic:item.trackCategory.coverPic,
             userId:props?.userData?._id
           };
             // console.log(params)
@@ -284,15 +298,15 @@ const data =[
             // console.log('group_data', res);
             if (res?.data) {
                 console.log(res?.data)
-                let cat = '';
+                let cat = item.trackCategory.name;
                 let cover = '';
                 let story = internal;
                 getStories(cat,cover,story)
-                Snackbar.show({
-                    text: res?.data,
-                    backgroundColor: '#018CAB',
-                    textColor: 'white',
-                  });
+                // Snackbar.show({
+                //     text: res?.data,
+                //     backgroundColor: '#018CAB',
+                //     textColor: 'white',
+                //   });
             //   setmeditations(res?.data);
             }
           //   setloadingGroup(false);
@@ -450,7 +464,7 @@ const data =[
               await AsyncStorage.setItem("single_item",JSON.stringify({...single,type:'stories'}))
 
           } catch (e) {
-           alert("calling itself"+e)
+           console.log("calling itself"+e)
           }
       // alert('called set data')
               
@@ -485,7 +499,6 @@ const data =[
 
 
   async function startDownload  (item,index)  {
-      requestToPermissions()
       var res = meditations.map((post)=>{
         if(post._id === item._id){
           return {
@@ -502,7 +515,7 @@ const data =[
       // const {tunes, token, currentTrackIndex} = this.state;
       let url  = item.trackFile;
       let name  = item.trackName;
-      let coverUrl  = item.coverPic;
+      let coverUrl  = item.trackCategory.coverPic;
 
       // let dis = RNFetchBlob.fs.dirs
       // return console.log(dis.DownloadDir)
@@ -696,9 +709,9 @@ const data =[
           }
       })
         setmeditations(res)
-        CheckConnectivity()
+        CheckConnectivity(item.trackCategory.name)
         return  
-      }, 3000);
+      }, 8000);
       
       
       
@@ -744,11 +757,11 @@ const data =[
                 console.log(err);
             });
             // console.log(name+"Deleted");
-            Snackbar.show({
-              text: name+' Deleted',
-              backgroundColor: '#018CAB',
-              textColor: 'white',
-            });
+            // Snackbar.show({
+            //   text: name+' Deleted',
+            //   backgroundColor: '#018CAB',
+            //   textColor: 'white',
+            // });
         }else{
             console.log("File Not Available")
             Snackbar.show({
@@ -762,8 +775,12 @@ const data =[
       }catch(e){
         console.log("error : "+e)
       }
+      if(item.liked === "yes"){
+        // alert('called')
+        favourities(item)
+      }
       setTimeout(() => {
-        CheckConnectivity()
+        CheckConnectivity(item.trackCategory.name)
       }, 1500);
    
 
@@ -831,9 +848,9 @@ const data =[
                         
                     :
                     <FlatList
-                          refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={CheckConnectivity} />
-                          }
+                          // refreshControl={
+                          //   <RefreshControl refreshing={refreshing} onRefresh={CheckConnectivity} />
+                          // }
                           style={{width:'100%'}}
                           numColumns={'2'}
                           showsVerticalScrollIndicator={false}
@@ -845,7 +862,7 @@ const data =[
                                         item.cover
                                       : 
                                         connection?
-                                          item.coverPic 
+                                          item.trackCategory.coverPic 
                                         :
                                           'file://' + item.coverPic}}
                                       borderRadius={4}
@@ -853,59 +870,147 @@ const data =[
                                   >
                                       <View style={{flexDirection:'row',flex:0.3}}>
                                           <View style={{flex:0.29}}>
-                                              <TouchableOpacity onPress={()=> favourities(item)}  style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}>
-                                                  <Image
-                                                      source={fav}
-                                                      style={[styles.icon,{
-                                                          tintColor: item.liked === 'no'? 'white' :'#FF4040'
-                                                      }]}
-                                                  />
+                                          {connection?
+                                          <>
+                                          {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                              null
+                                            :
+                                            <>
+                                              {item.isdownloading?
+                                                <TouchableOpacity onPress={()=> favourities(item)}  style={{height:40}} >
+                                                    <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
+                                                      <Image
+                                                          source={fav}
+                                                          style={[styles.icon,{
+                                                              tintColor: item.liked === 'no'? 'white' :'#FF4040'
+                                                          }]}
+                                                      />
+                                                    </View>
+                                                </TouchableOpacity>
+                                              :
+                                              null}
+                                            </>
+                                            }
+                                          </>
+                                          :
+                                          <>
+                                            {item.isdownloading?
+                                              <TouchableOpacity onPress={()=> favourities(item)}  style={{height:40}} >
+                                                  <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
+                                                    <Image
+                                                        source={fav}
+                                                        style={[styles.icon,{
+                                                            tintColor: item.liked === 'no'? 'white' :'#FF4040'
+                                                        }]}
+                                                    />
+                                                  </View>
                                               </TouchableOpacity>
+                                            :
+                                            null}
+                                          </>
+                                          }
                                           </View>
                                           <View style={{flex:0.8,alignItems:'flex-end'}}>
-                                          {item.isdownloading?
-                                              <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
-                                                  <Image
-                                                      source={del}
-                                                      style={styles.icon}
-                                                  />
-                                              </TouchableOpacity>
+                                          {connection?
+                                            <>
+                                            {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                                null
                                               :
-                                              <TouchableOpacity  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
-                                                  <Image
-                                                      source={del}
-                                                      style={styles.icon}
-                                                  />
-                                              </TouchableOpacity>
+                                              <>
+                                                {item.isdownloading?
+                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                      <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]} >
+                                                        <Image
+                                                            source={del}
+                                                            style={styles.icon}
+                                                        />
+                                                      </View>
+                                                  </TouchableOpacity>
+                                                :
+                                                null}
+                                              </>
                                             }
+                                            </>
+                                          :
+                                            <>
+                                              {item.isdownloading?
+                                                <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                    <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]} >
+                                                      <Image
+                                                          source={del}
+                                                          style={styles.icon}
+                                                      />
+                                                    </View>
+                                                </TouchableOpacity>
+                                              :
+                                              null}
+                                            </>
+                                          }
+                                          
                                           </View>
                                       </View>
                                       <View style={{flex:0.4}}></View>
                                       <View style={{flex:0.25,width:'100%',alignItems:'center'}} >
-                                      {/* {item.unloc?
-                                      <> */}
-                                          {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                              <TouchableOpacity onPress={()=> {
-                                                  props.navigation.navigate('Packages'),
-                                                  setislock(!islock)}}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                        {connection?
+                                          <>
+                                          {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
+                                              <TouchableOpacity onPress={()=> 
+                                                  props.navigation.navigate('Packages')
+                                              }
+                                              style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                   <Image
                                                       source={unloc}
                                                       style={[styles.icon,{width:15,height:19}]}
                                                   />
                                               </TouchableOpacity>
+                                                :
+                                                <>
+                                                {item.isdownloading?
+                                                    <>
+                                                      {item.isplaying?
+                                                          <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)} 
+                                                          style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                                <Image
+                                                                    source={pause}
+                                                                    style={[styles.icon,{width:22.67,height:22.67}]}
+                                                                />
+                                                          </TouchableOpacity>
+                                                          :
+                                                          <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)}
+                                                              style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                              <Image
+                                                                  source={play}
+                                                                  style={[styles.icon,{width:22,height:22}]}
+                                                              />
+                                                          </TouchableOpacity>
+                                                      }
+                                                    </>
+                                                  :
+                                                    <TouchableOpacity onPress={()=> {
+                                                      startDownload(item,item._id)
+                                                      }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
+                                                      <Image
+                                                          source={download}
+                                                          style={[styles.icon,{width:34,height:34,}]}
+                                                      />
+                                                    </TouchableOpacity>
+                                                }
+                                                </>
+                                            }
+                                          </>
                                           :
                                           <>
-                                          {item.isdownloading?
-                                              <>
+                                            {item.isdownloading?
+                                                <>
                                                   {item.isplaying?
-                                                      <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
-                                                          <Image
-                                                              source={pause}
-                                                              style={[styles.icon,{width:22.67,height:22.67}]}
-                                                          />
+                                                      <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)} 
+                                                      style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                            <Image
+                                                                source={pause}
+                                                                style={[styles.icon,{width:22.67,height:22.67}]}
+                                                            />
                                                       </TouchableOpacity>
                                                       :
-                                                      
                                                       <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)}
                                                           style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                           <Image
@@ -914,19 +1019,20 @@ const data =[
                                                           />
                                                       </TouchableOpacity>
                                                   }
-                                              </>
-                                            :
-                                              <TouchableOpacity onPress={()=> {
-                                                startDownload(item,index)
-                                                // setislock(!islock)
-                                                }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
-                                                <Image
-                                                    source={download}
-                                                    style={[styles.icon,{width:34,height:34,}]}
-                                                />
-                                              </TouchableOpacity>
-                                          }</>
+                                                </>
+                                              :
+                                                <TouchableOpacity onPress={()=> {
+                                                  startDownload(item,item._id)
+                                                  }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
+                                                  <Image
+                                                      source={download}
+                                                      style={[styles.icon,{width:34,height:34,}]}
+                                                  />
+                                                </TouchableOpacity>
+                                            }
+                                          </>
                                         }
+                                          
                                           {item.progress &&
                                           <ActivityIndicator
                                           size={'large'}

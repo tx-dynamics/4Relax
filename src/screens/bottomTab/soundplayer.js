@@ -15,7 +15,9 @@ import Sound from 'react-native-sound';
 import axios from 'axios';
 import {BASE_URL} from '../../redux/base-url';
 import NetInfo from "@react-native-community/netinfo";
+import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+var RNFS = require('react-native-fs');
 
 // const img_speaker = require('./resources/ui_speaker.png');
 
@@ -40,9 +42,11 @@ export default class PlayerScreen extends React.Component{
             playSeconds:0,
             duration:0,
             single:{},
+            trackCategory:{},
             connection:false,
             isLoading:true,
             don:false,
+            selected:false
         }
         this.sliderEditing = false;
     }
@@ -57,7 +61,7 @@ export default class PlayerScreen extends React.Component{
         //     }
         //   );
         this.CheckConnectivity()
-        console.log(this.props.navigation);
+        // console.log(this.props.navigation);
         // this.props.navigation.addListener(
         //     'didBlur',
         //     () => this.sound.pause()
@@ -101,7 +105,7 @@ export default class PlayerScreen extends React.Component{
 
     getSingle = async (id,fav,type,tracktype) => {
         let userId = await AsyncStorage.getItem('userId');
-        console.log("***************************",userId)
+        // console.log("***************************",userId)
         const params = {
             userId : userId
         }
@@ -116,10 +120,10 @@ export default class PlayerScreen extends React.Component{
                 'Content-Type': 'application/json',
               },
             });
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            console.log(res?.data)
+            // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            // console.log(res?.data)
             if(res?.data){
-                this.setState({single:res?.data})
+                this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                 setTimeout(() => {
                     this.play()
                 }, 500);
@@ -138,7 +142,7 @@ export default class PlayerScreen extends React.Component{
                 });
                 // console.log(res?.data)
                 if(res?.data){
-                    this.setState({single:res?.data})
+                    this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                     setTimeout(() => {
                         this.play()
                     }, 500);
@@ -157,7 +161,7 @@ export default class PlayerScreen extends React.Component{
                 });
                 // console.log(res?.data)
                 if(res?.data){
-                    this.setState({single:res?.data})
+                    this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                     setTimeout(() => {
                         this.play()
                     }, 500);
@@ -167,7 +171,6 @@ export default class PlayerScreen extends React.Component{
                 }
         }else if(tracktype){
             try {
-                    // alert('fav : '+tracktype)
                     if(fav){
                         this.setState({single:fav})
                         setTimeout(() => {
@@ -304,6 +307,15 @@ export default class PlayerScreen extends React.Component{
         }
     }
 
+    getloop (){
+        this.setState({selected:!this.state.selected})
+        if(this.state.selected){
+            this.sound.setNumberOfLoops(0);
+        }else{
+            this.sound.setNumberOfLoops(-1);
+        }
+    }
+
     getAudioTimeString(seconds){
         // const h = parseInt(seconds/(60*60));
         const m = parseInt(seconds%(60*60)/60);
@@ -313,8 +325,141 @@ export default class PlayerScreen extends React.Component{
         return ((m<10?'0'+m:m) + ':' + (s<10?'0'+s:s));
     }
 
+    deletefile = async () => {
+        if(this.state.single.liked === 'yes'){
+            alert('called')
+            this.favourities(this.state.single)
+          }
+        //   return
+        this.setState({isLoading:true})
+        let name = this.state.single.trackName;
+        let cover = name.concat("_img");
+        // return console.log(cover)
+        let dir = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + name; 
+        let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+        try{
+          let exists = await RNFS.exists(dir,dirImg);
+          if(exists){
+              // exists call delete
+              await RNFS.unlink(dir).then(() => {
+                // console.log('1 deleted');
+                RNFS.scanFile(dir)
+                  .then(() => {
+                    // console.log('1 scanned');
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              })
+              .catch((err) => {         
+                  console.log(err);
+              });
+              await RNFS.unlink(dirImg).then(() => {
+                // console.log('2 deleted');
+                RNFS.scanFile(dirImg)
+                  .then(() => {
+                    // console.log('2 scanned');
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              })
+              .catch((err) => {         
+                  console.log(err);
+              });
+              // console.log(name+"Deleted");
+              // Snackbar.show({
+              //   text: name+' Deleted',
+              //   backgroundColor: '#018CAB',
+              //   textColor: 'white',
+              // });
+          }else{
+              console.log("File Not Available")
+              Snackbar.show({
+                text: 'File Not Available',
+                backgroundColor: 'tomato',
+                textColor: 'white', 
+              });
+          }
+  
+        
+        }catch(e){
+          console.log("error : "+e)
+        }
+        
+        setTimeout(() => {
+            this.props.navigation.goBack()
+            this.setState({isLoading:false})
+        }, 500);
+     
+  
+      }
+
+    favourities = async (item) => {
+    let userId = await AsyncStorage.getItem('userId');
+    if(this.state.connection){
+        const params = {
+        trackId: item._id,
+        trackType: "meditation",
+        trackName: item.trackName,
+        trackFile:item.trackFile,
+        coverPic:item.trackCategory.coverPic,
+        subscriptionType:item.subscriptionType,
+        userId:userId
+        };
+        console.log(params)
+        try {
+            const res = await axios.post(`${BASE_URL}api/relax/favorites/addToFavorite`,
+            JSON.stringify(params),
+            {
+                headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                },
+            });
+            // return console.log(res)
+            if (res?.data) {
+                alert(res?.data)
+            } 
+            return res;
+            } catch (err) {
+            console.log(err.response.data);
+            }
+    //   try {
+    //     const res = await props.set_fav(params);
+    //     // console.log('group_data', res);
+    //     if (res?.data) {
+    //         // console.log(res?.data)
+    //         // let cat = item.trackCategory.name;
+    //         // let cover = '';
+    //         // let medi = internal
+    //         // getMeditation(cat,cover,medi)
+    //         // Snackbar.show({
+    //         //     text: res?.data,
+    //         //     backgroundColor: '#018CAB',
+    //         //     textColor: 'white',
+    //         //   });
+    //     //   setmeditations(res?.data);
+    //     }
+    //   //   setloadingGroup(false);
+    //   } catch (err) {
+    //   //   setloadingGroup(false);
+    //     console.log(err);
+    //   }
+    }else{
+        Snackbar.show({
+        text: 'No Internet Connection! ',
+        backgroundColor: 'tomato',
+        textColor: 'white',
+        });
+    }
+        
+    }
+
+
     render(){
-        const {single} = this.state
+        const {single,trackCategory,selected} = this.state
+        // console.log(single.trackCategory);
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
 
@@ -327,7 +472,7 @@ export default class PlayerScreen extends React.Component{
                             'file://' + single.coverPic
                         :
                         this.state.connection?
-                            single.coverPic 
+                            trackCategory.coverPic ? trackCategory.coverPic : single.coverPic 
                             :
                             'file://' + single.coverPic}}
                     
@@ -338,7 +483,7 @@ export default class PlayerScreen extends React.Component{
                         width:'100%',
                         backgroundColor: '#00000080',
                     }} >
-                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(4)}} >
+                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(2)}} >
                             <View style={{flex:0.98}}>
                                 <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
                                     <Image
@@ -348,16 +493,17 @@ export default class PlayerScreen extends React.Component{
                                 </TouchableOpacity>
                                 
                             </View>
-                            {/* <TouchableOpacity style={{width:32,height:32,borderRadius:50,backgroundColor:'rgba(31, 26, 21, 0.56)',alignItems:'center'}} >
+                            
+                            <TouchableOpacity onPress={()=>this.deletefile()} style={{width:32,height:32,borderRadius:50,backgroundColor:'rgba(31, 26, 21, 0.56)',alignItems:'center'}} >
                                 <Image
                                     source={del}
                                     style={{width:16,height:16,alignSelf:'center',marginTop:responsiveHeight(1)}}
                                 />
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                         </View>
                         <View style={{alignItems:'center',marginTop:responsiveHeight(6)}} >
-                            {/* <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato'}} >{single.trackName? single.trackName : single.trackType}</Text> */}
-                            {/* <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato'}} >{single.trackType}</Text> */}
+                            <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {trackCategory.name}  </Text>
+                            <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackName? single.trackName : single.trackType}</Text>
                         </View>
                         
                         {this.state.isLoading?
@@ -366,7 +512,7 @@ export default class PlayerScreen extends React.Component{
                             </View>
                         :
                             <>
-                                <View style={{marginTop:responsiveHeight(60)}}>
+                                <View style={{marginTop:responsiveHeight(52)}}>
                                 <View style={{flexDirection:'row',flex:1,marginVertical:15, }}>
                                     <Slider
                                         onTouchStart={this.onSliderEditStart}
@@ -406,9 +552,9 @@ export default class PlayerScreen extends React.Component{
                                 </View>
                                 <View style={{flex:0.8,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
                                     <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{}}>
-                                        <Image source={img_playjumpleft} style={{width:16, height:20}}/>
-                                        <View style={{position:'absolute',top:responsiveHeight(1),bottom:0,left:0,right:0,alignSelf:'center'}} >
-                                            <Text style={{textAlign:'center' ,color:'white', fontSize:6}}>20</Text>
+                                        <Image source={img_playjumpleft} style={{width:19, height:25}}/>
+                                        <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
+                                            <Text style={{textAlign:'center' ,color:'white', fontSize:5.5}}>20</Text>
                                         </View>
                                     </TouchableOpacity> 
                                     {this.state.playState == 'playing' && 
@@ -420,17 +566,30 @@ export default class PlayerScreen extends React.Component{
                                         <Image source={img_play} style={{width:42.88, height:42.88}}/>
                                     </TouchableOpacity>}
                                     <TouchableOpacity onPress={this.jumpNext15Seconds} style={{}}>
-                                        <Image source={img_playjumpright} style={{width:16, height:20}}/>
-                                        <View style={{position:'absolute',top:responsiveHeight(1),bottom:0,left:0,right:0,alignSelf:'center'}} >
-                                            <Text style={{textAlign:'center' , color:'white', fontSize:6}}>20</Text>
+                                        <Image source={img_playjumpright} style={{width:19, height:25}}/>
+                                        <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
+                                            <Text style={{textAlign:'center' , color:'white', fontSize:5.5}}>20</Text>
                                         </View>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{flex:0.15}} >
-                                    <Image
-                                        source={shuffle}
-                                        style={{width:19,height:17,alignSelf:'center'}}
-                                    />
+                                    {selected?
+                                    <TouchableOpacity onPress={()=>this.getloop()}>
+                                        <Image
+                                            source={shuffle}
+                                            style={{width:19,height:17,alignSelf:'center',tintColor:'#007FFF'}}
+                                        />
+                                    </TouchableOpacity> 
+                                    :
+                                    <TouchableOpacity onPress={()=>this.getloop()}>
+                                        <Image
+                                            source={shuffle}
+                                            style={{width:19,height:17,alignSelf:'center'}}
+                                        />
+                                    </TouchableOpacity>
+                                        
+                                    }
+                                    
                                 </View>
                                 </View>
                             </>

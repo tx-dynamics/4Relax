@@ -105,7 +105,14 @@ function sub_packages(props) {
                 }
                 />
 
-                
+                <LinearGradient
+                        start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
+                        style={[styles.setting_btn,{marginTop:responsiveHeight(4),marginBottom:responsiveHeight(3)}]}
+                        >
+                    <TouchableOpacity onPress={()=> props.navigation.navigate('Activation')} >
+                        <Text style={[styles.title,{fontSize:18}]} >I have an activation code</Text>
+                    </TouchableOpacity>
+                </LinearGradient>
 
                
             </View>

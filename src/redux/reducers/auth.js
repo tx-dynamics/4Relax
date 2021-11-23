@@ -82,13 +82,13 @@ export const authReducer = (state = initialState, action) => {
       // console.log('auth', action.payload.data.message);
       return {
         ...state,
-        message: action.payload.data.message,
+        message: action.payload.data.msg,
         token: action.payload.data.token,
         isLoggedIn: true,
         isLoading: false,
         isSuccess: true,
         isError: false,
-        userData: action.payload.data.user,
+        userData: action.payload.data.userExist,
         // errMsg: null,
       };
     case REGISTER_USER:

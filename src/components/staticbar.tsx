@@ -4,7 +4,7 @@ import {
 } from "react-native";
 // import { music,feed,fav,setting,explore} from "../assets";
 import LinearGradient from 'react-native-linear-gradient';
-
+import { NavigationActions, StackActions } from '@react-navigation/native';
 
 const { width } = Dimensions.get("window");
 
@@ -51,7 +51,17 @@ class StaticTabbar extends React.PureComponent<StaticTabbarProps> {
       }
       else {
         // alert(index)
-        this.props.navigation.navigate("Setting")
+        // this.props.navigation.popToTop() 
+        // && 
+        // this.props.navigation.navigate('Setting')
+        this.props.navigation.navigate("Setting",{screen:'Setting'})
+      //   const resetAction = StackActions.reset({
+      //     index: 0,
+      //     actions: [NavigationActions.navigate({ routeName: 'Setting' })],
+      // });
+
+      // this.props.navigation.dispatch(resetAction); 
+
   
       }
     const { value, tabs } = this.props;

@@ -4,6 +4,8 @@ import {View, LogBox, PermissionsAndroid, NativeModules} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import Snackbar from 'react-native-snackbar';
+import NetInfo from "@react-native-community/netinfo";
 
 
 import BottomTab from './bottomtab'
@@ -18,14 +20,19 @@ import Downloads from '../screens/bottomTab/donloads'
 import Activation from '../screens/bottomTab/activation'
 import AudioPlayer from '../screens/bottomTab/soundplayer'
 import Payment from '../screens/bottomTab/payment'
-import AuthenticationStack from './Auth_nav';
+import Contact from '../screens/bottomTab/contact_us';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
 
 const setting = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    initialRouteName="Setting"
+    screenOptions={{
+      animationTypeForReplace: 'pop',
+      headerShown: false,
+    }}>
       <Stack.Screen
         name="Setting"
         component={Setting}
@@ -65,11 +72,11 @@ const setting = () => {
         component={AudioPlayer}
         options={{headerShown: false}}
       />
-      {/* <Stack.Screen
-        name="Auth"
-        component={AuthenticationStack}
+      <Stack.Screen
+        name="Contact"
+        component={Contact}
         options={{headerShown: false}}
-      /> */}
+      />
     </Stack.Navigator>
   );
 };
@@ -164,7 +171,34 @@ const favor = () => {
 
 function Tabbar({navigation,props}) {
 
-console.log(navigation);
+  useEffect(() => {
+    CheckConnectivity()
+    // get_category()
+    // setcateEmp(false)
+    // setisplaying (false)
+
+}, [])
+
+  function CheckConnectivity  ()  {
+    // For Android devices
+    // alert("called")
+    NetInfo.fetch().then((state) => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected,state.isInternetReachable);
+      //if (Platform.OS === "android") {
+        if (state.isConnected) {
+        } else {
+          Snackbar.show({
+            text: 'You are not Connected to Internet, Continuing Offline!',
+            backgroundColor: '#018CAB',
+            textColor: 'white',
+          });
+        }
+      
+    });
+  };
+
+// console.log(navigation);
   return (
       // <NavigationContainer independent={true}>
         <Tab.Navigator

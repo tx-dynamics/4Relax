@@ -86,6 +86,7 @@ export const forgotpassword = params => {
 export const googleLoginApi = params => {
   return async dispatch => {
     try {
+      dispatch(authLoading());
       const res = await axios.post(
         `${BASE_URL}api/relax/user/loginWithGoogle`,
         JSON.stringify(params),
@@ -98,11 +99,11 @@ export const googleLoginApi = params => {
       );
       if(res?.data){
         // console.log(res?.data);
-        return dispatch(registerSuccess(res));
+        return dispatch(logingoogle(res));
       }
-      return dispatch(registerFAILED(err.response));
+      return dispatch(authFailed(err.response));
     } catch (err) {
-      dispatch(registerFAILED(err.response));
+      dispatch(authFailed(err.response));
     }
   };
 }

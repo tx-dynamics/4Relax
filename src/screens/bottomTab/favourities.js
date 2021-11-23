@@ -32,7 +32,7 @@ const feed = (props) => {
     const [meditations,setmeditations ] =  useState([])
     const [refreshing, setRefreshing] = useState(false);
     const [connection,setConnect ] =  useState(false)
-    const [internal,setInternal ] =  useState()
+    const [internal,setInternal ] =  useState([])
 
     useEffect(() => {
         setisplaying (false)
@@ -52,11 +52,11 @@ const feed = (props) => {
               getFiles(state)
             } else {
               getFiles(state)
-              Snackbar.show({
-                text: 'You are not Connected to Internet, Continuing Offline!',
-                backgroundColor: '#018CAB',
-                textColor: 'white',
-              });
+              // Snackbar.show({
+              //   text: 'You are not Connected to Internet, Continuing Offline!',
+              //   backgroundColor: '#018CAB',
+              //   textColor: 'white',
+              // });
             }
           
         });
@@ -69,7 +69,7 @@ const feed = (props) => {
         var ImagePath = [];
         RNFetchBlob.fs.isDir(dir).then((isDir)=>{
           if(isDir){
-            alert('called if getfiles')
+            // alert('called if getfiles')
             RNFS.readDir(dir).then(files => {
               // return console.log(files[0].isFile)
               files.map((item)=>{
@@ -140,7 +140,7 @@ const feed = (props) => {
                 checkData( posts ,fav)
             }, 1000);
           }
-         setRefreshing(false);
+        //  setRefreshing(false);
         
         } catch (err) {
           setRefreshing(false);
@@ -206,11 +206,11 @@ const feed = (props) => {
                 // console.log(res?.data)
                 let fav = internal
                 getfavorites(fav)
-                Snackbar.show({
-                    text: res?.data,
-                    backgroundColor: '#018CAB',
-                    textColor: 'white',
-                  });
+                // Snackbar.show({
+                //     text: res?.data,
+                //     backgroundColor: '#018CAB',
+                //     textColor: 'white',
+                //   });
             //   setmeditations(res?.data);
             }
           //   setloadingGroup(false);
@@ -316,12 +316,12 @@ const feed = (props) => {
           }     
         }, 500);
         
-        
+          return console.log(single);
             try {
                 await AsyncStorage.setItem("single_item",JSON.stringify(single))
 
             } catch (e) {
-             alert("calling itself"+e)
+             console.log("calling itself"+e)
             }
         // alert('called set data')
                 
@@ -575,7 +575,7 @@ const feed = (props) => {
           setmeditations(res)
           CheckConnectivity()
           return  
-        }, 3000);
+        }, 8000);
     
         
         
@@ -622,11 +622,11 @@ const feed = (props) => {
                   console.log(err);
               });
               // console.log(name+"Deleted");
-              Snackbar.show({
-                text: name+' Deleted',
-                backgroundColor: '#018CAB',
-                textColor: 'white',
-              });
+              // Snackbar.show({
+              //   text: name+' Deleted',
+              //   backgroundColor: '#018CAB',
+              //   textColor: 'white',
+              // });
           }else{
               console.log("File Not Available")
               Snackbar.show({
@@ -669,7 +669,7 @@ const feed = (props) => {
                     <>
                       {connection?
                         <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}}>
-                          <Text style={styles.title} >Favourties List is empty</Text>
+                          <Text style={styles.title} >Empty</Text>
                         </View>
                       :
                       <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}}>
@@ -725,8 +725,8 @@ const feed = (props) => {
                                         <View style={{flex:0.4}}></View>
                                         <View style={{flex:0.25,width:'100%',alignItems:'center'}} >
                                       
-                                            {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                                <TouchableOpacity onPress={()=> setislock(!islock)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                            {/* {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                                <TouchableOpacity onPress={()=> console.log(props?.userData?._id +"==="+ item.subscriptionType)}  style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                     <Image
                                                         source={unloc}
                                                         style={[styles.icon,{width:15,height:19}]}
@@ -734,7 +734,7 @@ const feed = (props) => {
                                                 </TouchableOpacity>
                                             :
                                             <>
-                                            {item.isdownloading?
+                                            {item.isdownloading? */}
                                                 <>
                                                     {item.isplaying?
                                                         <TouchableOpacity onPress={()=> setData(item,item._id,item.trackName)} style={[styles.iconBackground,{width:34,height:34,top:5,}]}>
@@ -754,7 +754,7 @@ const feed = (props) => {
                                                         </TouchableOpacity>
                                                     }
                                                 </>
-                                              :
+                                              {/* :
                                                 <TouchableOpacity onPress={()=> {
                                                   startDownload(item,index)
                                                   // setislock(!islock)
@@ -764,8 +764,9 @@ const feed = (props) => {
                                                       style={[styles.icon,{width:34,height:34,}]}
                                                   />
                                                 </TouchableOpacity>
-                                            }</>
-                                          }
+                                            }
+                                            </>
+                                          } */}
                                           {item.progress &&
                                             <ActivityIndicator
                                             size={'large'}

@@ -1,6 +1,5 @@
 import React,{Component} from "react";
 import { StyleSheet, View,Dimensions } from "react-native";
-
 import Tabbar from "../components/Tabar";
 import {
   responsiveHeight,
@@ -15,8 +14,11 @@ import {
   constructor(props) {
     super(props);
   }
+
+   
+
   render() {
-    const navigation = this.props.navigation 
+    // const navigation = this.props.navigation 
     // this.props.descriptors.map((item)=>{
     //   console.log(item.navigation)
 

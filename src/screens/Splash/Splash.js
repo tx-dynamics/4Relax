@@ -22,7 +22,7 @@ class Splash extends Component {
     setTimeout(() => {
       this.props.navigation.replace(this.props.isLoggedIn ? 'Root' : 'Signin');
       // this.props.navigation.navigate('Signin');
-    }, 3000);
+    }, 1200);
   };
 
   render() {

@@ -252,20 +252,27 @@ export default class PlayerScreen extends React.Component{
         // return console.log(JSON.parse(userId))
         this.setState({item:JSON.parse(data)})
         // return console.log(JSON.parse(data))
-        setTimeout(() => {
+        // setTimeout(() => {
             this.play();
-        }, 1000);
+        // }, 1000);
 
     }
 
     componentWillUnmount(){
         if(this.sound){
             this.sound.release();
+            this.sound.stop();  
             this.sound = null;
+            console.log('caled 1')
+        }else{
+            this.sound = null;
+            this.sound.stop();  
+            console.log('caled 3')
         }
-        if(this.timeout){
-            clearInterval(this.timeout);
-        }
+        // if(this.timeout){
+        //     console.log('caled 2')
+        //     clearInterval(this.timeout);
+        // }
     }
 
     onSliderEditStart = () => {
@@ -306,8 +313,8 @@ export default class PlayerScreen extends React.Component{
                     this.setState({playState:'paused'});
                 }else{
                     // alert("else called")
-                    this.setState({playState:'paused', duration:this.sound.getDuration(),isLoading:false});
-                    this.sound.pause(this.playComplete);
+                    this.setState({playState:'playing', duration:this.sound.getDuration(),isLoading:false});
+                    this.sound.play(this.playComplete);
                 }
             });    
         }
@@ -374,7 +381,7 @@ export default class PlayerScreen extends React.Component{
                 <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:responsiveHeight(1),marginLeft:responsiveWidth(5)}]} >{item.trackName? item.trackName : item.trackType}</Text>
                 {/* <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{single.trackName? single.trackName : single.trackType}</Text> */}
             </TouchableOpacity>
-            <View style={{flexDirection:'row',marginTop:responsiveHeight(1.5)}}>
+            <View style={{flexDirection:'row',marginTop:responsiveHeight(1)}}>
                 <View style={{flex:2}}>
                     <View style={{flexDirection:'row',marginLeft:responsiveWidth(2.5)}}>
                         <Slider
@@ -385,29 +392,29 @@ export default class PlayerScreen extends React.Component{
                             // onTouchCancel={() => console.log('onTouchCancel')}
                             onValueChange={this.onSliderEditing}
                             value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='#FFFFFF' minimumTrackTintColor='#7497FF'  thumbTintColor='white' 
-                            style={{ flex:0.98,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                            style={{ flex:1,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                     </View>
                     <View style={{flexDirection:'row',marginTop:responsiveHeight(0.4),marginLeft:responsiveWidth(5)}}>
-                        <View style={{flex:0.94}}>
+                        <View style={{flex:0.95}}>
                             <Text style={{fontSize:14,fontWeight:'400',fontFamily:'Lato',color:'white'}} >{currentTimeString}</Text>
                         </View>
-                        <View style={{marginRight:responsiveWidth(1)}} >
+                        <View style={{}} >
                             <Text style={{fontSize:14,fontWeight:'400',fontFamily:'Lato',color:'white'}} >{durationString}</Text>
                         </View>
                     </View>
                 </View>
                 {this.state.playState == 'playing' &&
-                <TouchableOpacity onPress={()=>this.pause()} style={{flex:0.25,marginLeft:responsiveWidth(1),marginRight:responsiveWidth(3),justifyContent:'center',marginBottom:responsiveHeight(9)}}>
+                <TouchableOpacity onPress={()=>this.pause()} style={{flex:0.4,alignItems:'center',justifyContent:'center',marginBottom:responsiveHeight(10)}}>
                     <Image 
                         source={img_pause}
-                        style={{width:32,height:32}}
+                        style={{width:32,height:32,marginRight:responsiveWidth(3.5)}}
                     />
                 </TouchableOpacity>}
                 {this.state.playState == 'paused' &&
-                <TouchableOpacity onPress={()=>this.play()} style={{flex:0.25,marginLeft:responsiveWidth(1),marginRight:responsiveWidth(3),justifyContent:'center',marginBottom:responsiveHeight(9)}}>
+                <TouchableOpacity onPress={()=>this.play()} style={{flex:0.4,alignItems:'center',justifyContent:'center',marginBottom:responsiveHeight(10)}}>
                     <Image 
                         source={img_play}
-                        style={{width:32,height:32}}
+                        style={{width:32,height:32,marginRight:responsiveWidth(3.5)}}
                     />
                 </TouchableOpacity>}                
             </View>

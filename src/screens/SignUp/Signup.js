@@ -55,6 +55,10 @@ const SignUp = (props) => {
   const [passwordMessage, setpasswordMessage] = useState('');
   const [confirmMessage, setconfirmMessage] = useState('');
   const [fNameMessage, setfNameMessage] = useState('');
+  const [placeholderName, setplaceholderName] = useState('Full Name');
+  const [placeholderEmail, setplaceholderEmail] = useState('Sample@gmail.com');
+  const [placeholderPass, setplaceholderPass] = useState('********');
+  const [placeholderConPass, setplaceholderConPass] = useState('********');
 
 
   useEffect(() => {
@@ -177,11 +181,11 @@ const SignUp = (props) => {
               const res = await props.registerUser(params);
               console.log('Api response', res?.data);
               if (res?.payload?.data) {
-                console.log('called if signup')
+                // console.log(email,"++++++++++++++++++++++++++++++++",password)
                 setLoading(false);
-                props.navigation.navigate('Signin');
+                props.navigation.navigate('Signin',{email:email,password:password});
                 Snackbar.show({
-                  text: 'Signup succesfully',
+                  text: 'Signup successfully',
                   backgroundColor: '#018CAB',
                   textColor: 'white',
                 });
@@ -272,11 +276,13 @@ const SignUp = (props) => {
         />
 
         <View style={{ width: '90%', alignSelf: 'center', top: responsiveHeight(10) }}>
-          <Text style={styles.labelstyle}>Full Name</Text>
+          <Text style={[styles.labelstyle,{}]}>Full Name</Text>
           <TextInput
             value={fullName}
             onChangeText={value => setfullName(value)}
-            placeholder='Full Name'
+            placeholder={placeholderName}
+            onBlur={()=>fullName === ''? setplaceholderName("Full Name"): null}
+            onFocus={() => setplaceholderName('')}
             placeholderTextColor={theme.colors.secondary}
             style={[styles.input, {
               borderBottomColor: fNameMessage !== '' ? 'tomato' : theme.colors.secondary
@@ -286,22 +292,26 @@ const SignUp = (props) => {
           <Text style={[styles.labelstyle, { marginTop: 20 }]}>Email</Text>
           <TextInput
             value={email}
-            onChangeText={value => setEmail(value)}
-            placeholder='Sample@gmail.com'
+            onChangeText={value => setEmail(value.trim())}
+            placeholder={placeholderEmail}
+            onBlur={()=>email === ''? setplaceholderEmail("Sample@gmail.com"): null}
+            onFocus={() => setplaceholderEmail('')}
             placeholderTextColor={theme.colors.secondary}
             style={[styles.input, {
               borderBottomColor: emailMessage !== '' ? 'tomato' : theme.colors.secondary
             }]}
           />
           {emailMessage !== '' && <Errors errors={emailMessage} />}
-          <Text style={[styles.labelstyle, { marginTop: 20 }]}>Password</Text>
+          <Text style={[styles.labelstyle, { marginTop: 20}]}>Password</Text>
           <View style={{
             borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary, borderBottomWidth: 1
           }} >
             <TextInput
               value={password}
               onChangeText={value => setPassword(value)}
-              placeholder='********'
+              placeholder={placeholderPass}
+              onBlur={()=>password === ''? setplaceholderPass("********"): null}
+              onFocus={() => setplaceholderPass('')}
               placeholderTextColor={theme.colors.secondary}
               secureTextEntry={!switchEye ? true : false}
               style={[styles.input, {
@@ -310,66 +320,73 @@ const SignUp = (props) => {
             />
           </View>
 
-          <View style={{ width: '100%', alignItems: 'flex-end', bottom: responsiveHeight(2.5) }}>
+          <View style={{ alignSelf:'flex-end', alignItems: 'flex-end', bottom: responsiveHeight(4) }}>
             {switchEye ?
               <TouchableOpacity
                 onPress={() => setswitchEye(false)}
-
+                style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}
               >
                 <Image
                   source={passeye}
-                  style={{ width: 14.34, height: 9, marginRight: responsiveWidth(2) }}
+                  style={{ width: 14.34, height: 9 }}
                 />
               </TouchableOpacity>
               :
               <TouchableOpacity
                 onPress={() => setswitchEye(true)}
+                style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}
               >
                 <Image
                   source={passeye}
-                  style={{ width: 14.34, height: 9, marginRight: responsiveWidth(2) }}
+                  style={{ width: 14.34, height: 9 }}
                 />
               </TouchableOpacity>
             }
           </View>
-          {passwordMessage !== '' && <Errors errors={passwordMessage} />}
-          <Text style={[styles.labelstyle, { marginTop: 10 }]}>Confirm Password</Text>
+          <View style={{bottom:responsiveHeight(2)}} >
+            {passwordMessage !== '' && <Errors errors={passwordMessage} />}
+          </View>
+          <Text style={[styles.labelstyle, { marginTop: 10}]}>Confirm Password</Text>
           <View style={{
             borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary, borderBottomWidth: 1
           }} >
             <TextInput
               value={confirmpass}
               onChangeText={value => setconfirmpass(value)}
-              placeholder='********'
+              placeholder={placeholderConPass}
+              onBlur={()=>confirmpass === ''? setplaceholderConPass("********"): null}
+              onFocus={() => setplaceholderConPass('')}
               placeholderTextColor={theme.colors.secondary}
               secureTextEntry={!conswitchEye ? true : false}
               style={[styles.input, { width: '90%', borderBottomWidth: 0 }]}
             />
           </View>
 
-          <View style={{ width: '100%', alignItems: 'flex-end', bottom: responsiveHeight(2.5) }}>
+          <View style={{ alignSelf:'flex-end', alignItems: 'flex-end', bottom: responsiveHeight(4) }}>
             {conswitchEye ?
               <TouchableOpacity
                 onPress={() => setCoswitchEye(false)}
-
+                style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}
               >
                 <Image
                   source={passeye}
-                  style={{ width: 14.34, height: 9, marginRight: responsiveWidth(2) }}
+                  style={{ width: 14.34, height: 9 }}
                 />
               </TouchableOpacity>
               :
               <TouchableOpacity
                 onPress={() => setCoswitchEye(true)}
-              >
+              style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}>
                 <Image
                   source={passeye}
-                  style={{ width: 14.34, height: 9, marginRight: responsiveWidth(2) }}
+                  style={{ width: 14.34, height: 9 }}
                 />
               </TouchableOpacity>
             }
           </View>
-          {confirmMessage !== '' && <Errors errors={confirmMessage} />}
+          <View style={{bottom:responsiveHeight(2)}} >
+            {confirmMessage !== '' && <Errors errors={confirmMessage} />}
+          </View>
           <View
             style={{ top: responsiveHeight(5) }}
           >
@@ -389,7 +406,7 @@ const SignUp = (props) => {
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View style={{ marginTop: responsiveHeight(8), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+          {/* <View style={{ marginTop: responsiveHeight(8), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
             <Text style={[styles.labelstyle, { fontSize: 14, fontWeight: '700' }]}>Or connect with</Text>
           </View>
           <View style={{ marginTop: responsiveHeight(3.5), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
@@ -405,8 +422,8 @@ const SignUp = (props) => {
                 style={{ width: 19.5, height: 24, alignSelf: 'center' }}
               />
             </TouchableOpacity>
-          </View>
-          <View style={{ marginTop: responsiveHeight(6), marginBottom: responsiveHeight(4), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+          </View> */}
+          <View style={{ marginTop: responsiveHeight(18), marginBottom: responsiveHeight(4), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
             <Text style={[styles.labelstyle, { fontSize: 12 }]}>Already have an account ? </Text>
             <TouchableOpacity onPress={() => props.navigation.goBack()}>
               <Text style={[styles.labelstyle, { fontSize: 14, fontWeight: '900', color: '#FF5959' }]}> Sign In</Text>

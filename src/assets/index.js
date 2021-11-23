@@ -37,4 +37,6 @@ export const shuffle = require('./images/shuffle.png');
 export const unloc = require('./images/lock.png');
 export const download = require('./images/download.png');
 export const logout = require('./images/log-out.png');
+export const policy = require('./images/privacy-policy.png');
+export const terms = require('./images/accept.png');
 

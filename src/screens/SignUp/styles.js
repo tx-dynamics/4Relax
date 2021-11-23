@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
   input:{
     borderBottomWidth:1,
     borderBottomColor:theme.colors.secondary,
-    fontSize:12,
-    fontWeight:'500',
+    fontSize:18,
+    // fontWeight:'500',
     color:theme.colors.secondary,
     paddingBottom:0,
     fontFamily:'Lato'

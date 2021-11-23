@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Platform,
   ScrollView,
 } from 'react-native';
 // import AsyncStorage from '@react-native-community/async-storage';
 import theme from '../../theme';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import styles from '../Sigin/styles';
-import {icon,passeye} from '../../assets';
+import {icon,passeye,apple, google} from '../../assets';
 import {
   responsiveHeight,
   responsiveScreenHeight,
@@ -21,8 +22,9 @@ import {
   responsiveWidth,
   
 } from 'react-native-responsive-dimensions';
-
+import GoogleSign from '../../components/GoogleSign';
 import Snackbar from 'react-native-snackbar';
+import {useIsFocused} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 // import {
 //   GoogleSignin,
@@ -35,8 +37,8 @@ import {
     Googlelogin,
     logoOut,
     authFailed,
+    googleLoginApi
   } from '../../redux/actions/auth';
-import {useIsFocused} from '@react-navigation/native';
 
 const Signin  =  props => {
 
@@ -46,9 +48,22 @@ const Signin  =  props => {
     const [switchEye,setswitchEye] = useState(false);
     const [emailMessage, setemailMessage] = useState('');
     const [passwordMessage, setpasswordMessage] = useState('');
+    const [placeholder, setplaceholder] = useState('Sample@gmail.com');
+    const [placeholderPass, setplaceholderPass] = useState('********');
     const navigation = props.navigation;
+    const isFocused = useIsFocused();
 
-    
+    useEffect(() => {
+      let email = props?.route?.params?.email
+      let password = props?.route?.params?.password
+      if(email == undefined || password == undefined){
+        // alert('not found')
+      }else{
+        setEmail(email)
+        setPassword(password)
+      }
+      // console.log(email,password)
+    }, [isFocused]);
 
     async function onLogin() {
         setemailMessage('');
@@ -120,6 +135,61 @@ const Signin  =  props => {
         }
       }
 
+      const onGoogleLoginPress = async () => {
+        let info = await GoogleSign();
+        // alert(JSON.stringify(info.Data.userInfo.user.photo))
+        // alert(JSON.stringify(info.Data.userInfo.user.name))
+        // alert(JSON.stringify(info.Data.userInfo.user.id))
+        // alert(JSON.stringify(info.Data.userInfo.user.email))
+    
+        let param = {};
+        param['fullName'] = info.Data.userInfo.user.name;
+        param['email'] = info.Data.userInfo.user.email;
+        // param['email'] = "info.Data.userInfo.user.email";
+        param['profileImage'] = info.Data.userInfo.user.photo;
+        // const res = await props.googleLoginApi(params);
+    
+        try{
+          const res = await props.googleLoginApi(param);
+          setemailMessage('');
+          setpasswordMessage('');
+          console.log('api respone', res);
+          //res?.data?.logged
+          if (res?.payload?.data) {
+            setLoading(false);
+            navigation.replace('Root');
+            // console.log('tokens', props.token);
+            Snackbar.show({
+              text: res?.payload?.data?.msg,
+              backgroundColor: '#018CAB',
+              textColor: 'white',
+            });
+          } else {
+            authFailed(res);
+            setLoading(false);
+            Snackbar.show({
+              text: 'Invalid Email',
+              backgroundColor: '#F14336',
+              textColor: 'white',
+            });
+          }
+        }catch(e){
+            console.log(e);
+        }
+
+        // axios({
+        //   method: 'post',
+        //   url: `${BASE_URL}api/relax/user/loginWithGoogle`,
+        //   data: param
+        // }).then(function (response) {
+        //   alert(JSON.stringify(response.data))
+        // })
+        // .catch(function (error) {
+        //   alert(JSON.stringify(error))
+        // });
+    
+    
+      }
 
     return (
         // <View style={{flex:1}}>
@@ -137,11 +207,13 @@ const Signin  =  props => {
                     />
     
                     <View style={{width:'90%',alignSelf:'center',top:responsiveHeight(15)}}>
-                        <Text style={styles.labelstyle}>Email</Text>
+                        <Text style={[styles.labelstyle,{}]}>Email</Text>
                         <TextInput
                             value={email}
                             onChangeText={value => setEmail(value.trim())}
-                            placeholder='Sample@gmail.com'
+                            placeholder={placeholder}
+                            onBlur={()=>email === ''? setplaceholder("Sample@gmail.com"): null}
+                            onFocus={() => setplaceholder('')}
                             placeholderTextColor={theme.colors.secondary}
                             style={[styles.input,{
                                 borderBottomColor:emailMessage !== '' ? 'tomato' : theme.colors.secondary
@@ -149,14 +221,16 @@ const Signin  =  props => {
                         />
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
 
-                        <Text style={[styles.labelstyle,{fontSize:16,fontFamily:'Poppins',top:30}]}>Password</Text>
+                        <Text style={[styles.labelstyle,{top:30}]}>Password</Text>
                         <View style={{
                           borderBottomColor: passwordMessage !== '' ? 'tomato' : theme.colors.secondary,borderBottomWidth:1
                         }} >
                           <TextInput
                             value={password}
                             onChangeText={value => setPassword(value)}
-                            placeholder='********'
+                            placeholder={placeholderPass}
+                            onBlur={()=>password === ''? setplaceholderPass("********"): null}
+                            onFocus={() => setplaceholderPass('')}
                             placeholderTextColor={theme.colors.secondary}
                             secureTextEntry={!switchEye? true : false}
                             style={[styles.input,{marginTop:responsiveHeight(3.8),
@@ -165,30 +239,35 @@ const Signin  =  props => {
                         />
                         </View>
                         
-                        <View style={{width:'100%',alignItems:'flex-end',bottom:responsiveHeight(2.5)}}> 
+                        <View style={{alignSelf:'flex-end',alignItems:'flex-end',height:'auto',bottom:responsiveHeight(4)}}> 
                         {switchEye?
                             <TouchableOpacity
                                 onPress={()=> setswitchEye(false)}
-                                
+                                style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
+                                    style={{width:14.34,height:9,justifyContent:'center'}}
                                 />
                             </TouchableOpacity>
                             :
                             <TouchableOpacity
                                 onPress={()=> setswitchEye(true)}
+                                style={{height:20,width:20,justifyContent:'center',alignItems:'center'}}
+
                             >
                                 <Image
                                     source={passeye}
-                                    style={{width:14.34,height:9,marginRight:responsiveWidth(2)}}
+                                    style={{width:14.34,height:9,justifyContent:'center'}}
                                 />
                             </TouchableOpacity>
                         }
-                        {passwordMessage !== '' && <Errors errors={passwordMessage} />}
 
                         </View>
+                        <View style={{bottom:responsiveHeight(2)}} >
+                          {passwordMessage !== '' && <Errors errors={passwordMessage} />}
+                        </View>
+
                         <View
                             style={{width:'100%',alignItems:'flex-end'}}
                         >
@@ -216,7 +295,29 @@ const Signin  =  props => {
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
-                        <View style={{top:responsiveHeight(14),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                        <View style={{ marginTop: responsiveHeight(15), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                            <Text style={[styles.labelstyle, { fontSize: 14, fontWeight: '700' }]}>Or connect with</Text>
+                          </View>
+                          <View style={{ marginTop: responsiveHeight(3.5), alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                            <TouchableOpacity onPress={() => { onGoogleLoginPress()}} style={{ width: 39, height: 39, justifyContent: 'center', borderRadius: 100, backgroundColor: 'white' }}>
+                              <Image
+                                source={google}
+                                style={{ width: 24, height: 24, alignSelf: 'center' }}
+                              />
+                            </TouchableOpacity>
+                            {Platform.ios?
+                              <TouchableOpacity style={{ marginLeft: 25, justifyContent: 'center', width: 39, height: 39, borderRadius: 100, backgroundColor: 'white' }}>
+                                <Image
+                                  source={apple}
+                                  style={{ width: 19.5, height: 24, alignSelf: 'center' }}
+                                />
+                              </TouchableOpacity>
+                            :
+                              null
+                            }
+                            
+                          </View>
+                        <View style={{top:responsiveHeight(10),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
                             <Text style={[styles.labelstyle,{fontSize:12}]}>Don't have an account ? </Text>
                             <TouchableOpacity onPress={()=> props.navigation.navigate('Signup')}>
                                 <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign Up</Text>
@@ -236,7 +337,7 @@ const mapStateToProps = state => {
       state.auth;
     return {status, message, isLoading, errMsg, isSuccess, token, islogin};
   };
-  export default connect(mapStateToProps, {loginUser, Googlelogin, logoOut})(
+  export default connect(mapStateToProps, {loginUser, googleLoginApi, logoOut})(
     Signin,
   );
   export function Errors({errors}) {

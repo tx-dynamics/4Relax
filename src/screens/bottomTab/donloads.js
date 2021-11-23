@@ -30,7 +30,7 @@ export default function downloads(props) {
     const [cateEmp,setcateEmp ] =  useState(false)
     const [item,setitem ] =  useState()
     const [meditations,setmeditations ] =  useState([])
-    const [refreshing, setRefreshing] = useState(false);
+    const [refreshing, setRefreshing] = useState(true);
     const [connection,setConnect ] =  useState(false)
     const [internal,setInternal ] =  useState()
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
@@ -46,12 +46,12 @@ export default function downloads(props) {
         let dirso = RNFS.DownloadDirectoryPath + '/FourRelax/sounds'
         let dirm = RNFS.DownloadDirectoryPath + '/FourRelax/meditation'
 
-        var meditation = [];
-        var sounds = [];
-        var stories = [];
-        var final = [];
-        var filePath = [];
-        var ImagePath = [];
+        let meditation = {};
+        let sounds = {};
+        let stories = {};
+        let final = [];
+        let filePath = [];
+        let ImagePath = [];
         RNFetchBlob.fs.isDir(dirm).then((isDir)=>{
           if(isDir){
             
@@ -69,28 +69,24 @@ export default function downloads(props) {
               filePath.map((item)=>{
                 ImagePath.map((img)=>{
                   if(item.trackName === img.name){
-                    meditation.push({'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
+                    meditation = ({id:Math.floor(Math.random() * 10),'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
                   }
                 })
               })
               // meditation = [{...filePath,...ImagePath}]
-              setmeditations(meditation)
-              console.log("??????????????????meditation??????????????????????")
-              console.log(meditation)
+              // setmeditations(meditation)
+              // console.log("??????????????????meditation??????????????????????")
+              // console.log(meditation)
+              final.push(meditation)
             
             }).catch(err => {
-              setRefreshing(false);
+              // setRefreshing(false);
               console.log(err.message, err.code);
             });
 
             
           }else{
-            // alert("No local data found")
-            // Snackbar.show({
-            //     text: 'No local data found',
-            //     backgroundColor: '#018CAB',
-            //     textColor: 'white',
-            //   });
+            
             let meditation = []
             getfavorites(meditation)
           }
@@ -113,28 +109,24 @@ export default function downloads(props) {
                 filePath.map((item)=>{
                   ImagePath.map((img)=>{
                     if(item.trackName === img.name){
-                        sounds.push({'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
+                        sounds = ({id:Math.floor(Math.random() * 10),'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
                     }
                   })
                 })
                 // meditation = [{...filePath,...ImagePath}]
-                setmeditations(sounds)
+                // setmeditations(sounds)
                 // console.log("??????????????????sounds??????????????????????")
                 // console.log(sounds)
+                final.push(sounds)
              
               }).catch(err => {
-                setRefreshing(false);
+                // setRefreshing(false);
                 console.log(err.message, err.code);
               });
   
               
             }else{
-              // alert("No local data found")
-              // Snackbar.show({
-              //     text: 'No local data found',
-              //     backgroundColor: '#018CAB',
-              //     textColor: 'white',
-              //   });
+              
               let meditation = []
               getfavorites(meditation)
             }
@@ -158,54 +150,67 @@ export default function downloads(props) {
             filePath.map((item)=>{
                 ImagePath.map((img)=>{
                 if(item.trackName === img.name){
-                    stories.push({'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
+                    stories = ({id:Math.floor(Math.random() * 10),'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
                 }
                 })
             })
             // meditation = [{...filePath,...ImagePath}]
-            setmeditations(stories)
+            // setmeditations(stories)
+            final.push(stories)
 
             // console.log("?????????????????????stories???????????????????")
             // console.log(stories)
             
             }).catch(err => {
-            setRefreshing(false);
+            // setRefreshing(false);
             console.log(err.message, err.code);
             });
 
             
         }else{
-            // alert("No local data found")
-            // Snackbar.show({
-            //     text: 'No local data found',
-            //     backgroundColor: '#018CAB',
-            //     textColor: 'white',
-            // });
+            
             let meditation = []
             getfavorites(meditation)
         }
         })
+        // var names = new Set(meditation.map(d => d.trackName));
+        // var merged = [...meditation, ...sounds.filter(d => !names.has(d.trackName))];
+        // final.push({...meditation,sounds,stories})
 
-        // final.push(meditation,sounds,stories)
-        // console.log("+++++++++++++++++++++++++++++++++++++")
-        // return console.log(final)
-        // setmeditations(final)
+        // var names2 = new Set(merged.map(d => d.trackName));
+        // var merged2 = [...merged, ...stories.filter(d => !names2.has(d.trackName))];
+        // const n = final.filter((tag, index, dub) =>
+        // dub.findIndex((t)=> t.trackName === tag.trackName
+        // ) == index);
+        
+        // n.map((item)=>{
+        //   item.map((data)=>{
+        //     alert("##################======>",data);
+
+        //   })
+        // })
+
         setTimeout(() => {
-        return console.log(meditation)
-            
-        }, 5000);
-        setRefreshing(false)
+        console.log("+++++++++++++++++++++++++++++++++++++")
+        // return console.log(meditations)
+        setmeditations(final)
+        // return console.log(final)
+        
+        }, 1000);
+        setTimeout(() => {
+          setRefreshing(false)
+        }, 1200);
 
     }
 
-    const setData = async (single,name) => {
+    const setData = async (single,id) => {
         // console.log(item.trackName)
         setisplaying(false)
         setTimeout(() => {
             if(single.isplaying){
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
-                    if(item.trackName === name){
+                    if(item.id === id){
                         return {
                             ...item,
                             isplaying: false,
@@ -224,7 +229,7 @@ export default function downloads(props) {
     
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
-                    if(item.trackName === name){
+                    if(item.id === id){
                         return {
                             ...item,
                             isplaying: true,
@@ -247,7 +252,7 @@ export default function downloads(props) {
                 await AsyncStorage.setItem("single_item",JSON.stringify(single))
 
             } catch (e) {
-             alert("calling itself"+e)
+             console.log("calling itself"+e)
             }
         // alert('called set data')
                 
@@ -463,7 +468,7 @@ export default function downloads(props) {
             <>
                 {meditations.length < 1?
                     <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}}>
-                        <Text style={styles.title} >No Downloads Found</Text>
+                        <Text style={styles.title} >Empty</Text>
                     </View>
                 :
                 <FlatList
@@ -478,38 +483,11 @@ export default function downloads(props) {
                                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                                     style={styles.setting_btn}
                                     >
-                                    <View   style={{flexDirection:'row',height:50,alignItems:'center'}}>
-                                        {item.type === 'meditation'?
-                                            <>
-                                                <Image
-                                                    source={feed}
-                                                    style={{width:21,height:19,left:10}}
-                                                />
-                                                <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'55%',color:theme.colors.primary}} >Meditate</Text>
-                                            </>
-                                        :
-                                            <>
-                                            {item.type === 'sound'?
-                                                <>
-                                                    <Image
-                                                        source={music}
-                                                        style={{width:15,height:32,left:10}}
-                                                    />
-                                                    <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(7),width:'56.5%',color:theme.colors.primary}} >Sound</Text>
-                                                </>
-                                            :
-                                            <>
-                                                    <Image
-                                                        source={explore}
-                                                        style={{width:21,height:19,left:10}}
-                                                    />
-                                                    <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),width:'55%',color:theme.colors.primary}} >Story</Text>
-                                                </>
-                                            }
-                                            </>
-                                        }
+                                    <View   style={{flexDirection:'row',height:50,flex:1,alignItems:'center'}}>
+                                        
+                                      <View style={{flexDirection:'row',alignItems:'center',flex:0.4}} >
                                         {item.isplaying?
-                                            <TouchableOpacity onPress={()=> setData(item,item.trackName)} >
+                                            <TouchableOpacity style={{marginLeft:responsiveWidth(3),alignItems:'center'}} onPress={()=> setData(item,item.id)} >
                                                 <Image
                                                     source={pause}
                                                     style={[styles.icon,{width:22.67,height:22.67}]}
@@ -517,7 +495,7 @@ export default function downloads(props) {
                                             </TouchableOpacity>
                                             :
                                             
-                                            <TouchableOpacity onPress={()=> setData(item,item.trackName)}
+                                            <TouchableOpacity style={{marginLeft:responsiveWidth(3),alignItems:'center'}} onPress={()=> setData(item,item.id)}
                                                 >
                                                 <Image
                                                     source={play}
@@ -525,19 +503,53 @@ export default function downloads(props) {
                                                 />
                                             </TouchableOpacity>
                                         }
-                                        <TouchableOpacity>
+                                        <TouchableOpacity style={{marginLeft:responsiveWidth(5.5),alignItems:'center'}} >
                                             <Image
                                                 source={fav}
-                                                style={{width:22,height:19,tintColor:'#FF4040',marginLeft:responsiveWidth(5.5),tintColor:item.liked ? 'white' :'#FF4040'}}
+                                                style={{width:22,height:19,tintColor:'#FF4040',tintColor:item.liked ? 'white' :'#FF4040'}}
                                             />
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={()=>{deletefile(item,item.trackName,item.type)}}>
+                                        <TouchableOpacity style={{alignItems:'center'}} onPress={()=>{deletefile(item,item.trackName,item.type)}}>
                                             <Image
                                                 source={del}
                                                 style={{width:17,height:18,marginLeft:responsiveWidth(5.5)}}
                                             />
                                         </TouchableOpacity>
+                                      </View>
+                                      <View style={{alignItems:'flex-end',flex:0.6}} >
+                                        <View style={{flexDirection:'row',alignItems:'center',marginRight:responsiveWidth(10)}} >
+                                          {item.type === 'meditation'?
+                                              <>
+                                                  <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),color:theme.colors.primary}} >{item.trackName}</Text>
+                                                  <Image
+                                                      source={feed}
+                                                      style={{width:21,height:19,left:responsiveWidth(8)}}
+                                                  />
+                                              </>
+                                          :
+                                              <>
+                                              {item.type === 'sound'?
+                                                  <>
+                                                      <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),color:theme.colors.primary}} >{item.trackName}</Text>
+                                                      <Image
+                                                          source={music}
+                                                          style={{width:15,height:32,left:responsiveWidth(8),marginRight:responsiveWidth(1)}}
+                                                      />
+                                                  </>
+                                              :
+                                              <>
+                                                <Text style={{fontSize:14,fontFamily:'Lato',fontWeight:'500',left:responsiveWidth(5),color:theme.colors.primary}} >{item.trackName}</Text>
+                                                <Image
+                                                    source={explore}
+                                                    style={{width:21,height:19,left:responsiveWidth(8)}}
+                                                />
+                                              </>
+                                              }
+                                              </>
+                                          }
+                                        </View>
                                     </View>
+                                  </View> 
 
                             </LinearGradient>
                         }/>
