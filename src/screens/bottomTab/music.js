@@ -18,6 +18,7 @@ import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'rn-fetch-blob'
 import NetInfo from "@react-native-community/netinfo";
+import { createTestScheduler } from 'jest';
 var RNFS = require('react-native-fs');
 
     const music = (props) => {
@@ -33,6 +34,7 @@ var RNFS = require('react-native-fs');
     const [category,setcategory ] =  useState([])
     const [islock,setislock ] =  useState(false)
     const [connection,setConnect ] =  useState(false)
+    const [localImage,setImage ] =  useState()
 
     useEffect(() => {
         requestToPermissions()
@@ -118,9 +120,26 @@ var RNFS = require('react-native-fs');
 
     function getFiles(state,cat){
       let dir = RNFS.DownloadDirectoryPath + '/FourRelax/sounds'
+      let Imgdir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
       var meditation = [];
       var filePath = [];
-      var ImagePath = [];
+      var ImagePath = '' ;
+
+
+      RNFetchBlob.fs.isDir(Imgdir).then((isDir)=>{
+        if(isDir){
+          RNFS.readDir(Imgdir).then(files => {
+            files.map((item)=>{
+              if(item.name === "Sounds"){
+                ImagePath = item.path
+
+                setImage(item.path)
+              // return console.log(files);
+            }
+            })
+          })
+        }
+      })
       RNFetchBlob.fs.isDir(dir).then((isDir)=>{
         if(isDir){
           // alert('called itslef')
@@ -129,19 +148,22 @@ var RNFS = require('react-native-fs');
             // return console.log(files[0].isFile)
             files.map((item)=>{
               // console.log(item)  
-              if(item.name.includes("_img")){
-                ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
-              }else{
+              // if(item.name.includes("_img")){
+              //   ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
+              // }else{
                 filePath.push({"trackFile":item.path,"trackName":item.name,isdownloading:true,exists:true})
-              }
+              // }
               // meditation.push( {"trackFile":item.path,"trackName":item.name,isdownloading:true})
             })
-            filePath.map((item)=>{
-              ImagePath.map((img)=>{
-                if(item.trackName === img.name){
-                  meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
-                }
-              })
+            filePath.map(async(item)=>{
+              // ImagePath.map(async(img)=>{
+              //   if(item.trackName === img.name){
+                  var res = await getLocalJson(ImagePath,item,item.trackName,state,cat)
+                  console.log("local===========>",res);
+                  meditation.push(res)
+                  // meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
+              //   }
+              // })
             })
             // meditation = [{...filePath,...ImagePath}]
             console.log("????????????????????????????????????????")
@@ -154,9 +176,12 @@ var RNFS = require('react-native-fs');
               getMusic(cate,cover,meditation)
     
             }else{
-              console.log(meditation)
-              setmeditations(meditation)
-              setRefreshing(false);
+              setTimeout(() => {
+                console.log(meditation)
+                setmeditations(meditation)
+                setRefreshing(false);  
+              }, 1000);
+              
             }
     
     
@@ -176,6 +201,60 @@ var RNFS = require('react-native-fs');
         }
       })
      
+    }
+
+    async function getLocalJson (img,item,name,state,cat){
+      let meditation = {}
+      let obj = await AsyncStorage.getItem(name);
+      // return console.log("here=====local json========>",JSON.parse(obj))
+      let pared = JSON.parse(obj) 
+      // return console.log("here=====local pared json========>",pared)
+        if (pared != null){      
+          // if(item.trackName === img.name){  
+            meditation = ({
+              "_id":pared._id,
+              "liked":pared.liked,
+              "cat_name":pared.trackCategory.name,
+              "trackType": pared.trackType,
+              "trackFile":item.trackFile,
+              "trackName":item.trackName,
+              isdownloading:item.isdownloading,
+              "coverPic":img,
+              isplaying: false,
+              exists:true
+            })
+          // }
+        }else{
+          // if(item.trackName === img.name){  
+            meditation = ({
+              // "_id":pared._id,
+              // "liked":pared.liked,
+              // "cat_name":pared.trackCategory.name,
+              // "trackType": pared.trackType,
+              "trackFile":item.trackFile,
+              "trackName":item.trackName,
+              isdownloading:item.isdownloading,
+              "coverPic":img,
+              isplaying: false,
+              exists:true
+            })
+          // }
+        }
+          return meditation
+    
+      if(state.isConnected){
+        // alert("called internal medi")
+        setInternal(meditation)
+        let cate = cat;
+        let cover = '';
+        getMeditation(cate,cover,meditation)
+
+      }else{
+        console.log("called====>========>",meditation)
+        // console.log(meditation)
+        setmeditations(meditation)
+        setRefreshing(false);
+      }
     }
 
     async function getMusic(cate = '',cover = '',sounds) {
@@ -269,7 +348,7 @@ var RNFS = require('react-native-fs');
     }
 
       async function  favourities(item){
-
+        setofflinefav(item)
         if(connection){
         const params = {
             trackId: item._id,
@@ -506,7 +585,7 @@ var RNFS = require('react-native-fs');
       // const {tunes, token, currentTrackIndex} = this.state;
       let url  = item.trackFile;
       let name  = item.trackName;
-      let coverUrl  = item.trackCategory.coverPic;
+      // let coverUrl  = item.trackCategory.coverPic;
 
       // let dis = RNFetchBlob.fs.dirs
       // return console.log(dis.DownloadDir)
@@ -514,6 +593,7 @@ var RNFS = require('react-native-fs');
       const FolderPAth = '/storage/emulated/0/Download/FourRelax';
       const tracktype = '/storage/emulated/0/Download/FourRelax/sounds'
 
+    try{
     RNFetchBlob.fs.isDir(FolderPAth).then((isDir)=>{
       if(isDir){
         //  alert('exist')
@@ -526,7 +606,7 @@ var RNFS = require('react-native-fs');
               appendExt: 'mp3',
               addAndroidDownloads: {
                 useDownloadManager: true,
-                notification: true,
+                notification: false,
                 title: name,
                 path : SongDir,
                 // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
@@ -538,24 +618,24 @@ var RNFS = require('react-native-fs');
                 console.log(res);
                 console.log('The file is save to ', res.path());
               });
-              RNFetchBlob.config({
-                fileCache: true,
-                appendExt: 'jpg',
-                addAndroidDownloads: {
-                  useDownloadManager: true,
-                  notification: true,
-                  title: name+"_img",
-                  path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
-                  // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
-                  description: 'Image',
-                },
-              })
-                .fetch('GET', coverUrl)
+              // RNFetchBlob.config({
+              //   fileCache: true,
+              //   appendExt: 'jpg',
+              //   addAndroidDownloads: {
+              //     useDownloadManager: true,
+              //     notification: false,
+              //     title: name+"_img",
+              //     path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
+              //     // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+              //     description: 'Image',
+              //   },
+              // })
+              //   .fetch('GET', coverUrl)
               
-                .then(res => {
-                  console.log(res);
-                  console.log('The file is save to ', res.path());
-                });
+              //   .then(res => {
+              //     console.log(res);
+              //     console.log('The file is save to ', res.path());
+              //   });
           }else{
             RNFetchBlob.fs.mkdir(tracktype).then(()=>{
               // alert('newly create medi')
@@ -565,7 +645,7 @@ var RNFS = require('react-native-fs');
               appendExt: 'mp3',
               addAndroidDownloads: {
                 useDownloadManager: true,
-                notification: true,
+                notification: false,
                 title: name,
                 path : SongDir,
                 // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
@@ -578,24 +658,24 @@ var RNFS = require('react-native-fs');
                 console.log('The file is save to ', res.path());
               });
 
-              RNFetchBlob.config({
-                fileCache: true,
-                appendExt: 'jpg',
-                addAndroidDownloads: {
-                  useDownloadManager: true,
-                  notification: true,
-                  title: name+"_img",
-                  path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
-                  // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
-                  description: 'Image',
-                },
-              })
-                .fetch('GET', coverUrl)
+              // RNFetchBlob.config({
+              //   fileCache: true,
+              //   appendExt: 'jpg',
+              //   addAndroidDownloads: {
+              //     useDownloadManager: true,
+              //     notification: false,
+              //     title: name+"_img",
+              //     path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
+              //     // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+              //     description: 'Image',
+              //   },
+              // })
+              //   .fetch('GET', coverUrl)
               
-                .then(res => {
-                  console.log(res);
-                  console.log('The file is save to ', res.path());
-                });
+              //   .then(res => {
+              //     console.log(res);
+              //     console.log('The file is save to ', res.path());
+              //   });
 
             })
           }
@@ -613,7 +693,7 @@ var RNFS = require('react-native-fs');
                 appendExt: 'mp3',
                 addAndroidDownloads: {
                   useDownloadManager: true,
-                  notification: true,
+                  notification: false,
                   title: name,
                   path : SongDir,
                   // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
@@ -626,24 +706,24 @@ var RNFS = require('react-native-fs');
                   console.log('The file is save to ', res.path());
                 });
 
-                RNFetchBlob.config({
-                  fileCache: true,
-                  appendExt: 'jpg',
-                  addAndroidDownloads: {
-                    useDownloadManager: true,
-                    notification: true,
-                    title: name+"_img",
-                    path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
-                    // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
-                    description: 'Image',
-                  },
-                })
-                  .fetch('GET', coverUrl)
+                // RNFetchBlob.config({
+                //   fileCache: true,
+                //   appendExt: 'jpg',
+                //   addAndroidDownloads: {
+                //     useDownloadManager: true,
+                //     notification: false,
+                //     title: name+"_img",
+                //     path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
+                //     // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+                //     description: 'Image',
+                //   },
+                // })
+                //   .fetch('GET', coverUrl)
                 
-                  .then(res => {
-                    console.log(res);
-                    console.log('The file is save to ', res.path());
-                  });
+                //   .then(res => {
+                //     console.log(res);
+                //     console.log('The file is save to ', res.path());
+                //   });
 
             }else{
               RNFetchBlob.fs.mkdir(tracktype).then(()=>{
@@ -654,7 +734,7 @@ var RNFS = require('react-native-fs');
                 appendExt: 'mp3',
                 addAndroidDownloads: {
                   useDownloadManager: true,
-                  notification: true,
+                  notification: false,
                   title: name,
                   path : SongDir,
                   // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
@@ -668,32 +748,34 @@ var RNFS = require('react-native-fs');
                 });
 
 
-                RNFetchBlob.config({
-                  fileCache: true,
-                  appendExt: 'jpg',
-                  addAndroidDownloads: {
-                    useDownloadManager: true,
-                    notification: true,
-                    title: name+"_img",
-                    path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
-                    // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
-                    description: 'Image',
-                  },
-                })
-                  .fetch('GET', coverUrl)
+                // RNFetchBlob.config({
+                //   fileCache: true,
+                //   appendExt: 'jpg',
+                //   addAndroidDownloads: {
+                //     useDownloadManager: true,
+                //     notification: false,
+                //     title: name+"_img",
+                //     path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/sounds'+ '/' + name+"_img",
+                //     // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+                //     description: 'Image',
+                //   },
+                // })
+                //   .fetch('GET', coverUrl)
                 
-                  .then(res => {
-                    console.log(res);
-                    console.log('The file is save to ', res.path());
-                  });
+                //   .then(res => {
+                //     console.log(res);
+                //     console.log('The file is save to ', res.path());
+                //   });
               })
             }
           })
       })
       }
       })
+    }catch(e){alert(e)}
+      setItemData(item)
       setTimeout(() => {
-        var res = meditations.map((post)=>{
+        const res = meditations.map((post)=>{
           if(post._id === item._id){
             return {
               ...post,
@@ -720,6 +802,15 @@ var RNFS = require('react-native-fs');
     async function deletefile(item,traname){
       setisplaying(false)
       let name = item.trackName;
+      try {
+          await AsyncStorage.removeItem(name);
+          // alert('cleared item')
+          // return true;
+      }
+      catch(exception) {
+        alert(exception)
+          // return false;
+      }
       let cover = name.concat("_img");
       // return console.log(cover)
       let dir = RNFS.DownloadDirectoryPath + '/FourRelax/sounds/' + name; 
@@ -775,13 +866,250 @@ var RNFS = require('react-native-fs');
       }
       if(item.liked === "yes"){
         // alert('called')
+        addRemoveFav(item)
         favourities(item)
       }
       setTimeout(() => {
-        CheckConnectivity(item.trackCategory.name)
+        if(connection){
+          CheckConnectivity(item.trackCategory.name)
+        }else{
+          let cate = ''
+          CheckConnectivity(cate)
+        }
       }, 1500);
    
 
+    }
+
+    async function offlineFav(sing){
+      // console.log(meditations);
+      try{
+        if(sing.liked == 'yes'){
+          // addRemoveFav(sing)
+          const res = meditations.map((item)=>{
+              // console.log(item.liked)
+              if(item._id === sing._id){
+                  return {
+                      ...item,
+                      liked: 'no',
+                    };
+              } else {
+                  return {
+                      ...item,
+                      // isplaying: false,
+                    };
+              }
+          })
+          setmeditations(res)
+        }else{
+          // addRemoveFav(sing)
+          const res = meditations.map((item)=>{
+              // console.log(item.liked)
+              if(item._id === sing._id){
+                  return {
+                      ...item,
+                      liked: 'yes',
+                    };
+              } else {
+                  return {
+                      ...item,
+                      // isplaying: false,
+                    };
+              }
+          })
+          setmeditations(res)
+        }
+        setofflinefav(sing)
+        // setItemData(sing)
+      }catch(e){
+        console.log(e);
+      }
+    } 
+     
+    async function setofflinefav(item){
+      let name = item.trackName
+      var res = await AsyncStorage.getItem(name)
+      var rep = JSON.parse(res)
+      if(rep.liked === 'yes'){
+        addRemoveFav(item)
+        rep = ({...rep,liked : 'no'})
+      }else{
+        addRemoveFav(item)
+        rep = ({...rep,liked : 'yes'})
+      }
+      console.log(rep.liked);
+      await AsyncStorage.setItem(name,JSON.stringify(rep))
+     
+    }
+
+    async function  setItemData(item){
+      try{
+        let name = item.trackName
+        await AsyncStorage.setItem(name,JSON.stringify(item))
+        // alert("set item successfully")
+      }catch(e){
+        alert(e)
+      }
+    }
+
+    async function addRemoveFav(post){
+      if(post.liked != 'yes'){
+          let dir = RNFS.DownloadDirectoryPath + '/FourRelax/sounds'
+          let desPath = RNFS.DownloadDirectoryPath + '/FourRelax/favourties'
+          const favPath = '/storage/emulated/0/Download/FourRelax/favourties'
+          let meditation = [];
+          var filePath = [];
+          var ImagePath = [];
+          let local = [];
+          RNFetchBlob.fs.isDir(dir).then((isDir)=>{
+            // return console.log(isDir);
+            if(isDir){
+              RNFS.readDir(dir).then(files => {
+                files.map(async(item)=>{
+                  try{
+                    RNFetchBlob.fs.isDir(favPath).then(async(isDir)=>{
+                      if(isDir){
+                        // alert('exists')
+                        if(item.name === post.trackName){
+                          if (item.path.startsWith('/')) {
+                            const url = item.path
+                            const uriComponents = url.split('/')
+                            const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                            // const destPath =  desPath+fileNameAndExtension
+                            // console.log(destPath);
+                            const destPath = `${desPath}/${fileNameAndExtension}`
+                            console.log(destPath);
+                            await RNFS.copyFile(url, destPath)
+                          }
+                        }
+                      }else{
+                        RNFetchBlob.fs.mkdir(favPath).then(async()=>{
+                          // alert("created")
+                          if(item.name === post.trackName){
+                            if (item.path.startsWith('/')) {
+                              const url = item.path
+                              const uriComponents = url.split('/')
+                              const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                              // const destPath =  desPath+fileNameAndExtension
+                              // console.log(destPath);
+                              const destPath = `${desPath}/${fileNameAndExtension}`
+                              console.log(destPath);
+                              await RNFS.copyFile(url, destPath)
+                            }
+                          }
+                        })
+                      }
+                    })
+                    
+                    //   let fil = item.path.getFileUri()
+                    //   // const fileNameAndExtension = fil.length - 1
+                    //    console.log(fil);
+                    //   // const destPath = `${ReactNativeFS.CachesDirectoryPath}/${fileSelected.name}`;
+                    // await RNFS.copyFile(fil, destPath);
+                    // copyToFav(item)
+                      // console.log(item);
+                    // }
+                  }catch(e){
+                    console.log(e);
+                  }
+                })
+              })
+                  // console.log(item)  
+                //   if(item.name.includes("_img")){
+                //     // console.log(item.name+"&&&&&&&&&&&&&&&&&&&&&&"+item.name.split("_")[0])
+                //     ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
+                //   }else{
+                //     filePath.push({"trackFile":item.path,"trackName":item.name,isdownloading:true,exists:true})
+                //   }
+                // })
+                // filePath.map(async(item)=>{
+                //   ImagePath.map(async(img)=>{
+                //     if(item.trackName === img.name){
+                //       var res = await getLocalJson(img,item,item.trackName,state,cat)
+                //       console.log("local===========>",res);
+                //       meditation.push(res)
+                //       // meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
+                //     }
+                //   })
+                // })
+                // meditation = [{...filePath,...ImagePath}]
+                // console.log("????????????????????????????????????????")
+                // console.log(meditation)
+                // console.log(ImagePath)
+                // if(state.isConnected){
+                //   // console.log(meditation)
+                //   // alert("called internal medi")
+                //   setInternal(meditation)
+                //   let cate = cat;
+                //   let cover = '';
+                //   getMeditation(cate,cover,meditation)
+        
+                // }else{
+                //   setTimeout(() => {
+                //     console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
+                //     // console.log(meditation)
+                //     setmeditations(meditation)
+                //     setRefreshing(false);  
+                //   }, 1000);
+                  
+                // }
+        
+        
+              // }).catch(err => {
+              //   setRefreshing(false);
+              //   console.log(err.message, err.code);
+              // });
+            }else{
+              Snackbar.show({
+                text: 'No local data found',
+                backgroundColor: '#018CAB',
+                textColor: 'white',
+              });
+              // console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
+              // let cate = cat;
+              // let cover = '';
+              // getMeditation(cate,cover,meditation)
+            }
+          })
+      }else{
+        // alert('called',post.trackName)
+        let name = post.trackName;
+        // let cover = name.concat("_img");
+        // return console.log(cover)
+        let dir = RNFS.DownloadDirectoryPath + '/FourRelax/favourties/' + name; 
+        // let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+        try{
+          let exists = await RNFS.exists(dir);
+          if(exists){
+              // exists call delete
+              await RNFS.unlink(dir).then(() => {
+                // console.log('1 deleted');
+                RNFS.scanFile(dir)
+                  .then(() => {
+                    // console.log('1 scanned');
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+              })
+              .catch((err) => {         
+                  console.log(err);
+              });
+              
+          }else{
+              console.log("File Not Available")
+              Snackbar.show({
+                text: 'File Not Available',
+                backgroundColor: 'tomato',
+                textColor: 'white', 
+              });
+        }
+
+      
+      }catch(e){
+        console.log("error : "+e)
+      }
+      }
     }
 
     return (
@@ -855,23 +1183,24 @@ var RNFS = require('react-native-fs');
                                 renderItem={({ item, index }) =>
                                     <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                                         <ImageBackground
-                                            source={{uri :  item.cover?
-                                              item.cover
-                                            : 
-                                              connection?
-                                                item.trackCategory.coverPic 
-                                              :
-                                                'file://' + item.coverPic}}
+                                            source={{uri : 'file://' + localImage }}  
+                                            // item.cover?
+                                            //   item.cover
+                                            // : 
+                                            //   connection?
+                                            //     item.trackCategory.coverPic 
+                                            //   :
+                                            //     'file://' + item.coverPic}}
                                             borderRadius={4}
                                             style={{width:'100%',height:178}}
                                         >
                                             <View style={{flexDirection:'row',flex:0.3}}>
                                                 <View style={{flex:0.29}}>
                                                 {connection?
-                                                  <>
-                                                  {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                                    null
-                                                  :
+                                                  // <>
+                                                  // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                                  //   null
+                                                  // :
                                                   <>
                                                     {item.isdownloading?
                                                       <TouchableOpacity onPress={()=> favourities(item)}  style={{height:40}} >
@@ -887,12 +1216,12 @@ var RNFS = require('react-native-fs');
                                                     :
                                                     null}
                                                   </>
-                                                  }
-                                                  </>
+                                                  // }
+                                                  // </>
                                                 :
                                                   <>
                                                     {item.isdownloading?
-                                                      <TouchableOpacity onPress={()=> favourities(item)}  style={{height:40}} >
+                                                      <TouchableOpacity onPress={()=> offlineFav(item)}  style={{height:40}} >
                                                           <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
                                                             <Image
                                                                 source={fav}
@@ -909,10 +1238,10 @@ var RNFS = require('react-native-fs');
                                                 </View>
                                                 <View style={{flex:0.8,alignItems:'flex-end'}}>
                                                 {connection?
-                                                  <>
-                                                {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                                  null
-                                                :
+                                                // <>
+                                                // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                                //   null
+                                                // :
                                                 <>
                                                   {item.isdownloading?
                                                     <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
@@ -926,8 +1255,8 @@ var RNFS = require('react-native-fs');
                                                   :
                                                   null}
                                                 </>
-                                                }
-                                                  </>
+                                                // }
+                                                //   </>
                                                 :
                                                   <>
                                                     {item.isdownloading?
@@ -948,18 +1277,18 @@ var RNFS = require('react-native-fs');
                                             <View style={{flex:0.4}}></View>
                                             <View style={{flex:0.25,width:'100%',alignItems:'center'}} >
                                             {connection?
-                                                <>
-                                                {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
-                                                    <TouchableOpacity onPress={()=> 
-                                                        props.navigation.navigate('Packages')
-                                                    }
-                                                    style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                        <Image
-                                                            source={unloc}
-                                                            style={[styles.icon,{width:15,height:19}]}
-                                                        />
-                                                    </TouchableOpacity>
-                                                      :
+                                                // <>
+                                                // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
+                                                //     <TouchableOpacity onPress={()=> 
+                                                //         props.navigation.navigate('Packages')
+                                                //     }
+                                                //     style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                //         <Image
+                                                //             source={unloc}
+                                                //             style={[styles.icon,{width:15,height:19}]}
+                                                //         />
+                                                //     </TouchableOpacity>
+                                                //       :
                                                       <>
                                                       {item.isdownloading?
                                                           <>
@@ -992,8 +1321,8 @@ var RNFS = require('react-native-fs');
                                                           </TouchableOpacity>
                                                       }
                                                       </>
-                                                  }
-                                                </>
+                                                //   }
+                                                // </>
                                                 :
                                                 <>
                                                   {item.isdownloading?

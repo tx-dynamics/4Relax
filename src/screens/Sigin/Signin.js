@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  PermissionsAndroid,
   ActivityIndicator,
   Platform,
   ScrollView,
@@ -39,6 +40,9 @@ import {
     authFailed,
     googleLoginApi
   } from '../../redux/actions/auth';
+  import {getAllimages} from '../../redux/actions/get_images'
+  import RNFetchBlob from 'rn-fetch-blob'
+  var RNFS = require('react-native-fs');
 
 const Signin  =  props => {
 
@@ -63,7 +67,188 @@ const Signin  =  props => {
         setPassword(password)
       }
       // console.log(email,password)
+      requestToPermissions()
     }, [isFocused]);
+
+    async function requestToPermissions ()  {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: 'Music',
+            message:
+              'App needs access to your Files... ',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('startDownload...');
+            downloadImages()
+          // this.startDownload();
+        }else{
+            alert("Permission must be granted for downloads to proceeds ")
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+
+    async function downloadImages(){
+
+      const FolderPAth = '/storage/emulated/0/Download/FourRelax';
+      const tracktype = '/storage/emulated/0/Download/FourRelax/mainImages'
+      let dir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
+      try{
+     
+      RNFetchBlob.fs.isDir(FolderPAth).then((isDir)=>{
+        if(isDir){
+         //  alert('exist')
+          RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
+           if(isDir){
+            //  alert('exist medii 1')
+            RNFS.readDir(dir).then(async(files) => {
+              if(files.length === 0){
+                // console.log("main imges==================>",files);
+                const res = await props.getAllimages();
+                const images = res?.payload?.data
+                if (images) {
+                  console.log("images here ----------->",images);
+                  images.map((item)=>{
+                    // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
+            
+                    RNFetchBlob.config({
+                      fileCache: true,
+                      appendExt: 'jpg',
+                      addAndroidDownloads: {
+                        useDownloadManager: true,
+                        notification: false,
+                        title: item.trackType,
+                        path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType,
+                        // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+                        description: 'Image',
+                      },
+                    })
+                      .fetch('GET', item.coverPic)
+                     
+                      .then(res => {
+                        // console.log(res);
+                        // console.log('The file is save to ', res.path());
+                      });
+                  })
+                }
+              }else{
+                files.map((item)=>{
+                  console.log('files exist 1')
+                  // alert(item);
+              })
+              }
+              
+            })
+             return
+           }else{
+             RNFetchBlob.fs.mkdir(tracktype).then(()=>{
+               alert('newly create medi 1')
+               RNFS.readDir(dir).then(async(files) => {
+                if(files.length === 0){
+                  // console.log("main imges==================>",files);
+                  const res = await props.getAllimages();
+                  const images = res?.payload?.data
+                  if (images) {
+                    console.log("images here ----------->",images);
+                    images.map((item)=>{
+                      // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
+              
+                      RNFetchBlob.config({
+                        fileCache: true,
+                        appendExt: 'jpg',
+                        addAndroidDownloads: {
+                          useDownloadManager: true,
+                          notification: false,
+                          title: item.trackType,
+                          path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType,
+                          // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+                          description: 'Image',
+                        },
+                      })
+                        .fetch('GET', item.coverPic)
+                       
+                        .then(res => {
+                          // console.log(res);
+                          // console.log('The file is save to ', res.path());
+                        });
+                    })
+                  }
+                }else{
+                  files.map((item)=>{
+                    console.log('files exist 1')
+                    // alert(item);
+                })
+                }
+               })
+               return
+               
+
+             })
+           }
+         })
+          
+        }else{
+         RNFetchBlob.fs.mkdir(FolderPAth).then(()=>{
+           // alert('newly created')
+          //  RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
+               RNFetchBlob.fs.mkdir(tracktype).then(()=>{
+                   alert('newly create medi 2')
+                   RNFS.readDir(dir).then(async(files) => {
+                    if(files.length === 0){
+                      // console.log("main imges==================>",files);
+                      const res = await props.getAllimages();
+                      const images = res?.payload?.data
+                      if (images) {
+                        console.log("images here ----------->",images);
+                        images.map((item)=>{
+                          // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
+                  
+                          RNFetchBlob.config({
+                            fileCache: true,
+                            appendExt: 'jpg',
+                            addAndroidDownloads: {
+                              useDownloadManager: true,
+                              notification: false,
+                              title: item.trackType,
+                              path : RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType,
+                              // path: RNFetchBlob.fs.dirs.DownloadDir + `${name}`, // Android platform
+                              description: 'Image',
+                            },
+                          })
+                            .fetch('GET', item.coverPic)
+                           
+                            .then(res => {
+                              // console.log(res);
+                              // console.log('The file is save to ', res.path());
+                            });
+                        })
+                      }
+                    }else{
+                      files.map((item)=>{
+                        console.log('files exist 1')
+                        // alert(item);
+                    })
+                    }
+
+               })
+           })
+        })
+       }
+       })
+      }catch(e){
+        alert(e)
+      }
+    }
+
 
     async function onLogin() {
         setemailMessage('');
@@ -337,7 +522,7 @@ const mapStateToProps = state => {
       state.auth;
     return {status, message, isLoading, errMsg, isSuccess, token, islogin};
   };
-  export default connect(mapStateToProps, {loginUser, googleLoginApi, logoOut})(
+  export default connect(mapStateToProps, {loginUser,getAllimages, googleLoginApi, logoOut})(
     Signin,
   );
   export function Errors({errors}) {

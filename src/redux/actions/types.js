@@ -41,6 +41,7 @@ export const GET_SUBSCRIPTION = 'GET_SUBSCRIPTION';
 export const PAYMENT = 'PAYMENT';
 export const UPDATE_USER = 'UPDATE_USER';
 export const FORGOT_PASS = 'FORGOT_PASS';
+export const GET_IMAGES = 'GET_IMAGES';
 
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';

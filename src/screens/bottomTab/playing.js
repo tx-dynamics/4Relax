@@ -252,9 +252,9 @@ export default class PlayerScreen extends React.Component{
         // return console.log(JSON.parse(userId))
         this.setState({item:JSON.parse(data)})
         // return console.log(JSON.parse(data))
-        // setTimeout(() => {
+        setTimeout(() => {
             this.play();
-        // }, 1000);
+        }, 1000);
 
     }
 

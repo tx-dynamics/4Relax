@@ -28,6 +28,8 @@ const img_play = require('../../assets/images/play.png');
 const img_playjumpleft = require('../../assets/images/backward.png');
 const img_playjumpright = require('../../assets/images/forward.png');
 const sliderEditing = false;
+import RNFetchBlob from 'rn-fetch-blob'
+var RNFS = require('react-native-fs');
 
 export default class PlayerScreen extends React.Component{
 
@@ -46,7 +48,8 @@ export default class PlayerScreen extends React.Component{
             connection:false,
             isLoading:true,
             don:false,
-            selected:false
+            selected:false,
+            mainPic:'',
         }
         this.sliderEditing = false;
     }
@@ -67,13 +70,32 @@ export default class PlayerScreen extends React.Component{
         //     () => this.sound.pause()
         //   )
         var id = this.props.route.params.single._id
+        var main = this.props.route.params.single.coverPic
         var fav = this.props.route.params.single
         var type = this.props.route.params.single.type
         var tracktype = this.props.route.params.single.trackType
-        // this.setState({single:id})
+        console.log(this.props.route.params.single)
         // console.log("***********************************777777777")
         // console.log(id)
+      
+        let Imgdir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
 
+        RNFetchBlob.fs.isDir(Imgdir).then((isDir)=>{
+            if(isDir){
+              RNFS.readDir(Imgdir).then(files => {
+                files.map((item)=>{
+                  if(item.name === type){
+                    // ImagePath = item.path
+                    this.setState({mainPic:item.path})
+    
+                    // setImage(item.path)
+                  // return console.log(files);
+                }
+                })
+              })
+            }
+          })    
+          this.setState({mainPic:main})
         
         this.getSingle(id,fav,type,tracktype);
         
@@ -109,8 +131,9 @@ export default class PlayerScreen extends React.Component{
         const params = {
             userId : userId
         }
-        if(id){
-        if(type === 'meditation'){
+        // alert(id)
+        if(this.state.connection){
+        if(type === 'Meditation'){
             // alert('meditation')
         try {
             // alert('called meditation')
@@ -150,7 +173,7 @@ export default class PlayerScreen extends React.Component{
                 } catch (err) {
                 console.log("error found : "+err);
                 }
-        }else if(type === 'stories'){
+        }else if(type === 'Stories'){
             try {
                     // alert('stories')
                 const res = await axios.post(`${BASE_URL}api/relax/stories/getSingle/${id}`,JSON.stringify(params), {
@@ -199,7 +222,7 @@ export default class PlayerScreen extends React.Component{
         }
         }else{
             try {
-                // alert('fav : '+tracktype)
+                alert('fav : '+tracktype)
                 this.setState({don:true})
                 console.log(fav);
                 if(fav){
@@ -458,7 +481,7 @@ export default class PlayerScreen extends React.Component{
 
 
     render(){
-        const {single,trackCategory,selected} = this.state
+        const {single,trackCategory,selected,mainPic} = this.state
         // console.log(single.trackCategory);
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
@@ -467,14 +490,14 @@ export default class PlayerScreen extends React.Component{
             <View style={{flex:1,backgroundColor:'#00303A'}}>
                 
                  <ImageBackground
-                    source={{uri: 
-                        this.state.don?
-                            'file://' + single.coverPic
-                        :
-                        this.state.connection?
-                            trackCategory.coverPic ? trackCategory.coverPic : single.coverPic 
-                            :
-                            'file://' + single.coverPic}}
+                    source={{uri:'file://' + mainPic }} 
+                        // this.state.don?
+                        //     'file://' + single.coverPic
+                        // :
+                        // this.state.connection?
+                        //     trackCategory.coverPic ? trackCategory.coverPic : single.coverPic 
+                        //     :
+                        //     'file://' + single.coverPic}}
                     
                     style={[styles.imgBackground,{height:'100%',alignItems:'center'}]}
                 >
@@ -502,7 +525,11 @@ export default class PlayerScreen extends React.Component{
                             </TouchableOpacity>
                         </View>
                         <View style={{alignItems:'center',marginTop:responsiveHeight(6)}} >
-                            <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {trackCategory.name}  </Text>
+                            {this.state.connection?
+                                <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {trackCategory.name}  </Text>
+                            :
+                                <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {single.cat_name}  </Text>
+                            }
                             <Text style={{fontSize:18,fontWeight:'500',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackName? single.trackName : single.trackType}</Text>
                         </View>
                         

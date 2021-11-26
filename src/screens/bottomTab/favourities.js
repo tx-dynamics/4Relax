@@ -24,7 +24,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 const feed = (props) => {
 
     const isFocused = useIsFocused();
-    const [selected,setSelected ] =  useState(false)
+    const [localImage,setImage ] =  useState()
     const [isplaying,setisplaying ] =  useState(false)
     const [islock,setislock ] =  useState(false)
     const [cateEmp,setcateEmp ] =  useState(false)
@@ -64,42 +64,67 @@ const feed = (props) => {
   
       function getFiles(state){
         let dir = RNFS.DownloadDirectoryPath + '/FourRelax/favourties'
+        let Imgdir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
         var meditation = [];
         var filePath = [];
-        var ImagePath = [];
-        RNFetchBlob.fs.isDir(dir).then((isDir)=>{
+        var ImagePath = '';
+
+        RNFetchBlob.fs.isDir(Imgdir).then((isDir)=>{
           if(isDir){
-            // alert('called if getfiles')
-            RNFS.readDir(dir).then(files => {
-              // return console.log(files[0].isFile)
+            RNFS.readDir(Imgdir).then(files => {
               files.map((item)=>{
-                // console.log(item)  
-                if(item.name.includes("_img")){
-                  ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
-                }else{
+                if(item.name === "Meditation"){
+                  ImagePath = item.path
+  
+                  setImage(item.path)
+                // return console.log(files);
+              }
+              })
+            })
+          }
+        })
+        try{
+        RNFetchBlob.fs.isDir(dir).then((isDir)=>{
+          // return   alert(isDir)
+          if(isDir){
+            RNFS.readDir(dir).then(files => {
+              files.map((item)=>{
+                // console.log("at here------------------>",item.path,item.name)  
+                // if(item.name.includes("_img")){
+                //   ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
+                // }else{
                   filePath.push({"trackFile":item.path,"trackName":item.name,isdownloading:true,exists:true})
-                }
+                // }
                 // meditation.push( {"trackFile":item.path,"trackName":item.name,isdownloading:true})
               })
-              filePath.map((item)=>{
-                ImagePath.map((img)=>{
-                  if(item.trackName === img.name){
-                    meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
-                  }
-                })
+              // console.log("at here------------------>",filePath)  
+
+              filePath.map(async(item)=>{
+                // ImagePath.map((img)=>{
+                // console.log("at here------------------>",item)  
+                //   if(item.trackName === img.name){
+                  var res = await getLocalJson(ImagePath,item,item.trackName,state)
+                  console.log("local===========>",JSON.stringify(res));
+                  meditation.push(res)
+                    // meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
+                //   }
+                // })
               })
               // meditation = [{...filePath,...ImagePath}]
-              console.log("????????????????????????????????????????")
+              // console.log("????????????????????????????????????????")
               if(state.isConnected){
-                console.log(meditation)
+                // console.log(meditation)
                 // alert("called internal medi")
                 setInternal(meditation)
                 getfavorites(meditation)
       
               }else{
-                console.log(meditation)
-                setmeditations(meditation)
-                setRefreshing(false);
+                setTimeout(() => {
+                  console.log("H@R@/////////////////////--->",meditation)
+                  setmeditations(meditation)
+                  setRefreshing(false);  
+                }, 1000);
+                
               }
       
       
@@ -118,8 +143,64 @@ const feed = (props) => {
             getfavorites(meditation)
           }
         })
-       
+      }catch(e){console.log(e);}
       }
+
+      async function getLocalJson (img,item,name,state){
+        let meditation = {}
+        let obj = await AsyncStorage.getItem(name);
+        // return console.log("here=====local json========>",JSON.parse(obj))
+        let pared = JSON.parse(obj) 
+        // return console.log("here=====local pared json========>",pared)
+          if (pared != null){      
+            // if(item.trackName === img.name){  
+              console.log('pared exists')
+              meditation = ({
+                "_id":pared._id,
+                "liked":pared.liked,
+                "cat_name":pared.trackCategory.name,
+                "trackType": pared.trackType,
+                "trackFile":item.trackFile,
+                "trackName":item.trackName,
+                "coverPic":img,
+                isdownloading:item.isdownloading,
+                isplaying: false,
+                exists:true
+              })
+            // }
+          }else{
+            // if(item.trackName === img.name){  
+              meditation = ({
+                // "_id":pared._id,
+                // "liked":pared.liked,
+                // "cat_name":pared.trackCategory.name,
+                // "trackType": pared.trackType,
+                "trackFile":item.trackFile,
+                "trackName":item.trackName,
+                "coverPic":img,
+                isdownloading:item.isdownloading,
+                isplaying: false,
+                exists:true
+              })
+            // }
+          }
+            return meditation
+      
+        if(state.isConnected){
+          // alert("called internal medi")
+          setInternal(meditation)
+          let cate = cat;
+          let cover = '';
+          getMeditation(cate,cover,meditation)
+  
+        }else{
+          console.log("called====>========>",meditation)
+          // console.log(meditation)
+          setmeditations(meditation)
+          setRefreshing(false);
+        }
+      }
+
 
     async function getfavorites(fav) {
         const params ={
@@ -356,19 +437,7 @@ const feed = (props) => {
     
     
     async function startDownload  (item,index)  {
-        requestToPermissions()
-        var res = meditations.map((post)=>{
-          if(post._id === item._id){
-            return {
-              ...post,
-              progress:true
-            }
-          }else{
-            return {
-              ...post,
-            }
-          }
-      })
+        
       setmeditations(res)
         // const {tunes, token, currentTrackIndex} = this.state;
         let url  = item.trackFile;
@@ -560,20 +629,8 @@ const feed = (props) => {
         }
         })
         setTimeout(() => {
-         var res =  meditations.map((post)=>{
-            if(post._id === item._id){
-              return {
-                ...post,
-                progress:false
-              }
-            }else{
-              return {
-                ...post,
-              }
-            }
-        })
-          setmeditations(res)
-          CheckConnectivity()
+         
+          // CheckConnectivity()
           return  
         }, 8000);
     
@@ -689,7 +746,8 @@ const feed = (props) => {
                             renderItem={({ item, index }) =>
                                 <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                                     <ImageBackground
-                                        source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
+                                        source={{uri :   'file://' + localImage}}
+                                        // source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
                                         borderRadius={4}
                                         style={{width:'100%',height:178}}
                                     >
