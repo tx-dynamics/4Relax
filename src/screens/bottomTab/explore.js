@@ -66,7 +66,20 @@ var RNFS = require('react-native-fs');
         const res = await props.get_categories();
         var posts = res?.data
         
-        var rest = posts.map((item,index)=>{
+        var sub_cat = posts.map((item,index)=>{
+          if(item.exist){
+            if(item.exist === 'yes'){
+              return item
+            }
+          }
+        })
+        
+        sub_cat = sub_cat.filter(function( element ) {
+          return element !== undefined;
+       });
+
+
+        var rest = sub_cat.map((item,index)=>{
           if(index === 0){
               return {
                 ...item,

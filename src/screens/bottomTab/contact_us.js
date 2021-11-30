@@ -1,6 +1,6 @@
 
 import React,{useState,useEffect} from 'react'
-import {View,Text,ImageBackground,Image,TextInput,FlatList,Switch} from 'react-native'
+import {View,Text,ActivityIndicator,ImageBackground,Image,TextInput,FlatList,Switch} from 'react-native'
 import {select,option,green,lokc,check,cross,icon} from '../../assets'
 import {
     responsiveHeight,
@@ -11,9 +11,10 @@ import {
     import LinearGradient from 'react-native-linear-gradient';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
-import {get_subscription} from '../../redux/actions/getSubscription';
+import {send_contact} from '../../redux/actions/contact_sent';
 import {connect} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
+import Snackbar from 'react-native-snackbar';
 
 function contact(props) {
 
@@ -32,18 +33,91 @@ function contact(props) {
         // get_all()
     }, [isFocused])
 
-    async function get_all (){
+    
+
+     function chectData (){
+        if(email === '' || subject === '' || msg === ''){
+            Snackbar.show({
+                text: 'All fields are required',
+                backgroundColor: 'tomato',
+                textColor: 'white',
+              });
+        }else if(!emailValidate(email)){
+            Snackbar.show({
+                text: 'Email is required',
+                backgroundColor: 'tomato',
+                textColor: 'white',
+              });
+        }else if(!ValidateName(subject)){
+            Snackbar.show({
+                text: 'Subject should be in alphabets only',
+                backgroundColor: 'tomato',
+                textColor: 'white',
+              });
+        }else if(!ValidateName(msg)){
+            Snackbar.show({
+                text: 'Message should be in alphabets only',
+                backgroundColor: 'tomato',
+                textColor: 'white',
+              });
+        }else {
+            sendData()
+        }
+    }
+
+    async function sendData (){
+        setisLoading(true)
         try {
-            const res = await props.get_subscription();
-            var subs = res?.data
+            const params ={
+                "email":email,
+                "subject":subject,
+                "bodyText":msg
+            }
+            const res = await props.send_contact(params);
+            var data = res?.data
+            if(data.msg){
+                console.log(data);
+                Snackbar.show({
+                    text: data.msg,
+                    backgroundColor: '#018CAB',
+                    textColor: 'white',
+                  });
+                  props.navigation.goBack()
+            }else{
+                // console.log(data);
+                Snackbar.show({
+                    text: data.err,
+                    backgroundColor: 'tomato',
+                    textColor: 'white',
+                  });
+            }
             
-            setSubs(subs)
             } catch (err) {
             setRefreshing(false);
     
             console.log(err);
             }
+        setisLoading(false)
+
     }
+
+    function emailValidate (email){
+        const re =
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const emailValid = re.test(email);
+    //   alert(emailValid)
+      return emailValid
+    }
+
+    const ValidateName = (text) => {
+        var regExp = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+        var name = text.match(regExp);
+        if (name) {
+    
+          return true;
+        }
+        return false;
+      }
 
     return (
         <LinearGradient
@@ -65,7 +139,7 @@ function contact(props) {
 
                 <Text style={{ marginTop:25 }}></Text>
                 <TextInput
-                placeholder={"Email"}
+                placeholder={"Email*"}
                 style={{
                     width: "80%",
                     color:'black',
@@ -76,7 +150,7 @@ function contact(props) {
                     fontSize: 14,
                     // fontWeight: "400",
                     borderWidth: 2,
-                    borderRadius: 26,
+                    borderRadius: 8,
                     borderColor: "#CCCDCC",
                     paddingVertical: 7,
                     borderWidth: 1.5,
@@ -87,7 +161,7 @@ function contact(props) {
                 underlineColorAndroid="transparent"
                 />
                 <TextInput
-                placeholder={"Subject"}
+                placeholder={"Subject*"}
                 style={{
                 width: "80%",
                 alignSelf: "center",
@@ -95,27 +169,28 @@ function contact(props) {
                 backgroundColor: "#FFFFFF",
                 marginTop: 20,
                 fontSize: 14,
-                // fontWeight: "400",
+                color:'black',
                 borderWidth: 2,
-                borderRadius: 26,
+                borderRadius: 8,
                 borderColor: "#CCCDCC",
                 paddingVertical: 7,
                 borderWidth: 1.5,
                 }}
                 onChangeText={(text) => setSubject(text)}
                 value={subject}
-                keyboardType="phone-pad"
+                // keyboardType="phone-pad"
                 placeholderTextColor={"#3E4143"}
                 underlineColorAndroid="transparent"
             />
             <TextInput
             multiline={true}
             numberOfLines={4}
-            placeholder={"Message"}
+            placeholder={"Message*"}
             style={{
                 width: "80%",
                 alignSelf: "center",
                 height: 200,
+                color:'black',
                 backgroundColor: "#FFFFFF",
                 paddingHorizontal: 15,
                 marginTop: 20,
@@ -124,7 +199,7 @@ function contact(props) {
                 paddingVertical: responsiveHeight(2),
                 borderWidth: 1.5,
                 borderColor: "#CCCDCC",
-                borderRadius: 26,
+                borderRadius: 8,
             }}
             textAlignVertical="top"
             onChangeText={(text) => setMsg(text)}
@@ -140,9 +215,14 @@ function contact(props) {
                 start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                 style={[styles.setting_btn,{marginTop:responsiveHeight(4),marginBottom:responsiveHeight(3)}]}
                 >
-            <TouchableOpacity onPress={()=> props.navigation.navigate('Activation')} >
-                <Text style={[styles.title,{fontSize:18}]} >Send</Text>
-            </TouchableOpacity>
+            {isLoading?
+                <ActivityIndicator animating color={'white'} size={25} />
+            :
+                <TouchableOpacity onPress={()=> chectData()} >
+                    <Text style={[styles.title,{fontSize:18}]} >Send</Text>
+                </TouchableOpacity>
+            }
+            
         </LinearGradient>
 
                 
@@ -153,8 +233,11 @@ function contact(props) {
 }
 const mapStateToProps = state => {
     const {userData} = state.auth;
+    
     return {
-        userData,
-        };
+      userData,
     };
-    export default connect(mapStateToProps, {get_subscription})(contact);
+  };
+  export default connect(mapStateToProps, {
+    send_contact
+  })(contact);

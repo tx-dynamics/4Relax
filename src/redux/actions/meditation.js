@@ -31,7 +31,7 @@ export const get_categories = () => {
     return async dispatch => {
       // dispatch(chatLoading());
       try {
-        const res = await axios.get(`${BASE_URL}api/relax/categories/getAll`,
+        const res = await axios.get(`${BASE_URL}api/relax/categories/getSingleTrackCategory/Meditation`,
         {
           headers: {
             Accept: 'application/json',

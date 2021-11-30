@@ -122,7 +122,7 @@ const Signin  =  props => {
                 }
               }else{
                 files.map((item)=>{
-                  console.log('files exist 1')
+                  // console.log('files exist 1')
                   // alert(item);
               })
               }
@@ -131,7 +131,7 @@ const Signin  =  props => {
              return
            }else{
              RNFetchBlob.fs.mkdir(tracktype).then(()=>{
-               alert('newly create medi 1')
+              //  alert('newly create medi 1')
                RNFS.readDir(dir).then(async(files) => {
                 if(files.length === 0){
                   // console.log("main imges==================>",files);
@@ -164,7 +164,7 @@ const Signin  =  props => {
                   }
                 }else{
                   files.map((item)=>{
-                    console.log('files exist 1')
+                    // console.log('files exist 1')
                     // alert(item);
                 })
                 }
@@ -181,7 +181,7 @@ const Signin  =  props => {
            // alert('newly created')
           //  RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
                RNFetchBlob.fs.mkdir(tracktype).then(()=>{
-                   alert('newly create medi 2')
+                  //  alert('newly create medi 2')
                    RNFS.readDir(dir).then(async(files) => {
                     if(files.length === 0){
                       // console.log("main imges==================>",files);
@@ -225,7 +225,7 @@ const Signin  =  props => {
        }
        })
       }catch(e){
-        alert(e)
+        console.log(e)
       }
     }
 
