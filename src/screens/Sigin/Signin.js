@@ -6,7 +6,6 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
-  PermissionsAndroid,
   ActivityIndicator,
   Platform,
   ScrollView,
@@ -47,6 +46,7 @@ import {
 const Signin  =  props => {
 
     const [loading, setLoading] = useState(false);
+    const [checkOnce, setcheckOnce] = useState(true);
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
     const [switchEye,setswitchEye] = useState(false);
@@ -58,44 +58,24 @@ const Signin  =  props => {
     const isFocused = useIsFocused();
 
     useEffect(() => {
-      let email = props?.route?.params?.email
-      let password = props?.route?.params?.password
-      if(email == undefined || password == undefined){
-        // alert('not found')
-      }else{
-        setEmail(email)
-        setPassword(password)
+      try{
+        let email = props?.route?.params?.email
+        let password = props?.route?.params?.password
+        if(email == undefined || password == undefined){
+          // alert('not found')
+        }else{
+          setEmail(email)
+          setPassword(password)
+        }
+      }catch(e){
+        console.log(e);
       }
       // console.log(email,password)
-      requestToPermissions()
-    }, [isFocused]);
-
-    async function requestToPermissions ()  {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: 'Music',
-            message:
-              'App needs access to your Files... ',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('startDownload...');
-            downloadImages()
-          // this.startDownload();
-        }else{
-            alert("Permission must be granted for downloads to proceeds ")
-        }
-      } catch (err) {
-        console.log(err);
+      if(checkOnce){
+        downloadImages()
+        setcheckOnce(false)
       }
-    };
-
+    }, [isFocused]);
 
     async function downloadImages(){
 
@@ -457,7 +437,7 @@ const Signin  =  props => {
                             style={{width:'100%',alignItems:'flex-end'}}
                         >
                             <TouchableOpacity onPress={()=>props.navigation.navigate('Forgot')}>
-                                <Text style={[styles.labelstyle,{fontFamily:'Poppins',fontSize:14,top:30}]}>Forgot Password?</Text>
+                                <Text style={[styles.labelstyle,{fontSize:14,top:30}]}>Forgot Password?</Text>
                             </TouchableOpacity>
                         </View> 
                         <View

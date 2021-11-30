@@ -1137,12 +1137,12 @@ var RNFS = require('react-native-fs');
                        style={styles.cate}
                        >
                             <TouchableOpacity onPress={()=> getcate(item,item._id) } >
-                                <Text style={{color:'black',fontStyle:'Poppins'}}>{item.name}</Text>
+                                <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
                             </TouchableOpacity>
                         </LinearGradient>
                       :
                       <TouchableOpacity onPress={()=> getcate(item,item._id) } style={[styles.cate,{backgroundColor:'white'}]}>
-                            <Text style={{color:'black',justifyContent:'center',fontStyle:'Poppins'}}>{item.name}</Text>
+                            <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
                         </TouchableOpacity>
                       }
                   </View>

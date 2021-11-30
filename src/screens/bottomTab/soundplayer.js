@@ -506,7 +506,7 @@ export default class PlayerScreen extends React.Component{
                         width:'100%',
                         backgroundColor: '#00000080',
                     }} >
-                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(2)}} >
+                        <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(3.5)}} >
                             <View style={{flex:0.98}}>
                                 <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
                                     <Image
@@ -539,8 +539,8 @@ export default class PlayerScreen extends React.Component{
                             </View>
                         :
                             <>
-                                <View style={{marginTop:responsiveHeight(52)}}>
-                                <View style={{flexDirection:'row',flex:1,marginVertical:15, }}>
+                                <View style={{marginTop:responsiveHeight(50)}}>
+                                <View style={{flexDirection:'row',flex:1,marginVertical:15}}>
                                     <Slider
                                         onTouchStart={this.onSliderEditStart}
                                         // onTouchMove={() => console.log('onTouchMove')}

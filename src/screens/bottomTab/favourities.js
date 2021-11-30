@@ -730,7 +730,7 @@ const feed = (props) => {
                         </View>
                       :
                       <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}}>
-                          <Text style={styles.title} >No local data found</Text>
+                          <Text style={styles.title} >Empty</Text>
                       </View>
                       }
                     </>

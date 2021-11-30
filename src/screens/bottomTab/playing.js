@@ -249,30 +249,30 @@ export default class PlayerScreen extends React.Component{
         var data = await AsyncStorage.getItem("single_item")
         
         // uid = (JSON.parse(userId))
-        // return console.log(JSON.parse(userId))
+        console.log("palying =================",JSON.parse(data))
         this.setState({item:JSON.parse(data)})
         // return console.log(JSON.parse(data))
         setTimeout(() => {
             this.play();
-        }, 1000);
+        }, 2000);
 
     }
 
     componentWillUnmount(){
         if(this.sound){
             this.sound.release();
-            this.sound.stop();  
+            // this.sound.stop();  
             this.sound = null;
             console.log('caled 1')
         }else{
             this.sound = null;
-            this.sound.stop();  
+            // this.sound.stop();  
             console.log('caled 3')
         }
-        // if(this.timeout){
-        //     console.log('caled 2')
-        //     clearInterval(this.timeout);
-        // }
+        if(this.timeout){
+            console.log('caled 2')
+            clearInterval(this.timeout);
+        }
     }
 
     onSliderEditStart = () => {
