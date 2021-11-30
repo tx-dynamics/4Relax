@@ -24,7 +24,9 @@ import RNFetchBlob from 'rn-fetch-blob'
 const feed = (props) => {
 
     const isFocused = useIsFocused();
-    const [localImage,setImage ] =  useState()
+    const [localMediImage,setMediImage ] =  useState()
+    const [localSounImage,setSounImage ] =  useState()
+    const [localStorImage,setStorImage ] =  useState()
     const [isplaying,setisplaying ] =  useState(false)
     const [islock,setislock ] =  useState(false)
     const [cateEmp,setcateEmp ] =  useState(false)
@@ -68,21 +70,32 @@ const feed = (props) => {
         var meditation = [];
         var filePath = [];
         var ImagePath = '';
+        let MediImage = '';
+        let StoryImage = '';
+        let SoundImage = '';
 
         RNFetchBlob.fs.isDir(Imgdir).then((isDir)=>{
           if(isDir){
             RNFS.readDir(Imgdir).then(files => {
               files.map((item)=>{
+                // console.log(item);
                 if(item.name === "Meditation"){
-                  ImagePath = item.path
-  
-                  setImage(item.path)
+                  MediImage = item.path
+                  setMediImage(item.path)
                 // return console.log(files);
-              }
+                }else if(item.name === "Sounds"){
+                  SoundImage = item.path
+                  setSounImage(item.path)
+                }else{
+                  StoryImage = item.path
+                  setStorImage(item.path)
+                }
               })
             })
           }
         })
+          // alert(MediImage)
+          
         try{
         RNFetchBlob.fs.isDir(dir).then((isDir)=>{
           // return   alert(isDir)
@@ -103,8 +116,8 @@ const feed = (props) => {
                 // ImagePath.map((img)=>{
                 // console.log("at here------------------>",item)  
                 //   if(item.trackName === img.name){
-                  var res = await getLocalJson(ImagePath,item,item.trackName,state)
-                  console.log("local===========>",JSON.stringify(res));
+                  var res = await getLocalJson(MediImage,SoundImage,StoryImage,item,item.trackName,state)
+                  // console.log("local===========>",JSON.stringify(res));
                   meditation.push(res)
                     // meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
                 //   }
@@ -115,15 +128,18 @@ const feed = (props) => {
               if(state.isConnected){
                 // console.log(meditation)
                 // alert("called internal medi")
+                setTimeout(() => {
                 setInternal(meditation)
-                getfavorites(meditation)
+                getfavorites(meditation)  
+                }, 1500);
+                
       
               }else{
                 setTimeout(() => {
-                  console.log("H@R@/////////////////////--->",meditation)
+                  // console.log("H@R@/////////////////////--->",meditation)
                   setmeditations(meditation)
                   setRefreshing(false);  
-                }, 1000);
+                }, 1500);
                 
               }
       
@@ -146,15 +162,16 @@ const feed = (props) => {
       }catch(e){console.log(e);}
       }
 
-      async function getLocalJson (img,item,name,state){
+      async function getLocalJson (mediImg,sounImg,storyImg,item,name,state){
         let meditation = {}
         let obj = await AsyncStorage.getItem(name);
         // return console.log("here=====local json========>",JSON.parse(obj))
         let pared = JSON.parse(obj) 
         // return console.log("here=====local pared json========>",pared)
-          if (pared != null){      
-            // if(item.trackName === img.name){  
-              console.log('pared exists')
+          // if (pared != null){      
+            if(pared.trackType === 'Meditation'){ 
+              // alert(pared.trackType) 
+              if (pared != null){      
               meditation = ({
                 "_id":pared._id,
                 "liked":pared.liked,
@@ -162,13 +179,12 @@ const feed = (props) => {
                 "trackType": pared.trackType,
                 "trackFile":item.trackFile,
                 "trackName":item.trackName,
-                "coverPic":img,
+                "coverPic":mediImg,
                 isdownloading:item.isdownloading,
                 isplaying: false,
                 exists:true
               })
-            // }
-          }else{
+              }else{
             // if(item.trackName === img.name){  
               meditation = ({
                 // "_id":pared._id,
@@ -177,13 +193,74 @@ const feed = (props) => {
                 // "trackType": pared.trackType,
                 "trackFile":item.trackFile,
                 "trackName":item.trackName,
-                "coverPic":img,
+                "coverPic":mediImg,
                 isdownloading:item.isdownloading,
                 isplaying: false,
                 exists:true
               })
-            // }
+              }
+            }else if(pared.trackType === 'Sounds'){
+              // alert(pared.trackType) 
+              if (pared != null){      
+                meditation = ({
+                  "_id":pared._id,
+                  "liked":pared.liked,
+                  "cat_name":pared.trackCategory.name,
+                  "trackType": pared.trackType,
+                  "trackFile":item.trackFile,
+                  "trackName":item.trackName,
+                  "coverPic":sounImg,
+                  isdownloading:item.isdownloading,
+                  isplaying: false,
+                  exists:true
+                })
+                }else{
+              // if(item.trackName === img.name){  
+                meditation = ({
+                  // "_id":pared._id,
+                  // "liked":pared.liked,
+                  // "cat_name":pared.trackCategory.name,
+                  // "trackType": pared.trackType,
+                  "trackFile":item.trackFile,
+                  "trackName":item.trackName,
+                  "coverPic":sounImg,
+                  isdownloading:item.isdownloading,
+                  isplaying: false,
+                  exists:true
+                })
+                }
+            }else{
+              // alert(pared.trackType) 
+              if (pared != null){      
+                meditation = ({
+                  "_id":pared._id,
+                  "liked":pared.liked,
+                  "cat_name":pared.trackCategory.name,
+                  "trackType": pared.trackType,
+                  "trackFile":item.trackFile,
+                  "trackName":item.trackName,
+                  "coverPic":storyImg,
+                  isdownloading:item.isdownloading,
+                  isplaying: false,
+                  exists:true
+                })
+                }else{
+              // if(item.trackName === img.name){  
+                meditation = ({
+                  // "_id":pared._id,
+                  // "liked":pared.liked,
+                  // "cat_name":pared.trackCategory.name,
+                  // "trackType": pared.trackType,
+                  "trackFile":item.trackFile,
+                  "trackName":item.trackName,
+                  "coverPic":storyImg,
+                  isdownloading:item.isdownloading,
+                  isplaying: false,
+                  exists:true
+                })
+                }
           }
+        // }
             return meditation
       
         if(state.isConnected){
@@ -232,6 +309,7 @@ const feed = (props) => {
 
       function checkData(posts,fav){
         console.log("$$$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        // return console.log(fav);
         if(fav.length > 0){
           let trueData = [];
           let fasleData = [];
@@ -240,7 +318,7 @@ const feed = (props) => {
               // console.log(item._id)
               // console.log(item.trackName +"%%%%%%%%%%%%%%%%%%%%%%%%%%"+ child.trackName)
               if(item.trackName === child.trackName){
-                trueData.push({...item,isdownloading:true})
+                trueData.push({...item,isdownloading:true,cat_name:child.cat_name})
               }else{
                 fasleData.push({...item,isdownloading:false})
               }
@@ -248,12 +326,15 @@ const feed = (props) => {
           })
           var ids = new Set(trueData.map(d => d._id));
           var merged = [...trueData, ...fasleData.filter(d => !ids.has(d._id))];
+          // return console.log(merged);
   
           // console.log("id====>",merged)
           // let dub=finalData;
           const n = merged.filter((tag, index, dub) =>
           dub.findIndex((t)=> t._id === tag._id
           ) == index);
+          // return console.log(n);
+          
           setmeditations(n);
           setRefreshing(false);
         }else{
@@ -268,6 +349,7 @@ const feed = (props) => {
 
     async function  favourities(item){
         if(connection){
+        setisplaying(false)
         const params = {
             trackId: item.trackId ,
             trackType: item.trackType,
@@ -309,7 +391,7 @@ const feed = (props) => {
     }
 
     const setData = async (single,id,name) => {
-        // console.log(item.trackName)
+        console.log(single.trackName)
         setisplaying(false)
         setTimeout(() => {
           if(connection){
@@ -397,7 +479,7 @@ const feed = (props) => {
           }     
         }, 500);
         
-          return console.log(single);
+          //  console.log("single==============>",single);
             try {
                 await AsyncStorage.setItem("single_item",JSON.stringify(single))
 
@@ -685,12 +767,12 @@ const feed = (props) => {
               //   textColor: 'white',
               // });
           }else{
-              console.log("File Not Available")
-              Snackbar.show({
-                text: 'File Not Available',
-                backgroundColor: 'tomato',
-                textColor: 'white', 
-              });
+              // console.log("File Not Available")
+              // Snackbar.show({
+              //   text: 'File Not Available',
+              //   backgroundColor: 'tomato',
+              //   textColor: 'white', 
+              // });
           }
   
         
@@ -746,7 +828,8 @@ const feed = (props) => {
                             renderItem={({ item, index }) =>
                                 <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
                                     <ImageBackground
-                                        source={{uri :   'file://' + localImage}}
+                                        source={{uri : item.trackType === 'Meditation'?  'file://' + localMediImage:
+                                        item.trackType === 'Sounds'? 'file://' + localSounImage : 'file://' + localStorImage }}
                                         // source={{uri :  connection? item.coverPic : 'file://' + item.coverPic}}
                                         borderRadius={4}
                                         style={{width:'100%',height:178}}

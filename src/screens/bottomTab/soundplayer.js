@@ -73,7 +73,8 @@ export default class PlayerScreen extends React.Component{
         var main = this.props.route.params.single.coverPic
         var fav = this.props.route.params.single
         var type = this.props.route.params.single.type
-        var tracktype = this.props.route.params.single.trackType
+        var track = this.props.route.params.single.trackType
+        var tracktype=track.charAt(0).toUpperCase() + track.slice(1)
         console.log(this.props.route.params.single)
         // console.log("***********************************777777777")
         // console.log(id)
@@ -86,11 +87,16 @@ export default class PlayerScreen extends React.Component{
                 files.map((item)=>{
                   if(item.name === type){
                     // ImagePath = item.path
+                    // alert(1)
                     this.setState({mainPic:item.path})
     
                     // setImage(item.path)
                   // return console.log(files);
                 }
+                else if(item.name === tracktype){
+                    this.setState({mainPic:item.path})
+                }
+                // alert(tracktype)
                 })
               })
             }
@@ -194,6 +200,7 @@ export default class PlayerScreen extends React.Component{
                 }
         }else if(tracktype){
             try {
+                    console.log("fav calling============>",fav);
                     if(fav){
                         this.setState({single:fav})
                         setTimeout(() => {
@@ -222,7 +229,7 @@ export default class PlayerScreen extends React.Component{
         }
         }else{
             try {
-                alert('fav : '+tracktype)
+                // alert('fav : '+tracktype)   
                 this.setState({don:true})
                 console.log(fav);
                 if(fav){
@@ -398,11 +405,11 @@ export default class PlayerScreen extends React.Component{
               // });
           }else{
               console.log("File Not Available")
-              Snackbar.show({
-                text: 'File Not Available',
-                backgroundColor: 'tomato',
-                textColor: 'white', 
-              });
+            //   Snackbar.show({
+            //     text: 'File Not Available',
+            //     backgroundColor: 'tomato',
+            //     textColor: 'white', 
+            //   });
           }
   
         
@@ -526,7 +533,7 @@ export default class PlayerScreen extends React.Component{
                         </View>
                         <View style={{alignItems:'center',marginTop:responsiveHeight(6)}} >
                             {this.state.connection?
-                                <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {trackCategory.name}  </Text>
+                                <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {trackCategory.name ? trackCategory.name : single.cat_name}  </Text>
                             :
                                 <Text style={{fontSize:16,fontWeight:'400',fontFamily:'Lato',color:'#CCCCCC'}} >{single.trackType} - {single.cat_name}  </Text>
                             }

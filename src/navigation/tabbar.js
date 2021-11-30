@@ -122,7 +122,16 @@ const explore = () => {
         component={AudioPlayer}
         options={{headerShown: false}}
       />
-      
+      <Stack.Screen
+        name="Packages"
+        component={Packages}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Payment"
+        component={Payment}
+        options={{headerShown: false}}
+      />
 
 
     </Stack.Navigator>
@@ -142,7 +151,16 @@ const music = () => {
         component={AudioPlayer}
         options={{headerShown: false}}
       />
-      
+      <Stack.Screen
+        name="Packages"
+        component={Packages}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Payment"
+        component={Payment}
+        options={{headerShown: false}}
+      />
 
 
     </Stack.Navigator>

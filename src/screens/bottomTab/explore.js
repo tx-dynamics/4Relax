@@ -361,7 +361,7 @@ var RNFS = require('react-native-fs');
         if(connection){
         const params = {
             trackId: item._id,
-            trackType: "stories",
+            trackType: "Stories",
             trackName: item.trackName,
             trackFile:item.trackFile,
             coverPic:item.trackCategory.coverPic,
@@ -851,11 +851,11 @@ var RNFS = require('react-native-fs');
             // });
         }else{
             console.log("File Not Available")
-            Snackbar.show({
-              text: 'File Not Available',
-              backgroundColor: 'tomato',
-              textColor: 'white', 
-            });
+            // Snackbar.show({
+            //   text: 'File Not Available',
+            //   backgroundColor: 'tomato',
+            //   textColor: 'white', 
+            // });
         }
 
       
@@ -1094,11 +1094,11 @@ var RNFS = require('react-native-fs');
               
           }else{
               console.log("File Not Available")
-              Snackbar.show({
-                text: 'File Not Available',
-                backgroundColor: 'tomato',
-                textColor: 'white', 
-              });
+              // Snackbar.show({
+              //   text: 'File Not Available',
+              //   backgroundColor: 'tomato',
+              //   textColor: 'white', 
+              // });
         }
 
       

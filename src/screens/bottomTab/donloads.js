@@ -52,23 +52,29 @@ export default function downloads(props) {
         let stories = [];
         let final = [];
         let filePath = [];
-        let ImagePath = '';
+        let MediImage = '';
+        let StoryImage = '';
+        let SoundImage = '';
 
         RNFetchBlob.fs.isDir(Imgdir).then((isDir)=>{
           if(isDir){
             RNFS.readDir(Imgdir).then(files => {
               files.map((item)=>{
                 if(item.name === "Meditation"){
-                  ImagePath = item.path
-  
-                  setImage(item.path)
+                  MediImage = item.path
+                  // setImage(item.path)
                 // return console.log(files);
-              }
+                }else if(item.name === "Sounds"){
+                  SoundImage = item.path
+                }else{
+                  StoryImage = item.path
+                }
               })
             })
           }
         })
 
+       
         RNFetchBlob.fs.isDir(dirm).then((isDir)=>{
           if(isDir){
             
@@ -86,7 +92,7 @@ export default function downloads(props) {
               filePath.map(async(item)=>{
                 // ImagePath.map((img)=>{
                 //   if(item.trackName === img.name){
-                  var res = await getLocalJson(ImagePath,item,item.trackName)
+                  var res = await getLocalJson(MediImage,item,item.trackName)
                   // console.log("local donloads===========>",res);
                   meditation.push(res)
                   // meditation=(res)
@@ -138,7 +144,7 @@ export default function downloads(props) {
                 filePath.map(async(item)=>{
                   // ImagePath.map((img)=>{
                   //   if(item.trackName === img.name){
-                  var res = await getLocalJson(ImagePath,item,item.trackName)
+                  var res = await getLocalJson(SoundImage,item,item.trackName)
                   // console.log("local===========>",res);
                   sounds.push(res)
                   // sounds=(res)
@@ -190,7 +196,7 @@ export default function downloads(props) {
             filePath.map(async(item)=>{
                 // ImagePath.map((img)=>{
                 // if(item.trackName === img.name){
-                  var res = await getLocalJson(ImagePath,item,item.trackName)
+                  var res = await getLocalJson(StoryImage,item,item.trackName)
                   // console.log("local===========>",res);
                   // stories=(res)
                   stories.push(res)
@@ -413,11 +419,11 @@ export default function downloads(props) {
                   
               }else{
                   console.log("File Not Available")
-                  Snackbar.show({
-                    text: 'File Not Available',
-                    backgroundColor: 'tomato',
-                    textColor: 'white', 
-                  });
+                  // Snackbar.show({
+                  //   text: 'File Not Available',
+                  //   backgroundColor: 'tomato',
+                  //   textColor: 'white', 
+                  // });
               }
       
             
@@ -448,11 +454,11 @@ export default function downloads(props) {
                   
               }else{
                   console.log("File Not Available")
-                  Snackbar.show({
-                    text: 'File Not Available',
-                    backgroundColor: 'tomato',
-                    textColor: 'white', 
-                  });
+                  // Snackbar.show({
+                  //   text: 'File Not Available',
+                  //   backgroundColor: 'tomato',
+                  //   textColor: 'white', 
+                  // });
               }
       
             
@@ -483,11 +489,11 @@ export default function downloads(props) {
                   
               }else{
                   console.log("File Not Available")
-                  Snackbar.show({
-                    text: 'File Not Available',
-                    backgroundColor: 'tomato',
-                    textColor: 'white', 
-                  });
+                  // Snackbar.show({
+                  //   text: 'File Not Available',
+                  //   backgroundColor: 'tomato',
+                  //   textColor: 'white', 
+                  // });
               }
       
             
@@ -831,11 +837,11 @@ export default function downloads(props) {
                 // });
             }else{
                 console.log("File Not Available")
-                Snackbar.show({
-                  text: 'File Not Available',
-                  backgroundColor: 'tomato',
-                  textColor: 'white', 
-                });
+                // Snackbar.show({
+                //   text: 'File Not Available',
+                //   backgroundColor: 'tomato',
+                //   textColor: 'white', 
+                // });
           }
   
         
