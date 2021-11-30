@@ -18,10 +18,9 @@ import {unloc,pause,play,download,fav,logo,del,cover} from '../../assets'
 import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'rn-fetch-blob'
+import { firebase } from '@react-native-firebase/messaging';
+
 var RNFS = require('react-native-fs');
-
-
-
 
 
  const feed = (props) => {
@@ -46,9 +45,37 @@ var RNFS = require('react-native-fs');
       // console.log("has sub ====================>",props?.userData?.subscriptionDetail?.subscriptionId);
         // CheckConnectivity()
         checkInternet()
+        notificationFun()
         setcateEmp(false)
         setisplaying (false)
     }, [isFocused])
+
+
+    const notificationFun = async() =>{
+
+      const enabled = await firebase.messaging().hasPermission();
+      if (enabled) {
+      } else {
+        try {
+          await firebase.messaging().requestPermission();
+        } catch (error) {
+        }
+      }
+      const fcmToken = await firebase.messaging().getToken();
+      if (fcmToken) {
+        console.log("fcmTokenn", fcmToken)
+        console.log('Firebase TOKENnn==> ', fcmToken);
+        alert('Firebase TOKEN Upload==> '+ fcmToken);
+      } else {
+        console.warn('no token');
+      }
+
+
+    }
+
+
+
+
 
     async function checkInternet (){
       NetInfo.fetch().then((state) => {
@@ -65,7 +92,6 @@ var RNFS = require('react-native-fs');
         
       });
     }
-
     async function requestToPermissions ()  {
       try {
         const granted = await PermissionsAndroid.request(
@@ -89,9 +115,7 @@ var RNFS = require('react-native-fs');
       } catch (err) {
         console.log(err);
       }
-    };
-
-
+    }
     async function get_category(){
       try {
         const res = await props.get_categories();
@@ -126,7 +150,6 @@ var RNFS = require('react-native-fs');
         console.log(err);
       }
     }
-    
     function CheckConnectivity  (cat = '')  {
       setisplaying(false)
       setRefreshing(true);
@@ -164,7 +187,6 @@ var RNFS = require('react-native-fs');
         
       });
     };
-
     async function getFiles(state,cat){
       // return alert(cat)
       // AsyncStorage.clear()
@@ -260,7 +282,6 @@ var RNFS = require('react-native-fs');
         }
       })
     }
-
     async function getLocalJson (img,item,name,state,cat){
       let meditation = {}
       let obj = await AsyncStorage.getItem(name);
@@ -315,7 +336,6 @@ var RNFS = require('react-native-fs');
         setRefreshing(false);
       }
     }
-
     async function getMeditation( cate = '',cover = '' , meditation  ) {
       // return console.log("!!!!!!!!!!!!!!!!!!^^^^^^^^^^^^^^^^^^^!!!!!!!!!!!!!!!!!!"+category)
         // setRefreshing(true);
@@ -383,7 +403,6 @@ var RNFS = require('react-native-fs');
         }
        
       }
-
     function checkData(posts,meditation){
       console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
       // return console.log(posts );
@@ -425,7 +444,6 @@ var RNFS = require('react-native-fs');
      
 
     }
-
     async function  favourities(item){
       // alert('called')
       setofflinefav(item)
