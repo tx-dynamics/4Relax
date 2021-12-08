@@ -35,12 +35,13 @@ var RNFS = require('react-native-fs');
     const [islock,setislock ] =  useState(false)
     const [cateEmp,setcateEmp ] =  useState(false)
     const [localImage,setImage ] =  useState()
+    const [subId,setsubId ] =  useState('')
 
     useEffect(() => {
-        // CheckConnectivity()
+        setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
         checkInternet()
         setcateEmp(false)
-        setisplaying (false)
+        // setisplaying (false)
         requestToPermissions()
 
     }, [isFocused])
@@ -110,7 +111,7 @@ var RNFS = require('react-native-fs');
     }
 
     function CheckConnectivity  (cat = '')  {
-      setisplaying(false)
+      // setisplaying(false)
       setRefreshing(true);
       // For Android devices
       NetInfo.fetch().then((state) => {
@@ -550,7 +551,7 @@ var RNFS = require('react-native-fs');
       
           try {
               await AsyncStorage.setItem("single_item",JSON.stringify({...single,type:'Stories'}))
-
+              await AsyncStorage.setItem("userId",JSON.stringify(props.userData._id))
           } catch (e) {
            console.log("calling itself"+e)
           }
@@ -1166,7 +1167,7 @@ var RNFS = require('react-native-fs');
                   :
                   <>
                     {refreshing?
-                      null
+                      <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}} />
                     :
                     <>
                     { meditations.length < 1  ?
@@ -1208,10 +1209,10 @@ var RNFS = require('react-native-fs');
                                       <View style={{flexDirection:'row',flex:0.3}}>
                                           <View style={{flex:0.29}}>
                                           {connection?
-                                          // <>
-                                          // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                          //     null
-                                          //   :
+                                          <>
+                                          {!item.subscriptionType.includes(subId)?
+                                              null
+                                            :
                                             <>
                                               {item.isdownloading?
                                                 <TouchableOpacity onPress={()=> favourities(item)}  style={{height:40}} >
@@ -1227,8 +1228,8 @@ var RNFS = require('react-native-fs');
                                               :
                                               null}
                                             </>
-                                          //   }
-                                          // </>
+                                            }
+                                          </>
                                           :
                                           <>
                                             {item.isdownloading?
@@ -1249,10 +1250,10 @@ var RNFS = require('react-native-fs');
                                           </View>
                                           <View style={{flex:0.8,alignItems:'flex-end'}}>
                                           {connection?
-                                            // <>
-                                            // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                            //     null
-                                            //   :
+                                            <>
+                                            {!item.subscriptionType.includes(subId)?
+                                                null
+                                              :
                                               <>
                                                 {item.isdownloading?
                                                   <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
@@ -1266,8 +1267,8 @@ var RNFS = require('react-native-fs');
                                                 :
                                                 null}
                                               </>
-                                            // }
-                                            // </>
+                                            }
+                                            </>
                                           :
                                             <>
                                               {item.isdownloading?
@@ -1289,18 +1290,18 @@ var RNFS = require('react-native-fs');
                                       <View style={{flex:0.4}}></View>
                                       <View style={{flex:0.25,width:'100%',alignItems:'center'}} >
                                         {connection?
-                                          // <>
-                                          // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
-                                          //     <TouchableOpacity onPress={()=> 
-                                          //         props.navigation.navigate('Packages')
-                                          //     }
-                                          //     style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                          //         <Image
-                                          //             source={unloc}
-                                          //             style={[styles.icon,{width:15,height:19}]}
-                                          //         />
-                                          //     </TouchableOpacity>
-                                          //       :
+                                          <>
+                                          {!item.subscriptionType.includes(subId)? 
+                                              <TouchableOpacity onPress={()=> 
+                                                  props.navigation.navigate('Packages')
+                                              }
+                                              style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                  <Image
+                                                      source={unloc}
+                                                      style={[styles.icon,{width:15,height:19}]}
+                                                  />
+                                              </TouchableOpacity>
+                                                :
                                                 <>
                                                 {item.isdownloading?
                                                     <>
@@ -1333,8 +1334,8 @@ var RNFS = require('react-native-fs');
                                                     </TouchableOpacity>
                                                 }
                                                 </>
-                                          //   }
-                                          // </>
+                                            }
+                                          </>
                                           :
                                           <>
                                             {item.isdownloading?

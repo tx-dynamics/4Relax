@@ -17,8 +17,6 @@ import {BASE_URL} from '../../redux/base-url';
 import NetInfo from "@react-native-community/netinfo";
 import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-var RNFS = require('react-native-fs');
-
 // const img_speaker = require('./resources/ui_speaker.png');
 
 const fav = require('../../assets/images/fav.png');
@@ -50,6 +48,7 @@ export default class PlayerScreen extends React.Component{
             don:false,
             selected:false,
             mainPic:'',
+            type:''
         }
         this.sliderEditing = false;
     }
@@ -64,19 +63,12 @@ export default class PlayerScreen extends React.Component{
         //     }
         //   );
         this.CheckConnectivity()
-        // console.log(this.props.navigation);
-        // this.props.navigation.addListener(
-        //     'didBlur',
-        //     () => this.sound.pause()
-        //   )
-        var id = this.props.route.params.single._id
+        this.getData()
         var main = this.props.route.params.single.coverPic
-        var fav = this.props.route.params.single
         var type = this.props.route.params.single.type
         var track = this.props.route.params.single.trackType
         var tracktype=track.charAt(0).toUpperCase() + track.slice(1)
-        console.log(this.props.route.params.single)
-        // console.log("***********************************777777777")
+        
         // console.log(id)
       
         let Imgdir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
@@ -103,7 +95,6 @@ export default class PlayerScreen extends React.Component{
           })    
           this.setState({mainPic:main})
         
-        this.getSingle(id,fav,type,tracktype);
         
         this.timeout = setInterval(() => {
             if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
@@ -120,6 +111,25 @@ export default class PlayerScreen extends React.Component{
 
     }
 
+    getData(again = ''){
+        var id = this.props.route.params.single._id
+        var track_id = this.props.route.params.single.trackId
+        var fav = this.props.route.params.single
+        var type = this.props.route.params.single.type
+        var track = this.props.route.params.single.trackType
+        var tracktype=track.charAt(0).toUpperCase() + track.slice(1)
+        // return console.log(id,track_id)
+        this.setState({type:type})
+        if(type === 'fav'){
+          this.getSingle(again,track_id,fav,type,tracktype);
+
+        }else{
+          this.getSingle(again,id,fav,type,tracktype);
+
+        }
+        // alert(tracktype)
+    }
+
   
     CheckConnectivity  ()  {
         // For Android devices
@@ -131,19 +141,23 @@ export default class PlayerScreen extends React.Component{
         });
       };
 
-    getSingle = async (id,fav,type,tracktype) => {
+    getSingle = async (again,id,fav,type,tracktype) => {
+        // alert(again)
         let userId = await AsyncStorage.getItem('userId');
-        // console.log("***************************",userId)
+        console.log("***************************",JSON.parse(userId))
         const params = {
-            userId : userId
+            userId :JSON.parse(userId)
         }
         // alert(id)
         if(this.state.connection){
-        if(type === 'Meditation'){
+        if(tracktype === 'Meditation'){
             // alert('meditation')
         try {
-            // alert('called meditation')
-            const res = await axios.post(`${BASE_URL}api/relax/meditation/getSingle/${id}`,JSON.stringify(params), {
+            // alert(id)
+            // console.log("***************************************88");
+
+                // console.log(params)
+            const res = await axios.post(`${BASE_URL}api/relax/meditation/getSingle/${id}`,(params), {
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -154,16 +168,16 @@ export default class PlayerScreen extends React.Component{
             if(res?.data){
                 this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                 setTimeout(() => {
-                    this.play()
+                    this.play(again)
                 }, 500);
             }
           } catch (err) {
             console.log("error found : "+err);
           }
-        }else if(type === 'Sounds'){
+        }else if(tracktype === 'Sounds'){
             try {
                     // alert('Sounds')
-                const res = await axios.post(`${BASE_URL}api/relax/sounds/getSingle/${id}`,JSON.stringify(params), {
+                const res = await axios.post(`${BASE_URL}api/relax/sounds/getSingle/${id}`,(params), {
                     headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -173,57 +187,63 @@ export default class PlayerScreen extends React.Component{
                 if(res?.data){
                     this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                     setTimeout(() => {
-                        this.play()
+                        this.play(again)
                     }, 500);
                 }
                 } catch (err) {
                 console.log("error found : "+err);
                 }
-        }else if(type === 'Stories'){
+        }else if(tracktype === 'Stories'){
             try {
+                console.log("***************************************88");
+
+                // console.log(params)
                     // alert('stories')
-                const res = await axios.post(`${BASE_URL}api/relax/stories/getSingle/${id}`,JSON.stringify(params), {
+                const res = await axios.post(`${BASE_URL}api/relax/stories/getSingle/${id}`,(params), {
                     headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     },
                 });
-                // console.log(res?.data)
+                console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+                console.log(res?.data)
                 if(res?.data){
                     this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
                     setTimeout(() => {
-                        this.play()
+                        this.play(again)
                     }, 500);
                 }
                 } catch (err) {
                 console.log("error found : "+err);
                 }
-        }else if(tracktype){
-            try {
-                    console.log("fav calling============>",fav);
-                    if(fav){
-                        this.setState({single:fav})
-                        setTimeout(() => {
-                            this.play()
-                        }, 500);
-                    }
-                // const res = await axios.get(`${BASE_URL}api/relax/sounds/getSingle/${id}`, {
-                //     headers: {
-                //     Accept: 'application/json',
-                //     'Content-Type': 'application/json',
-                //     },
-                // });
-                // // console.log(res?.data)
-                // if(res?.data){
-                //     this.setState({single:res?.data})
-                //     setTimeout(() => {
-                //         this.play()
-                //     }, 500);
-                // }
-                } catch (err) {
-                console.log("error found : "+err);
-                }
-        }else{
+        }
+        // else if(tracktype){
+        //     try {
+        //             console.log("fav calling============>",fav);
+        //             if(fav){
+        //                 this.setState({single:fav})
+        //                 setTimeout(() => {
+        //                     this.play()
+        //                 }, 500);
+        //             }
+        //         // const res = await axios.get(`${BASE_URL}api/relax/sounds/getSingle/${id}`, {
+        //         //     headers: {
+        //         //     Accept: 'application/json',
+        //         //     'Content-Type': 'application/json',
+        //         //     },
+        //         // });
+        //         // // console.log(res?.data)
+        //         // if(res?.data){
+        //         //     this.setState({single:res?.data})
+        //         //     setTimeout(() => {
+        //         //         this.play()
+        //         //     }, 500);
+        //         // }
+        //         } catch (err) {
+        //         console.log("error found : "+err);
+        //         }
+        // }
+        else{
             alert('not found')
 
         }
@@ -235,7 +255,7 @@ export default class PlayerScreen extends React.Component{
                 if(fav){
                     this.setState({single:fav})
                     setTimeout(() => {
-                        this.play()
+                        this.play(again)
                     }, 500);
                 }
             
@@ -273,7 +293,11 @@ export default class PlayerScreen extends React.Component{
         }
     }
 
-    play = async () => {
+    play = async (again = '') => {
+      // alert(again)
+      if(again === 'true'){
+
+      }else{
         if(this.sound){
             // alert("good")
             this.sound.play(this.playComplete);
@@ -296,11 +320,13 @@ export default class PlayerScreen extends React.Component{
                     Alert.alert('Notice', 'audio file error. (Error code : 1)');
                     this.setState({playState:'paused'});
                 }else{
+                    // if(this.state.playState === 'paused')
                     this.setState({playState:'playing',isLoading:false, duration:this.sound.getDuration()});
                     this.sound.play(this.playComplete);
                 }
             });    
         }
+      }
     }
     playComplete = (success) => {
         if(this.sound){
@@ -356,19 +382,25 @@ export default class PlayerScreen extends React.Component{
     }
 
     deletefile = async () => {
-        if(this.state.single.liked === 'yes'){
-            alert('called')
-            this.favourities(this.state.single)
+        let name = this.state.single.trackName;
+
+        try {
+            await AsyncStorage.removeItem(name);
+            // alert('cleared item')
+            // return true;
+        }catch(exception) {
+            alert(exception)
+              // return false;
           }
+        
         //   return
         this.setState({isLoading:true})
-        let name = this.state.single.trackName;
-        let cover = name.concat("_img");
+        // let cover = name.concat("_img");
         // return console.log(cover)
         let dir = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + name; 
-        let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+        // let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
         try{
-          let exists = await RNFS.exists(dir,dirImg);
+          let exists = await RNFS.exists(dir);
           if(exists){
               // exists call delete
               await RNFS.unlink(dir).then(() => {
@@ -384,19 +416,7 @@ export default class PlayerScreen extends React.Component{
               .catch((err) => {         
                   console.log(err);
               });
-              await RNFS.unlink(dirImg).then(() => {
-                // console.log('2 deleted');
-                RNFS.scanFile(dirImg)
-                  .then(() => {
-                    // console.log('2 scanned');
-                  })
-                  .catch(err => {
-                    console.log(err);
-                  });
-              })
-              .catch((err) => {         
-                  console.log(err);
-              });
+              
               // console.log(name+"Deleted");
               // Snackbar.show({
               //   text: name+' Deleted',
@@ -417,6 +437,12 @@ export default class PlayerScreen extends React.Component{
           console.log("error : "+e)
         }
         
+        if(this.state.single.liked === 'yes'){
+            // alert('called')
+            this.addRemoveFav(this.state.single)
+            this.favourities(this.state.single)
+          }
+
         setTimeout(() => {
             this.props.navigation.goBack()
             this.setState({isLoading:false})
@@ -425,19 +451,20 @@ export default class PlayerScreen extends React.Component{
   
       }
 
-    favourities = async (item) => {
+    favourities = async (item,track) => {
+        this.setofflinefav(item)
     let userId = await AsyncStorage.getItem('userId');
     if(this.state.connection){
         const params = {
         trackId: item._id,
-        trackType: "meditation",
+        trackType: item.trackType,
         trackName: item.trackName,
         trackFile:item.trackFile,
-        coverPic:item.trackCategory.coverPic,
+        coverPic:track.coverPic,
         subscriptionType:item.subscriptionType,
-        userId:userId
+        userId:JSON.parse(userId)
         };
-        console.log(params)
+        // return  console.log(params)
         try {
             const res = await axios.post(`${BASE_URL}api/relax/favorites/addToFavorite`,
             JSON.stringify(params),
@@ -449,46 +476,391 @@ export default class PlayerScreen extends React.Component{
             });
             // return console.log(res)
             if (res?.data) {
-                alert(res?.data)
+              if(this.state.type === 'fav'){
+                this.props.navigation.goBack()
+              }else{
+                let again = 'true';
+                this.getData(again)
+              }
+                // alert(res?.data)
             } 
             return res;
             } catch (err) {
             console.log(err.response.data);
             }
-    //   try {
-    //     const res = await props.set_fav(params);
-    //     // console.log('group_data', res);
-    //     if (res?.data) {
-    //         // console.log(res?.data)
-    //         // let cat = item.trackCategory.name;
-    //         // let cover = '';
-    //         // let medi = internal
-    //         // getMeditation(cat,cover,medi)
-    //         // Snackbar.show({
-    //         //     text: res?.data,
-    //         //     backgroundColor: '#018CAB',
-    //         //     textColor: 'white',
-    //         //   });
-    //     //   setmeditations(res?.data);
-    //     }
-    //   //   setloadingGroup(false);
-    //   } catch (err) {
-    //   //   setloadingGroup(false);
-    //     console.log(err);
-    //   }
+    
     }else{
-        Snackbar.show({
-        text: 'No Internet Connection! ',
-        backgroundColor: 'tomato',
-        textColor: 'white',
-        });
+        // Snackbar.show({
+        // text: 'No Internet Connection! ',
+        // backgroundColor: 'tomato',
+        // textColor: 'white',
+        // });
     }
         
     }
 
+    async offlineFav(sing){
+        // console.log(this.state.single);
+        if(this.state.type === 'fav'){
+          try{
+            if(sing.liked == 'yes'){
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'no';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }else{
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'yes';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }
+
+            this.setofflinefav(sing)
+
+        }catch(e){
+            console.log(e);
+        }
+        setTimeout(() => {
+          this.props.navigation.goBack()              
+        }, 500);
+        }else{
+          try{
+            if(sing.liked == 'yes'){
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'no';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }else{
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'yes';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }
+            this.setofflinefav(sing)
+
+        }catch(e){
+            console.log(e);
+        }
+        }
+        try{
+            if(sing.liked == 'yes'){
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'no';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }else{
+                this.setState(prevState => {
+                    let single = Object.assign({}, prevState.single);  // creating copy of state variable jasper
+                    single.liked = 'yes';                     // update the name property, assign a new value                 
+                    return { single };                                 // return new object jasper object
+                  })
+            }
+            this.setofflinefav(sing)
+
+        }catch(e){
+            console.log(e);
+        }
+
+        // try{
+        //   if(sing.liked == 'yes'){
+        //     // setofflinefav(sing)
+        //     const res = this.state.single.map((item)=>{
+        //         // console.log(item.liked)
+        //         if(item._id === sing._id){
+        //             return {
+        //                 ...item,
+        //                 liked: 'no',
+        //               };
+        //         } else {
+        //             return {
+        //                 ...item,
+        //                 // isplaying: false,
+        //               };
+        //         }
+        //     })
+        //     // setmeditations(res)
+        //     console.log(res);
+        //     this.setState({single:res})
+        //   }else{
+        //     // addRemoveFav(sing)
+        //     // setofflinefav(sing)
+        //     const res = this.state.single.map((item)=>{
+        //         // console.log(item.liked)
+        //         if(item._id === sing._id){
+        //             return {
+        //                 ...item,
+        //                 liked: 'yes',
+        //               };
+        //         } else {
+        //             return {
+        //                 ...item,
+        //                 // isplaying: false,
+        //               };
+        //         }
+        //     })
+        //     // setmeditations(res)
+        //     console.log(res);
+        //     this.setState({single:res})
+        //   }
+        //     setofflinefav(sing)
+        //   // setItemData(sing)
+        // }catch(e){
+        //   console.log(e);
+        // }
+      } 
+       
+    async setofflinefav(item){
+        let name = item.trackName
+        var res = await AsyncStorage.getItem(name)
+        var rep = JSON.parse(res)
+        if(rep.liked == 'yes'){
+            this.addRemoveFav(item)
+
+            rep = ({...rep,liked : 'no'})
+        }else{
+            this.addRemoveFav(item)
+
+            rep = ({...rep,liked : 'yes'})
+        }
+        console.log(rep.liked);
+        await AsyncStorage.setItem(name,JSON.stringify(rep))
+    }
+
+    async  addRemoveFav(post,track){
+        // return alert(post.trackType)
+        if(post.liked != 'yes'){
+            let dirMed = RNFS.DownloadDirectoryPath + '/FourRelax/meditation'
+            let dirStor = RNFS.DownloadDirectoryPath + '/FourRelax/stories'
+            let dirSou = RNFS.DownloadDirectoryPath + '/FourRelax/sounds'
+            let desPath = RNFS.DownloadDirectoryPath + '/FourRelax/favourties'
+            const favPath = '/storage/emulated/0/Download/FourRelax/favourties'
+            let meditation = [];
+            var filePath = [];
+            var ImagePath = [];
+            let local = [];
+            if(post.trackType === 'Meditation'){
+                RNFetchBlob.fs.isDir(dirMed).then((isDir)=>{
+                    // return console.log(isDir);
+                    if(isDir){
+                      RNFS.readDir(dirMed).then(files => {
+                        files.map(async(item)=>{
+                          try{
+                            RNFetchBlob.fs.isDir(favPath).then(async(isDir)=>{
+                              if(isDir){
+                                // alert('exists')
+                                if(item.name === post.trackName){
+                                  if (item.path.startsWith('/')) {
+                                    const url = item.path
+                                    const uriComponents = url.split('/')
+                                    const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                    // const destPath =  desPath+fileNameAndExtension
+                                    // console.log(destPath);
+                                    const destPath = `${desPath}/${fileNameAndExtension}`
+                                    console.log(destPath);
+                                    await RNFS.copyFile(url, destPath)
+                                  }
+                                }
+                              }else{
+                                RNFetchBlob.fs.mkdir(favPath).then(async()=>{
+                                  // alert("created")
+                                  if(item.name === post.trackName){
+                                    if (item.path.startsWith('/')) {
+                                      const url = item.path
+                                      const uriComponents = url.split('/')
+                                      const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                      // const destPath =  desPath+fileNameAndExtension
+                                      // console.log(destPath);
+                                      const destPath = `${desPath}/${fileNameAndExtension}`
+                                      console.log(destPath);
+                                      await RNFS.copyFile(url, destPath)
+                                    }
+                                  }
+                                })
+                              }
+                            })
+                            
+                        
+                          }catch(e){
+                            console.log(e);
+                          }
+                        })
+                      })
+                        
+                    }else{
+                      // Snackbar.show({
+                      //   text: 'No local data found',
+                      //   backgroundColor: '#018CAB',
+                      //   textColor: 'white',
+                      // });
+                    
+                    }
+                  })
+            }
+            else if(post.trackType === 'Sounds'){
+                RNFetchBlob.fs.isDir(dirSou).then((isDir)=>{
+                    // return console.log(isDir);
+                    if(isDir){
+                      RNFS.readDir(dirSou).then(files => {
+                        files.map(async(item)=>{
+                          try{
+                            RNFetchBlob.fs.isDir(favPath).then(async(isDir)=>{
+                              if(isDir){
+                                // alert('exists')
+                                if(item.name === post.trackName){
+                                  if (item.path.startsWith('/')) {
+                                    const url = item.path
+                                    const uriComponents = url.split('/')
+                                    const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                    // const destPath =  desPath+fileNameAndExtension
+                                    // console.log(destPath);
+                                    const destPath = `${desPath}/${fileNameAndExtension}`
+                                    console.log(destPath);
+                                    await RNFS.copyFile(url, destPath)
+                                  }
+                                }
+                              }else{
+                                RNFetchBlob.fs.mkdir(favPath).then(async()=>{
+                                  // alert("created")
+                                  if(item.name === post.trackName){
+                                    if (item.path.startsWith('/')) {
+                                      const url = item.path
+                                      const uriComponents = url.split('/')
+                                      const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                      // const destPath =  desPath+fileNameAndExtension
+                                      // console.log(destPath);
+                                      const destPath = `${desPath}/${fileNameAndExtension}`
+                                      console.log(destPath);
+                                      await RNFS.copyFile(url, destPath)
+                                    }
+                                  }
+                                })
+                              }
+                            })
+                            
+                        
+                          }catch(e){
+                            console.log(e);
+                          }
+                        })
+                      })
+                        
+                    }else{
+                      // Snackbar.show({
+                      //   text: 'No local data found',
+                      //   backgroundColor: '#018CAB',
+                      //   textColor: 'white',
+                      // });
+                    
+                    }
+                  })
+            }
+            else{
+                RNFetchBlob.fs.isDir(dirStor).then((isDir)=>{
+                    // return console.log(isDir);
+                    if(isDir){
+                      RNFS.readDir(dirStor).then(files => {
+                        files.map(async(item)=>{
+                          try{
+                            RNFetchBlob.fs.isDir(favPath).then(async(isDir)=>{
+                              if(isDir){
+                                // alert('exists')
+                                if(item.name === post.trackName){
+                                  if (item.path.startsWith('/')) {
+                                    const url = item.path
+                                    const uriComponents = url.split('/')
+                                    const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                    // const destPath =  desPath+fileNameAndExtension
+                                    // console.log(destPath);
+                                    const destPath = `${desPath}/${fileNameAndExtension}`
+                                    console.log(destPath);
+                                    await RNFS.copyFile(url, destPath)
+                                  }
+                                }
+                              }else{
+                                RNFetchBlob.fs.mkdir(favPath).then(async()=>{
+                                  // alert("created")
+                                  if(item.name === post.trackName){
+                                    if (item.path.startsWith('/')) {
+                                      const url = item.path
+                                      const uriComponents = url.split('/')
+                                      const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+                                      // const destPath =  desPath+fileNameAndExtension
+                                      // console.log(destPath);
+                                      const destPath = `${desPath}/${fileNameAndExtension}`
+                                      console.log(destPath);
+                                      await RNFS.copyFile(url, destPath)
+                                    }
+                                  }
+                                })
+                              }
+                            })
+                            
+                        
+                          }catch(e){
+                            console.log(e);
+                          }
+                        })
+                      })
+                        
+                    }else{
+                      // Snackbar.show({
+                      //   text: 'No local data found',
+                      //   backgroundColor: '#018CAB',
+                      //   textColor: 'white',
+                      // });
+                    
+                    }
+                  })
+            }
+           
+        }else{
+          // alert('called',post.trackName)
+          let name = post.trackName;
+          // let cover = name.concat("_img");
+          // return console.log(cover)
+          let dir = RNFS.DownloadDirectoryPath + '/FourRelax/favourties/' + name; 
+          // let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+          try{
+            let exists = await RNFS.exists(dir);
+            if(exists){
+                // exists call delete
+                await RNFS.unlink(dir).then(() => {
+                  // console.log('1 deleted');
+                  RNFS.scanFile(dir)
+                    .then(() => {
+                      // console.log('1 scanned');
+                    })
+                    .catch(err => {
+                      console.log(err);
+                    });
+                })
+                .catch((err) => {         
+                    console.log(err);
+                });
+               
+            }else{
+                console.log("File Not Available")
+                // Snackbar.show({
+                //   text: 'File Not Available',
+                //   backgroundColor: 'tomato',
+                //   textColor: 'white', 
+                // });
+          }
+  
+        
+        }catch(e){
+          console.log("error : "+e)
+        }
+        }
+      }
 
     render(){
-        const {single,trackCategory,selected,mainPic} = this.state
+        const {single,trackCategory,selected,mainPic,connection} = this.state
         // console.log(single.trackCategory);
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
@@ -572,10 +944,13 @@ export default class PlayerScreen extends React.Component{
                                 <View style={{flex:0.17}} >
                                     {/* {single.trackName? */}
                                     {/* <Text>{single.liked}</Text> */}
-                                    <Image
-                                        source={fav}
-                                        style={{width:20,height:18,alignSelf:'center',  tintColor:single.liked === 'no'? 'white' :'#FF4040'}}
-                                    />
+                                    <TouchableOpacity onPress={()=> connection? this.favourities(single,trackCategory) : this.offlineFav(single,trackCategory) } style={{height:25,width:25,justifyContent:'center',alignSelf:'center'}} >
+                                        <Image
+                                            source={fav}
+                                            style={{width:20,height:18,alignSelf:'center',  tintColor:single.liked === 'no'? 'white' :'#FF4040'}}
+                                        />
+                                    </TouchableOpacity>
+
                                     {/* // :
                                     // <Image
                                     //     source={fav}

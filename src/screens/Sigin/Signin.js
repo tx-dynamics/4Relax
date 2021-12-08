@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  PermissionsAndroid,
   ActivityIndicator,
   Platform,
   ScrollView,
@@ -20,8 +21,8 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveWidth,
-  
 } from 'react-native-responsive-dimensions';
+import moment from 'moment';
 import GoogleSign from '../../components/GoogleSign';
 import Snackbar from 'react-native-snackbar';
 import {useIsFocused} from '@react-navigation/native';
@@ -42,6 +43,8 @@ import {
   import {getAllimages} from '../../redux/actions/get_images'
   import RNFetchBlob from 'rn-fetch-blob'
   var RNFS = require('react-native-fs');
+  import { firebase } from '@react-native-firebase/messaging';
+  import NetInfo from "@react-native-community/netinfo";
 
 const Signin  =  props => {
 
@@ -54,6 +57,8 @@ const Signin  =  props => {
     const [passwordMessage, setpasswordMessage] = useState('');
     const [placeholder, setplaceholder] = useState('Sample@gmail.com');
     const [placeholderPass, setplaceholderPass] = useState('********');
+    const [ipAddress, setipAddress] = useState('');
+    const [Fcmtoken, setFcmtoken] = useState('');
     const navigation = props.navigation;
     const isFocused = useIsFocused();
 
@@ -71,11 +76,87 @@ const Signin  =  props => {
         console.log(e);
       }
       // console.log(email,password)
-      if(checkOnce){
-        downloadImages()
-        setcheckOnce(false)
-      }
+      // console.log();
+      // if(checkOnce){
+        checkInternet()
+        // alert('called in checkonce')
+        // setcheckOnce(false)
+      // }
     }, [isFocused]);
+
+    async function checkInternet (){
+      // alert("called 2 ")
+      NetInfo.fetch().then((state) => {
+        // setConnect(state.isConnected)
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected,state.details.ipAddress);
+        setipAddress(state.details.ipAddress)
+        //if (Platform.OS === "android") {
+          if (state.isConnected) {
+            // alert(state.isConnected)
+            notificationFun()
+            requestToPermissions()
+            // get_category()
+          } else {
+            let cat = '';
+            // alert("called 2 ")
+            // CheckConnectivity(cat)
+          }
+        
+      });
+    }
+
+    const notificationFun = async() =>{
+
+      const enabled = await firebase.messaging().hasPermission();
+      if (enabled) {
+      } else {
+        try {
+          await firebase.messaging().requestPermission();
+        } catch (error) {
+        }
+      }
+      const fcmToken = await firebase.messaging().getToken();
+      if (fcmToken) {
+          // console.log("fcmTokenn", fcmToken)
+          // console.log('Firebase TOKENnn==> ', fcmToken);
+          setFcmtoken(fcmToken)
+        // alert('Firebase TOKEN Upload==> '+ fcmToken);
+      } else {
+        console.warn('no token');
+       
+      }
+
+
+    }
+
+    async function requestToPermissions (){
+      setTimeout(() => {
+        console.log(ipAddress," ===== ",Fcmtoken);
+      },  5000);
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: 'Music',
+            message:
+              'App needs access to your Files... ',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // console.log('startDownload...');
+          downloadImages();
+        }else{
+            alert("Permission must be granted for downloads to proceeds ")
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     async function downloadImages(){
 
@@ -89,14 +170,14 @@ const Signin  =  props => {
          //  alert('exist')
           RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
            if(isDir){
-            //  alert('exist medii 1')
+            //  alert('exist images 1')
             RNFS.readDir(dir).then(async(files) => {
-              if(files.length === 0){
+              if(files.length < 1){
                 // console.log("main imges==================>",files);
                 const res = await props.getAllimages();
                 const images = res?.payload?.data
                 if (images) {
-                  console.log("images here ----------->",images);
+                  console.log("images here -----111------>",images);
                   images.map((item)=>{
                     // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
             
@@ -121,25 +202,25 @@ const Signin  =  props => {
                   })
                 }
               }else{
-                files.map((item)=>{
-                  // console.log('files exist 1')
-                  // alert(item);
-              })
+                // alert('images already exists 1')
               }
               
             })
              return
            }else{
+            // alert('exist images 2')
+
              RNFetchBlob.fs.mkdir(tracktype).then(()=>{
               //  alert('newly create medi 1')
                RNFS.readDir(dir).then(async(files) => {
-                if(files.length === 0){
+                if(files.length < 1){
                   // console.log("main imges==================>",files);
                   const res = await props.getAllimages();
                   const images = res?.payload?.data
                   if (images) {
-                    console.log("images here ----------->",images);
+                    console.log("images here ----2222------->",images);
                     images.map((item)=>{
+
                       // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
               
                       RNFetchBlob.config({
@@ -163,10 +244,7 @@ const Signin  =  props => {
                     })
                   }
                 }else{
-                  files.map((item)=>{
-                    // console.log('files exist 1')
-                    // alert(item);
-                })
+                  // alert('images already exists 2')
                 }
                })
                return
@@ -177,18 +255,19 @@ const Signin  =  props => {
          })
           
         }else{
+          // alert('exist images 3')
          RNFetchBlob.fs.mkdir(FolderPAth).then(()=>{
            // alert('newly created')
           //  RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
                RNFetchBlob.fs.mkdir(tracktype).then(()=>{
                   //  alert('newly create medi 2')
                    RNFS.readDir(dir).then(async(files) => {
-                    if(files.length === 0){
+                    if(files.length < 1){
                       // console.log("main imges==================>",files);
                       const res = await props.getAllimages();
                       const images = res?.payload?.data
                       if (images) {
-                        console.log("images here ----------->",images);
+                        console.log("images here -----333------>",images);
                         images.map((item)=>{
                           // let ImgDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/mainImages'+ '/' + item.trackType
                   
@@ -213,10 +292,8 @@ const Signin  =  props => {
                         })
                       }
                     }else{
-                      files.map((item)=>{
-                        console.log('files exist 1')
-                        // alert(item);
-                    })
+                      // alert('images are downloded 1')
+
                     }
 
                })
@@ -238,34 +315,69 @@ const Signin  =  props => {
             const params = {
               email: email,
               password: password,
+              ipAddress:ipAddress,
+              connectionTime:moment().format("YYYY-MM-DD hh:mm:ss a"),
+              fcmToken:Fcmtoken
             };
             const re =
               /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             const emailValid = re.test(email);
     
             if (emailValid) {
+              // alert(JSON.stringify(params));
               const res = await props.loginUser(params);
               setemailMessage('');
               setpasswordMessage('');
               console.log('api respone', res);
-              //res?.data?.logged
-              if (res?.payload?.data) {
+              // res?.data?.logged
+              if (res?.payload?.data ) {
                 setLoading(false);
-                navigation.replace('Root');
-                console.log('tokens', props.token);
-                Snackbar.show({
-                  text: 'Sign in succesfully',
-                  backgroundColor: '#018CAB',
-                  textColor: 'white',
-                });
+                if(res?.payload?.data?.msg){
+                  authFailed(res);
+                  Snackbar.show({
+                    text: res?.payload?.data?.msg,
+                    backgroundColor: '#F14336',
+                    textColor: 'white',
+                  });  
+                }else{
+                  if(res?.payload?.data?._id){
+                    navigation.replace('Root');
+                    // console.log('tokens', props.message.msg);
+                    Snackbar.show({
+                      text: 'Sign in Succesfully',
+                      backgroundColor: '#018CAB',
+                      textColor: 'white',
+                    });
+                  }else{
+                    authFailed(res);
+                    Snackbar.show({
+                      text: 'Email or password is not valid.',
+                      backgroundColor: '#F14336',
+                      textColor: 'white',
+                    });  
+                  }
+                }
               } else {
                 authFailed(res);
                 setLoading(false);
-                Snackbar.show({
-                  text: 'Invalid Email and Password',
-                  backgroundColor: '#F14336',
-                  textColor: 'white',
-                });
+                // if (res?.payload?.data ) {
+                //   Snackbar.show({
+                //     text: res?.payload?.data?.error,
+                //     backgroundColor: '#F14336',
+                //     textColor: 'white',
+                //   });
+                // }else{
+                // alert('called')
+
+                  Snackbar.show({
+                    // text: res?.payload?.data?.error,
+                    text: props.message,
+                    backgroundColor: '#F14336',
+                    textColor: 'white',
+                  });
+                // }
+                
+
               }
             } else {
               setLoading(false);
@@ -292,7 +404,7 @@ const Signin  =  props => {
           setLoading(false);
     
           Snackbar.show({
-            text: err.message,
+            text: 'Some issue occurred. Check internet and try again',
             backgroundColor: '#F14336',
             textColor: 'white',
           });
@@ -301,20 +413,25 @@ const Signin  =  props => {
       }
 
       const onGoogleLoginPress = async () => {
-        let info = await GoogleSign();
-        // alert(JSON.stringify(info.Data.userInfo.user.photo))
-        // alert(JSON.stringify(info.Data.userInfo.user.name))
-        // alert(JSON.stringify(info.Data.userInfo.user.id))
-        // alert(JSON.stringify(info.Data.userInfo.user.email))
-    
-        let param = {};
-        param['fullName'] = info.Data.userInfo.user.name;
-        param['email'] = info.Data.userInfo.user.email;
-        // param['email'] = "info.Data.userInfo.user.email";
-        param['profileImage'] = info.Data.userInfo.user.photo;
-        // const res = await props.googleLoginApi(params);
-    
+        
+        // return alert(JSON.stringify(param));
+        
         try{
+          let info = await GoogleSign();
+          // alert(JSON.stringify(info.Data.userInfo.user.photo))
+          // alert(JSON.stringify(info.Data.userInfo.user.name))
+          // alert(JSON.stringify(info.Data.userInfo.user.id))
+          // alert(JSON.stringify(info.Data.userInfo.user.email))
+      
+          let param = {};
+          param['fullName'] = info.Data.userInfo.user.name;
+          param['email'] = info.Data.userInfo.user.email;
+          // param['email'] = "info.Data.userInfo.user.email";
+          param['profileImage'] = info.Data.userInfo.user.photo;
+          // const res = await props.googleLoginApi(params);
+          param['ipAddress']=ipAddress,
+          param['connectionTime']=moment().format("YYYY-MM-DD hh:mm:ss a"),
+          param['fcmToken']=Fcmtoken
           const res = await props.googleLoginApi(param);
           setemailMessage('');
           setpasswordMessage('');
@@ -322,24 +439,42 @@ const Signin  =  props => {
           //res?.data?.logged
           if (res?.payload?.data) {
             setLoading(false);
-            navigation.replace('Root');
-            // console.log('tokens', props.token);
-            Snackbar.show({
-              text: res?.payload?.data?.msg,
-              backgroundColor: '#018CAB',
-              textColor: 'white',
-            });
+            if(res?.payload?.data?.msg){
+              Snackbar.show({
+                text: res?.payload?.data?.msg,
+                backgroundColor: '#F14336',
+                textColor: 'white',
+              });
+            }else{
+              navigation.replace('Root');
+              // console.log('tokens', props.token);
+              Snackbar.show({
+                text: "Google login Successfull",
+                // text: res?.payload?.data?.msg,
+                backgroundColor: '#018CAB',
+                textColor: 'white',
+              });
+            }
+            
           } else {
             authFailed(res);
             setLoading(false);
             Snackbar.show({
-              text: 'Invalid Email',
+              text: props.message,
               backgroundColor: '#F14336',
               textColor: 'white',
             });
           }
         }catch(e){
-            console.log(e);
+          // alert(e)
+          setLoading(false);
+
+          Snackbar.show({
+            text: "Some issue occurred. Check internet and try again",
+            backgroundColor: '#F14336',
+            textColor: 'white',
+          });
+            // console.log(e);
         }
 
         // axios({

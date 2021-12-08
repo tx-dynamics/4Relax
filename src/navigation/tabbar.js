@@ -21,6 +21,7 @@ import Activation from '../screens/bottomTab/activation'
 import AudioPlayer from '../screens/bottomTab/soundplayer'
 import Payment from '../screens/bottomTab/payment'
 import Contact from '../screens/bottomTab/contact_us';
+import Track from '../screens/bottomTab/trackplayer';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
@@ -84,7 +85,12 @@ const setting = () => {
 const feed = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
+      {/* <Stack.Screen
+        name="Track"
+        component={Track}
+        options={{headerShown: false}}
+      />   */}
+       <Stack.Screen
         name="Home"
         component={Feed}
         options={{headerShown: false}}

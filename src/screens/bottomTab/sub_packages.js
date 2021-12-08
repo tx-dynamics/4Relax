@@ -85,9 +85,9 @@ function sub_packages(props) {
                                     <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>{item.subscriptionName}</Text>
                                 </View>
                                 <View style={{justifyContent:'center',width:'45%'}}>
-                                    {/* <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>10 Meditations</Text>
-                                    <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>2 Stories</Text>
-                                    <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>10 Sounds</Text> */}
+                                    <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>{item.meditationCount} Meditations</Text>
+                                    <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>{item.storiesCount} Stories</Text>
+                                    <Text style={[styles.select,{fontWeight:'700',fontSize:14,color:'#ffff'}]}>{item.soundsCount} Sounds</Text>
 
                                 </View>
                                 {item.subscriptionAmount === '0'?

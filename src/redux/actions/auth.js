@@ -41,14 +41,22 @@ export const loginUser = params => {
         },
       );
       // return res;
+      console.log("%%%%%%%%%%%%%%%",res);
+
       if (res?.data) {
-        // console.log(res);
-        return dispatch(loginSuccess(res));
+        if(res?.data?.msg){
+          return dispatch(authFailed(res));
+        }else{
+          return dispatch(loginSuccess(res));
+        }
+        // alert(1)
+        // alert(2)
       }
       return dispatch(authFailed(res));
     } catch (err) {
-      // console.log('---> catch', err.response);
-      dispatch(authFailed(err.response));
+      console.log('---> catch', err.response);
+      // alert(JSON.stringify(err.response))
+      return dispatch(authFailed(err.response));
     }
   };
 };
@@ -98,10 +106,13 @@ export const googleLoginApi = params => {
         },
       );
       if(res?.data){
-        // console.log(res?.data);
+        if(res?.data?.msg){
+          return dispatch(authFailed(res));
+        }else{
         return dispatch(logingoogle(res));
       }
-      return dispatch(authFailed(err.response));
+    }
+      return dispatch(authFailed(res));
     } catch (err) {
       dispatch(authFailed(err.response));
     }
@@ -132,34 +143,34 @@ export const registerUser = params => {
 }
 
 //Google
-export const Googlelogin = params => {
-  // console.log('HERE');
-  // console.log(params);
-  return async dispatch => {
-    dispatch(authLoading());
+// export const Googlelogin = params => {
+//   // console.log('HERE');
+//   // console.log(params);
+//   return async dispatch => {
+//     dispatch(authLoading());
 
-    try {
-      const res = await axios.post(
-        `${BASE_URL}auth/google`,
-        JSON.stringify(params),
-        {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      if (res?.data?.logged) {
-        // console.log(res);
-        return dispatch(logingoogle(res));
-      }
-      return dispatch(authFailed(res));
-    } catch (err) {
-      console.log(err.response.data);
-      dispatch(authFailed(err.response));
-    }
-  };
-};
+//     try {
+//       const res = await axios.post(
+//         `${BASE_URL}auth/google`,
+//         JSON.stringify(params),
+//         {
+//           headers: {
+//             Accept: 'application/json',
+//             'Content-Type': 'application/json',
+//           },
+//         },
+//       );
+//       if (res?.data?.logged) {
+//         // console.log(res);
+//         return dispatch(logingoogle(res));
+//       }
+//       return dispatch(authFailed(res));
+//     } catch (err) {
+//       console.log(err.response.data);
+//       dispatch(authFailed(err.response));
+//     }
+//   };
+// };
 export const logoOut = params => {
   // console.log(params);
   return async dispatch => {

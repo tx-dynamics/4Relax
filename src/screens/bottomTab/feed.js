@@ -39,17 +39,38 @@ var RNFS = require('react-native-fs');
     const [connection,setConnect ] =  useState(false)
     const [once,setOnce ] =  useState(true)
     const [onceConnect,setonceConnect ] =  useState(true)
+    const [showLock,setshowLock ] =  useState(false)
+    const [subId,setsubId ] =  useState('')
 
     useEffect(() => {
       requestToPermissions()
+      checkInternet()
+      setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
       // console.log("has sub ====================>",props?.userData?.subscriptionDetail?.subscriptionId);
         // CheckConnectivity()
-        checkInternet()
-        notificationFun()
         setcateEmp(false)
         setisplaying (false)
     }, [isFocused])
 
+    async function checkInternet (){
+      // alert("called 2 ")
+      NetInfo.fetch().then((state) => {
+        // setConnect(state.isConnected)
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected,state.details.ipAddress);
+        //if (Platform.OS === "android") {
+          if (state.isConnected) {
+            // alert(state.isConnected)
+            notificationFun()
+            get_category()
+          } else {
+            let cat = '';
+            // alert("called 2 ")
+            CheckConnectivity(cat)
+          }
+        
+      });
+    }
 
     const notificationFun = async() =>{
 
@@ -75,24 +96,7 @@ var RNFS = require('react-native-fs');
     }
 
 
-
-
-
-    async function checkInternet (){
-      NetInfo.fetch().then((state) => {
-        // setConnect(state.isConnected)
-        console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected,state.isInternetReachable);
-        //if (Platform.OS === "android") {
-          if (state.isConnected) {
-            get_category()
-          } else {
-            let cat = '';
-            CheckConnectivity(cat)
-          }
-        
-      });
-    }
+  
     async function requestToPermissions ()  {
       try {
         const granted = await PermissionsAndroid.request(
@@ -362,8 +366,37 @@ var RNFS = require('react-native-fs');
                 ...item,
                 isplaying: false,
                 progress:false,
+                showLock:false,
               };
           })
+
+          // var subsc = posts.map((item)=>{
+          //   // console.log(item.trackName);
+          //   let subs = item.subscriptionType 
+          //   return subs.map((subId)=>{
+          //     // console.log( subId);
+          //     if(props?.userData?.subscriptionDetail?.subscriptionId === subId){
+          //         return {
+          //           // subid :props?.userData?.subscriptionDetail?.subscriptionId
+          //             ...item,
+          //             subscription  :true
+          //         }
+          //     }else{
+          //       // setshowLock(true)
+          //         return {
+          //           ...item,
+          //           // subscriptionType:false
+
+          //       }
+          //     }
+              
+          //     // console.log('false');
+          //   })
+            
+          // })
+
+          // console.log(subsc);
+          
 
           if (posts) {
               if(cate === ''){
@@ -1006,9 +1039,9 @@ var RNFS = require('react-native-fs');
       let cover = name.concat("_img");
       // return console.log(cover)
       let dir = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + name; 
-      let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+      // let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
       try{
-        let exists = await RNFS.exists(dir,dirImg);
+        let exists = await RNFS.exists(dir);
         if(exists){
             // exists call delete
             await RNFS.unlink(dir).then(() => {
@@ -1024,19 +1057,19 @@ var RNFS = require('react-native-fs');
             .catch((err) => {         
                 console.log(err);
             });
-            await RNFS.unlink(dirImg).then(() => {
-              // console.log('2 deleted');
-              RNFS.scanFile(dirImg)
-                .then(() => {
-                  // console.log('2 scanned');
-                })
-                .catch(err => {
-                  console.log(err);
-                });
-            })
-            .catch((err) => {         
-                console.log(err);
-            });
+            // await RNFS.unlink(dirImg).then(() => {
+            //   // console.log('2 deleted');
+            //   RNFS.scanFile(dirImg)
+            //     .then(() => {
+            //       // console.log('2 scanned');
+            //     })
+            //     .catch(err => {
+            //       console.log(err);
+            //     });
+            // })
+            // .catch((err) => {         
+            //     console.log(err);
+            // });
             // console.log(name+"Deleted");
             // Snackbar.show({
             //   text: name+' Deleted',
@@ -1402,9 +1435,9 @@ var RNFS = require('react-native-fs');
                             
                         :
                         <FlatList
-                            refreshControl={
-                              <RefreshControl refreshing={refreshing} onRefresh={CheckConnectivity} />
-                            }
+                            // refreshControl={
+                            //   <RefreshControl refreshing={refreshing} onRefresh={CheckConnectivity} />
+                            // }
                               style={{width:'100%'}}
                               numColumns={'2'}
                               showsVerticalScrollIndicator={false}
@@ -1428,10 +1461,10 @@ var RNFS = require('react-native-fs');
                                           <View style={{flex:0.29}}>
                                             {connection?
                                             <>
-                                            {/* {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
+                                            {!item.subscriptionType.includes(subId)?
                                               null
                                             :
-                                            <> */}
+                                            <>
                                               {item.isdownloading?
                                                 // <TouchableOpacity onPress={()=> connection? alert('online') : alert('offonline') } 
                                                 <TouchableOpacity onPress={()=> favourities(item)  } 
@@ -1450,8 +1483,8 @@ var RNFS = require('react-native-fs');
                                                 </TouchableOpacity>
                                               :
                                               null}
-                                            {/* </>
-                                            } */}
+                                            </>
+                                            }
                                             </>
                                             :
                                             <>
@@ -1478,10 +1511,10 @@ var RNFS = require('react-native-fs');
                                           </View>
                                           <View style={{flex:0.8,alignItems:'flex-end'}}>
                                           {connection?
-                                          // <>
-                                          // {!(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)?
-                                          //     null
-                                          //   :
+                                          <>
+                                          {!item.subscriptionType.includes(subId)?
+                                              null
+                                            :
                                             <>
                                               {item.isdownloading?
                                                 <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
@@ -1495,8 +1528,8 @@ var RNFS = require('react-native-fs');
                                               :
                                               null}
                                             </>
-                                          //   }
-                                          // </>
+                                            }
+                                          </>
                                             :
                                           <>
                                               {item.isdownloading?
@@ -1519,113 +1552,53 @@ var RNFS = require('react-native-fs');
                                       <View style={{flex:0.4}}><Text>{item.isdownloading}</Text></View>
                                       <View style={{flex:0.25,alignItems:'center'}} >
                                           {connection?
-                                          <>
-                                            {item.subscriptionType.map((subId)=>{
-                                                // console.log(item);
-                                                return (
-                                                  <>
-                                                    {(props?.userData?.subscriptionDetail?.subscriptionId === subId)?
-                                                        // console.log(props?.userData?.subscriptionDetail?.subscriptionId ,"==true==", item)
-                                                        <>
-                                                              {item.isdownloading?
-                                                                  <>
-                                                                    {item.isplaying?
-                                                                        <TouchableOpacity onPress={()=> setData(item,item._id)} 
-                                                                        style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                                              <Image
-                                                                                  source={pause}
-                                                                                  style={[styles.icon,{width:22.67,height:22.67}]}
-                                                                              />
-                                                                        </TouchableOpacity>
-                                                                        :
-                                                                        <TouchableOpacity onPress={()=> setData(item,item._id)}
-                                                                            style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                                            <Image
-                                                                                source={play}
-                                                                                style={[styles.icon,{width:22,height:22}]}
-                                                                            />
-                                                                        </TouchableOpacity>
-                                                                    }
-                                                                  </>
-                                                                :
-                                                                  <TouchableOpacity onPress={()=> {
-                                                                    startDownload(item,item._id)
-                                                                    }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
-                                                                    <Image
-                                                                        source={download}
-                                                                        style={[styles.icon,{width:34,height:34,}]}
-                                                                    />
-                                                                  </TouchableOpacity>
-                                                              }
-                                                        </>
-                                                        :
-                                                        null
-                                                        // <TouchableOpacity onPress={()=> 
-                                                        //     props.navigation.navigate('Packages')
-                                                        // }
-                                                        // style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                        //     <Image
-                                                        //         source={unloc}
-                                                        //         style={[styles.icon,{width:15,height:19}]}
-                                                        //     />
-                                                        // </TouchableOpacity>
+
+                                            <>
+                                            {item.subscriptionType.includes(subId)?
+                                            <>
+                                                {item.isdownloading?
+                                                    <>
+                                                      {item.isplaying?
+                                                          <TouchableOpacity onPress={()=> setData(item,item._id)} 
+                                                          style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                                <Image
+                                                                    source={pause}
+                                                                    style={[styles.icon,{width:22.67,height:22.67}]}
+                                                                />
+                                                          </TouchableOpacity>
+                                                          :
+                                                          <TouchableOpacity onPress={()=> setData(item,item._id)}
+                                                              style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                              <Image
+                                                                  source={play}
+                                                                  style={[styles.icon,{width:22,height:22}]}
+                                                              />
+                                                          </TouchableOpacity>
                                                       }
-                                                  </>
-                                                )
-                                              //  return (<>
-                                              //     {(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
-                                              //         <TouchableOpacity onPress={()=> 
-                                              //             props.navigation.navigate('Packages')
-                                              //         }
-                                              //         style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                              //             <Image
-                                              //                 source={unloc}
-                                              //                 style={[styles.icon,{width:15,height:19}]}
-                                              //             />
-                                              //         </TouchableOpacity>
-                                              //           :
-                                              //           
-                                              //       }
-                                              //     </>)
-                                                  
-                                              })}
-                                              {item.subscriptionType.map((subId)=>{
-                                                // console.log(item);
-                                                return (
-                                                  <>
-                                                    {(props?.userData?.subscriptionDetail?.subscriptionId === subId)?
-                                                          null
-                                                        :
-                                                        <TouchableOpacity onPress={()=> 
-                                                            props.navigation.navigate('Packages')
-                                                        }
-                                                        style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                            <Image
-                                                                source={unloc}
-                                                                style={[styles.icon,{width:15,height:19}]}
-                                                            />
-                                                        </TouchableOpacity>
-                                                      }
-                                                  </>
-                                                )
-                                              //  return (<>
-                                              //     {(props?.userData?.subscriptionDetail?.subscriptionId === item.subscriptionType)? 
-                                              //         <TouchableOpacity onPress={()=> 
-                                              //             props.navigation.navigate('Packages')
-                                              //         }
-                                              //         style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                              //             <Image
-                                              //                 source={unloc}
-                                              //                 style={[styles.icon,{width:15,height:19}]}
-                                              //             />
-                                              //         </TouchableOpacity>
-                                              //           :
-                                              //           
-                                              //       }
-                                              //     </>)
-                                                  
-                                              })}
-                                          </>
+                                                    </>
+                                                  :
+                                                    <TouchableOpacity onPress={()=> {
+                                                      startDownload(item,item._id)
+                                                      }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
+                                                      <Image
+                                                          source={download}
+                                                          style={[styles.icon,{width:34,height:34,}]}
+                                                      />
+                                                    </TouchableOpacity>
+                                                }
+                                              </>
+                                            :
+                                            <TouchableOpacity onPress={()=> 
+                                                  props.navigation.navigate('Packages')
+                                              }
+                                              style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                  <Image
+                                                      source={unloc}
+                                                      style={[styles.icon,{width:15,height:19}]}
+                                                  />
+                                              </TouchableOpacity> 
+                                            }
+                                            </>
                                             :
                                             <>
                                               {item.isdownloading?
@@ -1660,7 +1633,17 @@ var RNFS = require('react-native-fs');
                                               }
                                             </>
                                           }
-  
+                                        {showLock?
+                                        <TouchableOpacity onPress={()=> 
+                                                props.navigation.navigate('Packages')
+                                            }
+                                            style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                <Image
+                                                    source={unloc}
+                                                    style={[styles.icon,{width:15,height:19}]}
+                                                />
+                                            </TouchableOpacity>  
+                                        :null}
                                             
                                       {item.progress?
                                           <ActivityIndicator

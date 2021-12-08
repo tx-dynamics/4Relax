@@ -31,6 +31,7 @@ import LinearGradient from 'react-native-linear-gradient';
 // } from '@react-native-google-signin/google-signin';
 import {connect} from 'react-redux';
 import {
+  authFailed,
   forgotpassword
   } from '../../redux/actions/auth';
 import {useIsFocused} from '@react-navigation/native';
@@ -103,9 +104,9 @@ const Forgot  =  props => {
           }
         } catch (err) {
           setLoading(false);
-    
+          console.log(err);
           Snackbar.show({
-            text: err.message,
+            text: "Some issue occured. Check internet and try again",
             backgroundColor: '#F14336',
             textColor: 'white',
           });

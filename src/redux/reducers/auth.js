@@ -45,15 +45,15 @@ export const authReducer = (state = initialState, action) => {
         errMsg: null,
       };
     case AUTH_FAILED:
-      // console.log('auth', action.payload.data.message);
+      console.log('auth', action.payload.data.error);
       return {
         ...state,
         isLoading: false,
         isError: true,
         isSuccess: false,
-        errMsg: action.payload,
+        errMsg: action.payload.data.msg,
         isLoggedIn: false,
-        message: action.payload.data.message,
+        message: action.payload.data.error,
       };
       case  FORGOT_PASS:
         // console.log('auth', action.payload.data.message);
@@ -79,7 +79,7 @@ export const authReducer = (state = initialState, action) => {
         errMsg: null,
       };
     case GOOGLE_LOGIN:
-      // console.log('auth', action.payload.data.message);
+      console.log('google login', action.payload.data);
       return {
         ...state,
         message: action.payload.data.msg,
@@ -88,7 +88,8 @@ export const authReducer = (state = initialState, action) => {
         isLoading: false,
         isSuccess: true,
         isError: false,
-        userData: action.payload.data.userExist,
+        userData: action.payload.data,
+        // userData: action.payload.data.userExist,
         // errMsg: null,
       };
     case REGISTER_USER:

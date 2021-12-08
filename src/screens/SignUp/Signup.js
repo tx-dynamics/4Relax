@@ -37,7 +37,9 @@ import LinearGradient from 'react-native-linear-gradient';
 // } from '@react-native-google-signin/google-signin';
 
 import { useIsFocused } from '@react-navigation/native';
-
+import { firebase } from '@react-native-firebase/messaging';
+import NetInfo from "@react-native-community/netinfo";
+import moment from 'moment';
 
 
 
@@ -59,9 +61,12 @@ const SignUp = (props) => {
   const [placeholderEmail, setplaceholderEmail] = useState('Sample@gmail.com');
   const [placeholderPass, setplaceholderPass] = useState('********');
   const [placeholderConPass, setplaceholderConPass] = useState('********');
-
+  const [ipAddress, setipAddress] = useState('');
+  const [Fcmtoken, setFcmtoken] = useState('');
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    checkInternet()
     // GoogleSignin.configure({
     //   webClientId:
     //     '237114661060-g9vl5km5n8juo3u8e80tin1rtpchm8v3.apps.googleusercontent.com',
@@ -70,7 +75,48 @@ const SignUp = (props) => {
     // iosClientId:
     //   '664178336819-pfg0mvocbu3sml19e499di4145i0qmvv.apps.googleusercontent.com',
     // });
-  }, []);
+  }, [isFocused]);
+
+  async function checkInternet (){
+    // alert("called 2 ")
+    NetInfo.fetch().then((state) => {
+      // setConnect(state.isConnected)
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected,state.details.ipAddress);
+      setipAddress(state.details.ipAddress)
+      //if (Platform.OS === "android") {
+        if (state.isConnected) {
+          // alert(state.isConnected)
+          notificationFun()
+        } else {
+        }
+      
+    });
+  }
+
+  const notificationFun = async() =>{
+
+    const enabled = await firebase.messaging().hasPermission();
+    if (enabled) {
+    } else {
+      try {
+        await firebase.messaging().requestPermission();
+      } catch (error) {
+      }
+    }
+    const fcmToken = await firebase.messaging().getToken();
+    if (fcmToken) {
+        // console.log("fcmTokenn", fcmToken)
+        // console.log('Firebase TOKENnn==> ', fcmToken);
+        setFcmtoken(fcmToken)
+      // alert('Firebase TOKEN Upload==> '+ fcmToken);
+    } else {
+      console.warn('no token');
+     
+    }
+
+
+  }
 
   const onGoogleLoginPress = async () => {
     let info = await GoogleSign();
@@ -157,6 +203,7 @@ const SignUp = (props) => {
     setfNameMessage('');
     setpasswordMessage('');
     setconfirmMessage('');
+    try{
     if (
       password !== '' &&
       confirmpass !== '' &&
@@ -168,6 +215,10 @@ const SignUp = (props) => {
         // lastName: lName,
         email: email,
         password: password,
+        ipAddress:ipAddress,
+        connectionTime:moment().format("YYYY-MM-DD hh:mm:ss a"),
+        fcmToken:Fcmtoken
+
       };
       if (ValidateName(fullName)) {
         // alert('Called name ')
@@ -178,6 +229,7 @@ const SignUp = (props) => {
             const emailValid = re.test(email);
 
             if (emailValid) {
+              // return alert(JSON.stringify(params))
               const res = await props.registerUser(params);
               console.log('Api response', res?.data);
               if (res?.payload?.data) {
@@ -240,6 +292,15 @@ const SignUp = (props) => {
         setconfirmMessage('Kindly enter confirm password');
       }
       return false;
+    }
+    }catch(e){
+    setLoading(false);
+    Snackbar.show({
+      text: "Some issue occured. Check internet and try again",
+      backgroundColor: '#F14336',
+      textColor: 'white',
+    });
+    // alert(e)    
     }
   }
 

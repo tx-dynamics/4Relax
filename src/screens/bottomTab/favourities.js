@@ -286,7 +286,7 @@ const feed = (props) => {
         try {
           const res = await props.get_allFAVORITES(params);
           var posts = res?.data
-
+          console.log("pots=====>",posts);
           posts.map((item)=>{
             return {
                 ...item,
@@ -348,6 +348,8 @@ const feed = (props) => {
 
 
     async function  favourities(item){
+        setofflinefav(item)
+        // return console.log(item);
         if(connection){
         setisplaying(false)
         const params = {
@@ -382,11 +384,11 @@ const feed = (props) => {
             console.log(err);
           }
         }else{
-            Snackbar.show({
-              text: 'No Internet Connection! ',
-              backgroundColor: 'tomato',
-              textColor: 'white',
-            });
+            // Snackbar.show({
+            //   text: 'No Internet Connection! ',
+            //   backgroundColor: 'tomato',
+            //   textColor: 'white',
+            // });
           }
     }
 
@@ -481,8 +483,8 @@ const feed = (props) => {
         
           //  console.log("single==============>",single);
             try {
-                await AsyncStorage.setItem("single_item",JSON.stringify(single))
-
+                await AsyncStorage.setItem("single_item",JSON.stringify({...single,type:'fav'}))
+                await AsyncStorage.setItem("userId",JSON.stringify(props.userData._id))
             } catch (e) {
              console.log("calling itself"+e)
             }
@@ -786,6 +788,180 @@ const feed = (props) => {
   
       }
 
+      async function offlineFav(sing){
+        // console.log(meditations);
+        try{
+          if(sing.liked == 'yes'){
+            // setofflinefav(sing)
+            const res = meditations.map((item)=>{
+                // console.log(item.liked)
+                if(item._id === sing._id){
+                    return {
+                        ...item,
+                        liked: 'no',
+                      };
+                } else {
+                    return {
+                        ...item,
+                        // isplaying: false,
+                      };
+                }
+            })
+            setmeditations(res)
+          }else{
+            // addRemoveFav(sing)
+            // setofflinefav(sing)
+            const res = meditations.map((item)=>{
+                // console.log(item.liked)
+                if(item._id === sing._id){
+                    return {
+                        ...item,
+                        liked: 'yes',
+                      };
+                } else {
+                    return {
+                        ...item,
+                        // isplaying: false,
+                      };
+                }
+            })
+            setmeditations(res)
+          }
+            setofflinefav(sing)
+          // setItemData(sing)
+        }catch(e){
+          console.log(e);
+        }
+      } 
+       
+      async function setofflinefav(item){
+        let name = item.trackName
+        var res = await AsyncStorage.getItem(name)
+        var rep = JSON.parse(res)
+        // console.log("rep=====",rep);
+        if(rep.liked == 'yes'){
+          addRemoveFav(item)
+    
+          rep = ({...rep,liked : 'no'})
+        }
+        else{
+          addRemoveFav(item)
+    
+          rep = ({...rep,liked : 'yes'})
+        }
+        console.log(rep.liked);
+        await AsyncStorage.setItem(name,JSON.stringify(rep))
+       
+      }
+
+      async function addRemoveFav(post){
+        // if(post.liked == 'yes'){
+        //     let dir = RNFS.DownloadDirectoryPath + '/FourRelax/meditation'
+        //     let desPath = RNFS.DownloadDirectoryPath + '/FourRelax/favourties'
+        //     const favPath = '/storage/emulated/0/Download/FourRelax/favourties'
+        //     let meditation = [];
+        //     var filePath = [];
+        //     var ImagePath = [];
+        //     let local = [];
+        //     RNFetchBlob.fs.isDir(dir).then((isDir)=>{
+        //       // return console.log(isDir);
+        //       if(isDir){
+        //         RNFS.readDir(dir).then(files => {
+        //           files.map(async(item)=>{
+        //             try{
+        //               RNFetchBlob.fs.isDir(favPath).then(async(isDir)=>{
+        //                 if(isDir){
+        //                   // alert('exists')
+        //                   if(item.name === post.trackName){
+        //                     if (item.path.startsWith('/')) {
+        //                       const url = item.path
+        //                       const uriComponents = url.split('/')
+        //                       const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+        //                       // const destPath =  desPath+fileNameAndExtension
+        //                       // console.log(destPath);
+        //                       const destPath = `${desPath}/${fileNameAndExtension}`
+        //                       console.log(destPath);
+        //                       await RNFS.copyFile(url, destPath)
+        //                     }
+        //                   }
+        //                 }else{
+        //                   RNFetchBlob.fs.mkdir(favPath).then(async()=>{
+        //                     // alert("created")
+        //                     if(item.name === post.trackName){
+        //                       if (item.path.startsWith('/')) {
+        //                         const url = item.path
+        //                         const uriComponents = url.split('/')
+        //                         const fileNameAndExtension = uriComponents[uriComponents.length - 1]
+        //                         // const destPath =  desPath+fileNameAndExtension
+        //                         // console.log(destPath);
+        //                         const destPath = `${desPath}/${fileNameAndExtension}`
+        //                         console.log(destPath);
+        //                         await RNFS.copyFile(url, destPath)
+        //                       }
+        //                     }
+        //                   })
+        //                 }
+        //               })
+                      
+                  
+        //             }catch(e){
+        //               console.log(e);
+        //             }
+        //           })
+        //         })
+                  
+        //       }else{
+        //         Snackbar.show({
+        //           text: 'No local data found',
+        //           backgroundColor: '#018CAB',
+        //           textColor: 'white',
+        //         });
+              
+        //       }
+        //     })
+        // }
+        // else{
+          // alert('called',post.trackName)
+          let name = post.trackName;
+          // let cover = name.concat("_img");
+          // return console.log(cover)
+          let dir = RNFS.DownloadDirectoryPath + '/FourRelax/favourties/' + name; 
+          // let dirImg = RNFS.DownloadDirectoryPath + '/FourRelax/meditation/' + cover;
+          try{
+            let exists = await RNFS.exists(dir);
+            if(exists){
+                // exists call delete
+                await RNFS.unlink(dir).then(() => {
+                  // console.log('1 deleted');
+                  RNFS.scanFile(dir)
+                    .then(() => {
+                      // console.log('1 scanned');
+                    })
+                    .catch(err => {
+                      console.log(err);
+                    });
+                })
+                .catch((err) => {         
+                    console.log(err);
+                });
+                CheckConnectivity()
+            }else{
+                console.log("File Not Available")
+                // Snackbar.show({
+                //   text: 'File Not Available',
+                //   backgroundColor: 'tomato',
+                //   textColor: 'white', 
+                // });
+          }
+  
+        
+        }catch(e){
+          console.log("error : "+e)
+        }
+        // }
+      }
+
+
     return (
         <View style={{flex:1,backgroundColor:'#00303A'}}>
             <ImageBackground
@@ -801,7 +977,7 @@ const feed = (props) => {
             </ImageBackground>
             <>
               {refreshing?
-                null
+                  <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}} />
               :
                 <>
                   {meditations.length < 1 ?
@@ -836,7 +1012,7 @@ const feed = (props) => {
                                     >
                                         <View style={{flexDirection:'row',flex:0.3}}>
                                             <View style={{flex:0.29}}>
-                                                <TouchableOpacity onPress={()=>favourities(item)} style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}>
+                                                <TouchableOpacity onPress={()=> connection?favourities(item): offlineFav(item)} style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}>
                                                     <Image
                                                         source={fav}
                                                         style={[styles.icon,{
@@ -926,11 +1102,16 @@ const feed = (props) => {
                 </>
               }
             </>
-            
-            {isplaying?
-                <Soundplayer navigation={props.navigation} />
-                :
-            null}   
+            {meditations.length < 1 ?
+             null
+            :
+            <>
+              {isplaying?
+                  <Soundplayer navigation={props.navigation} />
+                  :
+              null}
+            </>
+          }   
         </View>
     )
 }
