@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
-import {View,Text,ImageBackground,Image,Slider,FlatList, Dimensions, ActivityIndicator} from 'react-native'
+import {View,Text,ImageBackground,Image,FlatList, Dimensions, ActivityIndicator} from 'react-native'
 import {logo,shuffle,bg,left,pause,play,del} from '../../assets'
+import Slider from '@react-native-community/slider';
 import {
     responsiveHeight,
     responsiveScreenHeight,
@@ -859,6 +860,17 @@ export default class PlayerScreen extends React.Component{
         }
       }
 
+      set_CatCurrent = async () =>{
+        this.props.navigation.goBack()
+        // return alert(this.state.single.cat_name)
+        // try{
+        //   await AsyncStorage.setItem("currentCat",this.state.trackCategory.name ? this.state.trackCategory.name : this.state.single.cat_name)
+        //   this.props.navigation.replace("Root",{screen:"Home"})
+        // }catch(e){
+        //   alert(e)
+        // }
+      }
+
     render(){
         const {single,trackCategory,selected,mainPic,connection} = this.state
         // console.log(single.trackCategory);
@@ -887,7 +899,7 @@ export default class PlayerScreen extends React.Component{
                     }} >
                         <View style={{width:'90%',alignSelf:'center',alignItems:'center',flexDirection:'row',marginTop:responsiveHeight(3.5)}} >
                             <View style={{flex:0.98}}>
-                                <TouchableOpacity onPress={()=> this.props.navigation.goBack()}>
+                                <TouchableOpacity onPress={()=> this.set_CatCurrent()}>
                                     <Image
                                         source={left}
                                         style={{width:7,height:14}}
@@ -961,21 +973,21 @@ export default class PlayerScreen extends React.Component{
                                 </View>
                                 <View style={{flex:0.8,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
                                     <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{}}>
-                                        <Image source={img_playjumpleft} style={{width:19, height:25}}/>
+                                        <Image source={img_playjumpleft} style={{width:20.5, height:25.5}}/>
                                         <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
                                             <Text style={{textAlign:'center' ,color:'white', fontSize:5.5}}>20</Text>
                                         </View>
                                     </TouchableOpacity> 
                                     {this.state.playState == 'playing' && 
                                     <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
-                                        <Image source={img_pause} style={{width:42.88, height:42.88}}/>
+                                        <Image source={img_pause} style={{width:42.88, height:42.99}}/>
                                     </TouchableOpacity>}
                                     {this.state.playState == 'paused' && 
                                     <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
                                         <Image source={img_play} style={{width:42.88, height:42.88}}/>
                                     </TouchableOpacity>}
                                     <TouchableOpacity onPress={this.jumpNext15Seconds} style={{}}>
-                                        <Image source={img_playjumpright} style={{width:19, height:25}}/>
+                                        <Image source={img_playjumpright} style={{width:20, height:25}}/>
                                         <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
                                             <Text style={{textAlign:'center' , color:'white', fontSize:5.5}}>20</Text>
                                         </View>

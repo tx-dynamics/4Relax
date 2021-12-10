@@ -16,7 +16,7 @@ import {
   CREATE_GROUP,
   GOOGLE_LOGIN,
   UPDATE_USER,
-  GOOGLE_SIGNUP,
+  UPDATE_DATA,
   GOOGLE_FAIL,
   GROUP_FAIL,
 } from '../actions/types';
@@ -79,7 +79,7 @@ export const authReducer = (state = initialState, action) => {
         errMsg: null,
       };
     case GOOGLE_LOGIN:
-      console.log('google login', action.payload.data);
+      // console.log('google login', action.payload.data);
       return {
         ...state,
         message: action.payload.data.msg,
@@ -160,6 +160,19 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         userData: action.payload.data.updatedUser,
+        token: action.payload.data.token,
+        isLoggedIn: true,
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        errMsg: null,
+      };
+
+      case UPDATE_DATA:
+      console.log('here=============>',action.payload.data);
+      return {
+        ...state,
+        userData: action.payload.data,
         token: action.payload.data.token,
         isLoggedIn: true,
         isLoading: false,

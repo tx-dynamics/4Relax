@@ -85,16 +85,17 @@ const setting = () => {
 const feed = () => {
   return (
     <Stack.Navigator>
+       
+       <Stack.Screen
+        name="Feed"
+        component={Feed}
+        options={{headerShown: false}}
+      />  
       {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />   */}
-       <Stack.Screen
-        name="Home"
-        component={Feed}
-        options={{headerShown: false}}
-      />      
+      />      */}
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
@@ -119,7 +120,7 @@ const explore = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Explore"
+        name="Story"
         component={Explore}
         options={{headerShown: false}}
       />      
@@ -148,7 +149,7 @@ const music = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Music"
+        name="Sound"
         component={Music}
         options={{headerShown: false}}
       />      
@@ -177,7 +178,7 @@ const favor = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Fav"
+        name="Favou"
         component={Fav}
         options={{headerShown: false}}
       />      
@@ -234,7 +235,7 @@ function Tabbar({navigation,props}) {
               <Tab.Screen name="Explore" component={explore} />
               <Tab.Screen name="Music" component={music} />
               <Tab.Screen name="Fav" component={favor} />
-              <Tab.Screen name="Setting" component={setting} />
+              <Tab.Screen name="Settin" component={setting} />
         </Tab.Navigator>
     // </NavigationContainer>
   );

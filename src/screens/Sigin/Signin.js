@@ -572,7 +572,7 @@ const Signin  =  props => {
                             style={{width:'100%',alignItems:'flex-end'}}
                         >
                             <TouchableOpacity onPress={()=>props.navigation.navigate('Forgot')}>
-                                <Text style={[styles.labelstyle,{fontSize:14,top:30}]}>Forgot Password?</Text>
+                                <Text style={[styles.labelstyle,{fontSize:14,top:10}]}>Forgot Password?</Text>
                             </TouchableOpacity>
                         </View> 
                         <View

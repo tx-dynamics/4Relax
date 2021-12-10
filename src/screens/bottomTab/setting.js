@@ -10,16 +10,48 @@ import {
   import LinearGradient from 'react-native-linear-gradient';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
-import {logoOut} from '../../redux/actions/auth';
+import {logoOut,switch_noification} from '../../redux/actions/auth';
 import {connect} from 'react-redux';
 import theme from '../../theme';
+import Snackbar from 'react-native-snackbar';
 
 
 function setting(props) {
 
     const [selected,setSelected ] =  useState(false)
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const [isEnabled, setIsEnabled] = useState(props?.userData?.allowNotification);
+    
+    
+    const toggleSwitch = async () => {
+        try{
+            if(props.userData.allowNotification){
+                setIsEnabled(false);
+            }else{
+                setIsEnabled(true);
+            }
+
+            let id = props.userData._id
+            // console.log(props.userData)
+            const res = await props.switch_noification(id)
+            console.log(res.data.allowNotification);
+            if(res.data.allowNotification){
+                // alert('allowed')
+                // Snackbar.show({
+                //     text: 'allowed',
+                //     backgroundColor: '#F14336',
+                //     textColor: 'white',
+                //   });  
+            }else{
+                // setIsEnabled(previousState => !previousState);
+                // alert('not allowed')
+                // Snackbar.show({
+                //     text: 'not allowed',
+                //     backgroundColor: '#F14336',
+                //     textColor: 'white',
+                //   });  
+            }
+        }catch(e){console.log(e)}
+    }
 
     async function onlogout() {
         await props.logoOut();
@@ -104,8 +136,8 @@ function setting(props) {
                                 </TouchableOpacity>
                                 <View style={{width:'20%'}}>
                                     <Switch
-                                        trackColor={{ false: "#ffff", true: "#0184A1" }}
-                                        thumbColor={isEnabled ? "#f4f3f4" : "#0184A1"}
+                                        trackColor={{ false: "#A9A9A9", true: "#003d4a" }}
+                                        thumbColor={isEnabled ? "#0184A1" : "#f4f3f4" }
                                         ios_backgroundColor="#0184A1"
                                         onValueChange={toggleSwitch}
                                         value={isEnabled}
@@ -249,7 +281,7 @@ function setting(props) {
     )
 }
 const mapStateToProps = state => {
-    const {status, message, isLoading, errMsg, isSuccess, token} = state.auth;
-    return {status, message, isLoading, errMsg, isSuccess, token};
+    const {status, message, isLoading, errMsg, isSuccess, token,userData} = state.auth;
+    return {status, message, isLoading, errMsg, isSuccess, token,userData};
   };
-  export default connect(mapStateToProps, {logoOut})(setting);
+  export default connect(mapStateToProps, {logoOut,switch_noification})(setting);

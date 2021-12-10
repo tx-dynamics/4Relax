@@ -188,7 +188,8 @@
 
 
 import React,{useState,useEffect,useRef} from 'react'
-import {View,Text,Alert,TouchableOpacity,Slider,ActivityIndicator,Image} from 'react-native'
+import {View,Text,Alert,TouchableOpacity,ActivityIndicator,Image} from 'react-native'
+import Slider from '@react-native-community/slider';
 import styles from './styles'
 import {logo,cover,play,pause} from '../../assets'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
@@ -249,7 +250,7 @@ export default class PlayerScreen extends React.Component{
         var data = await AsyncStorage.getItem("single_item")
         
         // uid = (JSON.parse(userId))
-        console.log("palying =================",JSON.parse(data))
+        // console.log("palying =================",JSON.parse(data))
         this.setState({item:JSON.parse(data)})
         // return console.log(JSON.parse(data))
         setTimeout(() => {
@@ -376,13 +377,14 @@ export default class PlayerScreen extends React.Component{
             <>
             <TouchableOpacity onPress={()=> 
                 {this.pause(),
-                this.props.navigation.navigate('AudioPlayer',{single:item})
+                this.props.navigation.navigate('Track',{single:item})
+                // this.props.navigation.navigate('AudioPlayer',{single:item})
                 }}>
                 <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:responsiveHeight(1),marginLeft:responsiveWidth(5)}]} >{item.trackName? item.trackName : item.trackType}</Text>
                 {/* <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:10,marginLeft:15}]} >{single.trackName? single.trackName : single.trackType}</Text> */}
             </TouchableOpacity>
             <View style={{flexDirection:'row',marginTop:responsiveHeight(1)}}>
-                <View style={{flex:2}}>
+                <View style={{flex:2.5}}>
                     <View style={{flexDirection:'row',marginLeft:responsiveWidth(2.5)}}>
                         <Slider
                             onTouchStart={this.onSliderEditStart}
@@ -392,7 +394,7 @@ export default class PlayerScreen extends React.Component{
                             // onTouchCancel={() => console.log('onTouchCancel')}
                             onValueChange={this.onSliderEditing}
                             value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='#FFFFFF' minimumTrackTintColor='#7497FF'  thumbTintColor='white' 
-                            style={{ flex:1,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                            style={{ flex:10,alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
                     </View>
                     <View style={{flexDirection:'row',marginTop:responsiveHeight(0.4),marginLeft:responsiveWidth(5)}}>
                         <View style={{flex:0.95}}>
@@ -407,14 +409,14 @@ export default class PlayerScreen extends React.Component{
                 <TouchableOpacity onPress={()=>this.pause()} style={{flex:0.4,alignItems:'center',justifyContent:'center',marginBottom:responsiveHeight(10)}}>
                     <Image 
                         source={img_pause}
-                        style={{width:32,height:32,marginRight:responsiveWidth(3.5)}}
+                        style={{width:32,height:32,marginRight:responsiveWidth(3.4)}}
                     />
                 </TouchableOpacity>}
                 {this.state.playState == 'paused' &&
                 <TouchableOpacity onPress={()=>this.play()} style={{flex:0.4,alignItems:'center',justifyContent:'center',marginBottom:responsiveHeight(10)}}>
                     <Image 
                         source={img_play}
-                        style={{width:32,height:32,marginRight:responsiveWidth(3.5)}}
+                        style={{width:32,height:32,marginRight:responsiveWidth(3.3)}}
                     />
                 </TouchableOpacity>}                
             </View>

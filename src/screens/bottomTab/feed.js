@@ -43,26 +43,28 @@ var RNFS = require('react-native-fs');
     const [subId,setsubId ] =  useState('')
 
     useEffect(() => {
+      // console.log("parms =====>",props);
       requestToPermissions()
-      checkInternet()
       setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
-      // console.log("has sub ====================>",props?.userData?.subscriptionDetail?.subscriptionId);
-        // CheckConnectivity()
-        setcateEmp(false)
-        setisplaying (false)
-    }, [isFocused])
+      //   // CheckConnectivity()
+      setcateEmp(false)
+      setisplaying (false)
+      checkInternet()
+      }, [isFocused])
 
     async function checkInternet (){
       // alert("called 2 ")
       NetInfo.fetch().then((state) => {
-        // setConnect(state.isConnected)
+        // let current = await AsyncStorage.getItem('currentCat')
+      // alert(current)
         console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected,state.details.ipAddress);
+        // console.log("Is connected?", state.isConnected,state.details.ipAddress);
         //if (Platform.OS === "android") {
-          if (state.isConnected) {
             // alert(state.isConnected)
+            if (state.isConnected) {
             notificationFun()
             get_category()
+
           } else {
             let cat = '';
             // alert("called 2 ")
@@ -292,6 +294,7 @@ var RNFS = require('react-native-fs');
           //   textColor: 'white',
           // });
           // console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
+          setmeditations([])
           let cate = cat;
           let cover = '';
           getMeditation(cate,cover,meditation)
@@ -1016,7 +1019,7 @@ var RNFS = require('react-native-fs');
         await AsyncStorage.setItem(name,JSON.stringify(item))
         // alert("set item successfully")
       }catch(e){
-        alert(e)
+        console.log(e)
       }
     }
 
@@ -1314,21 +1317,21 @@ var RNFS = require('react-native-fs');
             if(isDir){
               let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
               RNFetchBlob.fs.cp(originalDir, destDir)
-              .then(() => { alert('called copied data 1') })
+              .then(() => { })
               .catch((e) => { alert(e) })
               
                 // RNFS.copyFile(originalDir, destDir).then(res => {
               //   alert(res)
               //   // expect(res).to.be(undefined);
               // });
-              alert('exist medii 1')
+              // alert('exist medii 1')
             }else{
               RNFetchBlob.fs.mkdir(tracktype).then(async()=>{
-              alert('newly create medi 1')
+              // alert('newly create medi 1')
               let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
                 // await ReactNativeFS.copyFile(item.path, SongDir);
                 RNFetchBlob.fs.cp(originalDir, originalDir)
-                .then(() => { alert('called copied data 2') })
+                .then(() => {})
                 .catch((e) => { alert(e) })
                 // RNFS.copyFile(originalDir, destDir).then(res => {
                 //   alert(res)
@@ -1379,7 +1382,9 @@ var RNFS = require('react-native-fs');
                 source={cover}
                 style={styles.imgBackground}
             >
+              {/* <TouchableOpacity style={{alignItems:'center'}} onPress={()=>props.navigation.navigate('Track')} > */}
                 <Text style={styles.title}>MEDITATION</Text>
+              {/* </TouchableOpacity> */}
                 <View style={{height:'50%'}} />
                 <Image
                     source={logo}
@@ -1461,9 +1466,8 @@ var RNFS = require('react-native-fs');
                                           <View style={{flex:0.29}}>
                                             {connection?
                                             <>
-                                            {!item.subscriptionType.includes(subId)?
-                                              null
-                                            :
+                                            {item.subscriptionType.includes(subId)?
+                                             
                                             <>
                                               {item.isdownloading?
                                                 // <TouchableOpacity onPress={()=> connection? alert('online') : alert('offonline') } 
@@ -1483,8 +1487,10 @@ var RNFS = require('react-native-fs');
                                                 </TouchableOpacity>
                                               :
                                               null}
+                                            
                                             </>
-                                            }
+                                            :
+                                            null}
                                             </>
                                             :
                                             <>
@@ -1512,9 +1518,8 @@ var RNFS = require('react-native-fs');
                                           <View style={{flex:0.8,alignItems:'flex-end'}}>
                                           {connection?
                                           <>
-                                          {!item.subscriptionType.includes(subId)?
-                                              null
-                                            :
+                                          {item.subscriptionType.includes(subId)?
+                                            
                                             <>
                                               {item.isdownloading?
                                                 <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
@@ -1528,6 +1533,8 @@ var RNFS = require('react-native-fs');
                                               :
                                               null}
                                             </>
+                                            :
+                                            null
                                             }
                                           </>
                                             :

@@ -39,10 +39,10 @@ var RNFS = require('react-native-fs');
 
     useEffect(() => {
         setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
-        checkInternet()
         setcateEmp(false)
         // setisplaying (false)
         requestToPermissions()
+        checkInternet()
 
     }, [isFocused])
     
@@ -50,11 +50,13 @@ var RNFS = require('react-native-fs');
       NetInfo.fetch().then((state) => {
         // setConnect(state.isConnected)
         console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected,state.isInternetReachable);
+        // console.log("Is connected?", state.isConnected,state.isInternetReachable);
         //if (Platform.OS === "android") {
           if (state.isConnected) {
+            // alert(state.isConnected)
             get_category()
           } else {
+            // alert(state.isConnected)
             let cat = '';
             CheckConnectivity(cat)
           }
@@ -112,12 +114,13 @@ var RNFS = require('react-native-fs');
 
     function CheckConnectivity  (cat = '')  {
       // setisplaying(false)
+      // alert("called check coneectivity")
       setRefreshing(true);
       // For Android devices
       NetInfo.fetch().then((state) => {
         setConnect(state.isConnected)
         console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected,state.isInternetReachable);
+        // console.log("Is connected?", state.isConnected,state.isInternetReachable);
         //if (Platform.OS === "android") {
           if (state.isConnected) {
             getFiles(state,cat)
@@ -134,6 +137,7 @@ var RNFS = require('react-native-fs');
     };
 
     function getFiles(state,cat){
+      // alert(" get files here")
       let dir = RNFS.DownloadDirectoryPath + '/FourRelax/stories'
       let Imgdir = RNFS.DownloadDirectoryPath + '/FourRelax/mainImages'
       var meditation = [];
@@ -180,9 +184,9 @@ var RNFS = require('react-native-fs');
               // })
             })
             // meditation = [{...filePath,...ImagePath}]
-            // console.log("????????????????????????????????????????")
+            // alert("????????????????????????????????????????")
             if(state.isConnected){
-              console.log(meditation)
+              // console.log(meditation)
               // alert("called internal medi")
               setInternal(meditation)
               let cate = cat
@@ -190,6 +194,7 @@ var RNFS = require('react-native-fs');
               getStories(cate,cover,meditation)
     
             }else{
+              // alert('Called gere')
               setTimeout(() => {
                 // console.log(meditation)
                 setmeditations(meditation)
@@ -209,6 +214,7 @@ var RNFS = require('react-native-fs');
           //   backgroundColor: '#018CAB',
           //   textColor: 'tomato',
           // });
+          setmeditations([])
               let cate = cat
               let cover = '';
           let meditation = []
@@ -317,6 +323,7 @@ var RNFS = require('react-native-fs');
                 setcateEmp(true)
                 setmeditations([])
               }else{
+      
                   checkData(getFilter,stories)
               }
 
@@ -328,14 +335,14 @@ var RNFS = require('react-native-fs');
         //   setloadingGroup(false);
           console.log(err);
         }
-        // if (props?.all_group_data) {
-        //   setgroupDetail(props?.all_group_data[0]);
-        // }
+       
       }
 
       function checkData(posts,stories){
-        console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
+        // console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
         if(stories.length > 0){
+          // alert('here')
+
           let trueData = [];
           let fasleData = [];
           // console.log(posts.length);
@@ -784,7 +791,7 @@ var RNFS = require('react-native-fs');
       })
       }
       })
-    }catch(e){alert(e)}
+    }catch(e){console.log(e)}
       setItemData(item)
 
       setTimeout(() => {
@@ -820,7 +827,7 @@ var RNFS = require('react-native-fs');
           // return true;
       }
       catch(exception) {
-        alert(exception)
+        console.log(exception)
           // return false;
       }
       let cover = name.concat("_img");
@@ -958,7 +965,7 @@ var RNFS = require('react-native-fs');
         await AsyncStorage.setItem(name,JSON.stringify(item))
         // alert("set item successfully")
       }catch(e){
-        alert(e)
+        console.log(e)
       }
     }
 

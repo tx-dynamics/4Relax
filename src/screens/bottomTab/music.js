@@ -184,7 +184,7 @@ var RNFS = require('react-native-fs');
               // })
             })
             // meditation = [{...filePath,...ImagePath}]
-            console.log("????????????????????????????????????????")
+            // console.log("????????????????????????????????????????")
             if(state.isConnected){
               console.log(meditation)
               // alert("called internal medi")
@@ -213,6 +213,7 @@ var RNFS = require('react-native-fs');
           //   backgroundColor: '#018CAB',
           //   textColor: 'tomato',
           // });
+          setmeditations([])
           let cate = cat;
           let cover = ''
           getMusic(cate,cover,meditation)
@@ -547,7 +548,6 @@ var RNFS = require('react-native-fs');
         }    
       }, 500);
       
-      
           try {
               await AsyncStorage.setItem("single_item",JSON.stringify({...single,type:'Sounds'}))
               await AsyncStorage.setItem("userId",JSON.stringify(props.userData._id))
@@ -790,7 +790,7 @@ var RNFS = require('react-native-fs');
       })
       }
       })
-    }catch(e){alert(e)}
+    }catch(e){console.log(e)}
       setItemData(item)
       setTimeout(() => {
         const res = meditations.map((post)=>{
@@ -826,7 +826,7 @@ var RNFS = require('react-native-fs');
           // return true;
       }
       catch(exception) {
-        alert(exception)
+        console.log(exception)
           // return false;
       }
       let cover = name.concat("_img");
@@ -966,7 +966,7 @@ var RNFS = require('react-native-fs');
         await AsyncStorage.setItem(name,JSON.stringify(item))
         // alert("set item successfully")
       }catch(e){
-        alert(e)
+        console.log(e)
       }
     }
 

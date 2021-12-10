@@ -12,6 +12,7 @@ import {
   CREATE_GROUP,
   GOOGLE_LOGIN,
   UPDATE_USER,
+  UPDATE_DATA,
   GOOGLE_SIGNUP,
   GOOGLE_FAIL,
   GROUP_FAIL,
@@ -178,13 +179,6 @@ export const logoOut = params => {
   };
 };
 
-//helper Functions
-
-const logingoogle = res => ({
-  type: GOOGLE_LOGIN,
-  payload: res,
-});
-
 export const get_paymentResponse = (params) => {
   //   console.log(rid);
     return async dispatch => {
@@ -205,13 +199,57 @@ export const get_paymentResponse = (params) => {
         return res;
       } catch (err) {
         console.log(err.response.data);
-        dispatch(subsFailed(err.response));
+        dispatch(authFailed(err.response));
       }
     };
   };
+
+
+  export const switch_noification = (id) => {
+    console.log(id);
+      // console.log(`${BASE_URL}api/relax/user/updateNotification/${id}`);
+      return async dispatch => {
+        // dispatch(chatLoading());
+        try {
+          const res = await axios.put(`${BASE_URL}api/relax/user/updateNotification/${id}`
+           ,{
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+          )
+          // .then(response => console.log(response));
+          // if (res?.data) {
+            // console.log("HeERE======================>",res);
+            dispatch(validated(res));
+          // }
+          // return dispatch(subsFailed(res));
+          return res;
+        } catch (err) {
+          // console.log(err.response.data);
+          dispatch(authFailed(err.response));
+        }
+      };
+    };
+
+
+//helper Functions
+
+const logingoogle = res => ({
+  type: GOOGLE_LOGIN,
+  payload: res,
+});
+
+
   //helper
   export const paymentSuccess = res => ({
     type: UPDATE_USER,
+    payload: res,
+  });
+
+  export const validated = res => ({
+    type: UPDATE_DATA,
     payload: res,
   });
 

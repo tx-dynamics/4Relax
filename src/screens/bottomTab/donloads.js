@@ -93,7 +93,7 @@ export default function downloads(props) {
                 // ImagePath.map((img)=>{
                 //   if(item.trackName === img.name){
                   var res = await getLocalJson(MediImage,item,item.trackName)
-                  // console.log("local donloads===========>",res);
+                  console.log("local donloads===========>",res);
                   meditation.push(res)
                   // meditation=(res)
                     // meditation = ({id:Math.floor(Math.random() * 10),'type':item.type,"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,liked:false,exists:true})
@@ -256,11 +256,11 @@ export default function downloads(props) {
 
         setTimeout(() => {
         console.log("+++++++++++++++++++++++++++++++++++++")
-        // return console.log(meditations)
+        // return console.log(final)
         const n = final.filter((tag, index, dub) =>
         dub.findIndex((t)=> t._id === tag._id ) == index);
         setmeditations(n)
-        return console.log(n)
+        // return console.log(n)
         
         }, 3000);
         setTimeout(() => {

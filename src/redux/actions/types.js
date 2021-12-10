@@ -43,6 +43,7 @@ export const UPDATE_USER = 'UPDATE_USER';
 export const FORGOT_PASS = 'FORGOT_PASS';
 export const GET_IMAGES = 'GET_IMAGES';
 export const POST_CONTACT = 'POST_CONTACT'; 
+export const UPDATE_DATA = 'UPDATE_DATA'; 
 
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';
