@@ -39,7 +39,11 @@ const setting = () => {
         component={Setting}
         options={{headerShown: false}}
       />
-
+      <Stack.Screen
+        name="Track"
+        component={Track}
+        options={{headerShown: false}}
+      />  
       <Stack.Screen
         name="Subscription"
         component={Subscription}
@@ -91,11 +95,11 @@ const feed = () => {
         component={Feed}
         options={{headerShown: false}}
       />  
-      {/* <Stack.Screen
+      <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />      */}
+      />     
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
@@ -125,6 +129,11 @@ const explore = () => {
         options={{headerShown: false}}
       />      
       <Stack.Screen
+        name="Track"
+        component={Track}
+        options={{headerShown: false}}
+      />  
+      <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
@@ -152,7 +161,12 @@ const music = () => {
         name="Sound"
         component={Music}
         options={{headerShown: false}}
-      />      
+      />    
+      <Stack.Screen
+        name="Track"
+        component={Track}
+        options={{headerShown: false}}
+      />    
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
@@ -181,7 +195,12 @@ const favor = () => {
         name="Favou"
         component={Fav}
         options={{headerShown: false}}
-      />      
+      />     
+      <Stack.Screen
+        name="Track"
+        component={Track}
+        options={{headerShown: false}}
+      />   
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}

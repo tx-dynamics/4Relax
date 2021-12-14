@@ -18,6 +18,7 @@ import Soundplayer from './playing'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Snackbar from 'react-native-snackbar';
 import theme from '../../theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function downloads(props) {
@@ -855,28 +856,37 @@ export default function downloads(props) {
         <LinearGradient
             start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
             style={{flex:1}}>
-            <Header
-                backgroundColor="transparent"
+            {/* <Header
+                backgroundColor="red"
                 containerStyle={{
                 alignSelf: 'center',
                 // height: ,
+                marginTop:20,
                 borderBottomWidth: 0,
                 // borderBottomColor: '#E1E3E6',
                 }}
                 leftComponent={
-                    <TouchableOpacity style={{width:30,height:30,justifyContent:'center',alignItems:'center'}} onPress={()=> props.navigation.goBack()} >
-                        <Image
-                            source={left}  
-                            style={{width:7,height:14,tintColor:'white'}}
-                        />
-                    </TouchableOpacity>
+                    
                     
                 }
                 centerComponent={
                     <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff'}} >DOWNLOADS</Text>
                 }
-            />
-            <View style={{alignItems:'center',width:'90%',height:'88%',alignSelf:'center',marginTop:responsiveHeight(1)}}>
+            /> */}
+            <View style={{flex:0.8,alignItems:'center',flexDirection:'row'}} >
+                <View style={{flex:0.15,alignItems:'center'}} >
+                <TouchableOpacity style={{width:30,height:30,justifyContent:'center',alignItems:'center'}} onPress={()=> props.navigation.goBack()} >
+                        <Image
+                            source={left}  
+                            style={{width:7,height:14,tintColor:'white'}}
+                        />
+                    </TouchableOpacity>
+                </View>
+                <View style={{flex:1,alignItems:'center'}} >
+                  <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff',marginRight:responsiveWidth(12)}} >DOWNLOADS</Text>
+                </View>
+            </View>
+            <View style={{alignItems:'center',width:'90%',height:'88%',alignSelf:'center'}}>
             {refreshing?
                 null
             :

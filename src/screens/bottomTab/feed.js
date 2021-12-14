@@ -48,9 +48,9 @@ var RNFS = require('react-native-fs');
       setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
       //   // CheckConnectivity()
       setcateEmp(false)
-      setisplaying (false)
+      // setisplaying (false)
       checkInternet()
-      }, [isFocused])
+      }, [])
 
     async function checkInternet (){
       // alert("called 2 ")

@@ -45,7 +45,7 @@ var RNFS = require('react-native-fs');
         // setisplaying (false)
         checkInternet()
         // CheckConnectivity()
-    }, [isFocused])
+    }, [])
     
     async function checkInternet (){
       NetInfo.fetch().then((state) => {

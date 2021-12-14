@@ -44,7 +44,7 @@ var RNFS = require('react-native-fs');
         requestToPermissions()
         checkInternet()
 
-    }, [isFocused])
+    }, [])
     
     async function checkInternet (){
       NetInfo.fetch().then((state) => {

@@ -131,7 +131,7 @@ const feed = (props) => {
                 setTimeout(() => {
                 setInternal(meditation)
                 getfavorites(meditation)  
-                }, 1500);
+                }, 500);
                 
       
               }else{
@@ -139,7 +139,7 @@ const feed = (props) => {
                   // console.log("H@R@/////////////////////--->",meditation)
                   setmeditations(meditation)
                   setRefreshing(false);  
-                }, 1500);
+                }, 500);
                 
               }
       
@@ -296,7 +296,7 @@ const feed = (props) => {
           if (posts) {
             setTimeout(() => {
                 checkData( posts ,fav)
-            }, 1000);
+            }, 500);
           }
         //  setRefreshing(false);
         
@@ -783,7 +783,7 @@ const feed = (props) => {
         }
         setTimeout(() => {
           CheckConnectivity()
-        }, 1500);
+        }, 500);
      
   
       }

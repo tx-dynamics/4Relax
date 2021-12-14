@@ -108,7 +108,7 @@ function setting(props) {
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                         style={styles.setting_btn}
                         >
-                        <TouchableOpacity onPress={()=> props.navigation.navigate('Subscription')}  style={{flexDirection:'row',alignItems:'center'}}>
+                        <TouchableOpacity onPress={()=> props.navigation.navigate('Packages')}  style={{flexDirection:'row',alignItems:'center'}}>
                             <Image
                                 source={product}
                                 style={{width:16,height:16,left:10}}
