@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {BASE_URL} from '../base-url';
-import {GET_CATEGORIES, GET_STORIES,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
+import {GET_STORCATEGORIES, GET_STORIES,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
 //Local Types
 export const STORIES_FAILED = 'STORIES_FAILED';
 export const LOADING_STORIES = 'LOADING_STORIES';
@@ -79,7 +79,7 @@ const getmsg = res => ({
   payload: res,
 });
 const getcat = res => ({
-  type: GET_CATEGORIES,
+  type: GET_STORCATEGORIES,
   payload: res,
 });
 const getfav = res => ({

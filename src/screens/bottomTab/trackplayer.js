@@ -148,6 +148,7 @@ function track  (props)  {
   
   useEffect(() => {
     setup();
+    // return console.log(props);
     getMain();
     // CheckConnectivity()
     
@@ -949,7 +950,7 @@ function track  (props)  {
                   </View>
               :
                   <>
-                      <View style={{marginTop:responsiveHeight(50)}}>
+                      <View style={{marginTop:responsiveHeight(56)}}>
                       <View style={{flexDirection:'row',flex:1,marginVertical:15}}>
                           <Slider
                               style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {BASE_URL} from '../base-url';
-import {GET_CATEGORIES, GET_MUSIC,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
+import {GET_SOUNCATEGORIES, GET_MUSIC,SET_FAV, SEND_MSG, UPLOAD_DOCS} from './types';
 //Local Types
 export const MUSIC_FAILED = 'MUSIC_FAILED';
 export const LOADING_MUSIC = 'LOADING_MUSIC';
@@ -78,7 +78,7 @@ const getmsg = res => ({
   payload: res,
 });
 const getcat = res => ({
-  type: GET_CATEGORIES,
+  type: GET_SOUNCATEGORIES,
   payload: res,
 });
 const getfav = res => ({

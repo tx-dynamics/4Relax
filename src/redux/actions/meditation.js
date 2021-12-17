@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {BASE_URL} from '../base-url';
-import { GET_MEDITATIONS,SET_FAV, GET_CATEGORIES} from './types';
+import { GET_MEDITATIONS,SET_FAV, GET_MEDCATEGORIES,SAVE_MEDI,SAVE_MEDICAT,CLEAR_MEDI} from './types';
 //Local Types
 export const MEDITATION_FAILED = 'MEDITATE_FAILED';
 export const LOADING_MEDITATION = 'LOADING_MEDITATE';
@@ -18,6 +18,7 @@ export const get_allmeditation = params => {
         },
       });
       dispatch(getmsg(res));
+      // dispatch(storeMedi(res));
       return res;
     } catch (err) {
       console.log(err.response.data);
@@ -72,15 +73,39 @@ export const set_fav = params => {
     };
   };
 
-//helper
+  export const storeMedidation = params => {
+    // console.log(params);
+    return async dispatch => {
+        // console.log('called',params);
+      dispatch(storeMedi(params));
+    };
+  };
+
+  export const clearData = () => {
+    // console.log(params);
+    return async dispatch => {
+        // console.log('called',params);
+      dispatch(clear());
+    };
+  };
+
+  //helper
+  const clear = () => ({
+    type: CLEAR_MEDI,
+  });
 
 const getmsg = res => ({
   type: GET_MEDITATIONS,
   payload: res,
 });
 
+const storeMedi = res => ({
+  type: SAVE_MEDI,
+  payload: res,
+});
+
 const getcat = res => ({
-  type: GET_CATEGORIES,
+  type: GET_MEDCATEGORIES,
   payload: res,
 });
 const getfav = res => ({

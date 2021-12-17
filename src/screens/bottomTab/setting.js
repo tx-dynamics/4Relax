@@ -14,6 +14,7 @@ import {logoOut,switch_noification} from '../../redux/actions/auth';
 import {connect} from 'react-redux';
 import theme from '../../theme';
 import Snackbar from 'react-native-snackbar';
+import Soundplayer from './trackbanner'
 
 
 function setting(props) {
@@ -265,7 +266,7 @@ function setting(props) {
                     >
                         <TouchableOpacity  onPress={()=> {
                             props.logoOut()
-                            props.navigation.replace('Auth', {screen: 'Signin'})
+                            props.navigation.push('Auth', {screen: 'Signin'})
                             // props.navigation.replace('Signin')
                         }}  style={{}}>
                             <Image
@@ -277,11 +278,19 @@ function setting(props) {
 
                 </View>
             </ScrollView>
+            <>
+              {props?.val?
+                  <Soundplayer navigation={props.navigation} />
+                  :
+              null}
+            </>
         </LinearGradient>
     )
 }
 const mapStateToProps = state => {
     const {status, message, isLoading, errMsg, isSuccess, token,userData} = state.auth;
-    return {status, message, isLoading, errMsg, isSuccess, token,userData};
+    const {val} = state.validatePlayer;
+
+    return {status, message, isLoading, errMsg, isSuccess, token,userData,val};
   };
   export default connect(mapStateToProps, {logoOut,switch_noification})(setting);

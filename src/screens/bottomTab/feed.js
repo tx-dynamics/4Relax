@@ -10,15 +10,17 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
 import NetInfo from "@react-native-community/netinfo";
-import Soundplayer from './playing'
+import Soundplayer from './trackbanner'
 import {connect} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
-import {get_allmeditation,set_fav,get_categories} from '../../redux/actions/meditation';
+import {get_allmeditation,set_fav,get_categories,storeMedidation,clearData} from '../../redux/actions/meditation';
+import {togglePlayer} from '../../redux/actions/validate_player';
 import {unloc,pause,play,download,fav,logo,del,cover} from '../../assets'
 import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'rn-fetch-blob'
 import { firebase } from '@react-native-firebase/messaging';
+import * as Animatable from 'react-native-animatable'
 
 var RNFS = require('react-native-fs');
 
@@ -31,7 +33,7 @@ var RNFS = require('react-native-fs');
     const [islock,setislock ] =  useState(true)
     const [cateEmp,setcateEmp ] =  useState(false)
     const [item,setitem ] =  useState()
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [meditations,setmeditations ] =  useState([])
     const [internal,setInternal ] =  useState([])
     const [category,setcategory ] =  useState([])
@@ -41,16 +43,27 @@ var RNFS = require('react-native-fs');
     const [onceConnect,setonceConnect ] =  useState(true)
     const [showLock,setshowLock ] =  useState(false)
     const [subId,setsubId ] =  useState('')
+    const [favrt,setfav ] =  useState('no')
 
     useEffect(() => {
       // console.log("parms =====>",props);
+      
       requestToPermissions()
-      setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
-      //   // CheckConnectivity()
-      setcateEmp(false)
-      // setisplaying (false)
-      checkInternet()
-      }, [])
+      // if(isFocused){
+        setsubId(props?.userData?.subscriptionDetail?.subscriptionId)
+        //   // CheckConnectivity()
+        setcateEmp(false)
+        // setisplaying (false)
+        checkInternet()
+      // }
+      
+      // return async () => await props.togglePlayer(false)
+      // favrt
+    }, [isFocused])
+
+      // useEffect(() => {
+        
+      //   }, [props?.meditationData])
 
     async function checkInternet (){
       // alert("called 2 ")
@@ -124,21 +137,21 @@ var RNFS = require('react-native-fs');
       }
     }
     async function get_category(){
-      try {
-        const res = await props.get_categories();
-        var posts = res?.data
-        
+      // console.log("get sub category redux",props?.subCategories?.data);
+      if(props?.subCategories?.data != '' && props?.subCategories?.data != undefined){
+        var posts = props?.subCategories?.data
+          
         var sub_cat = posts.map((item,index)=>{
           if(item.exist === 'yes'){
               return item
             }else{
             }
         })
-     
+    
         sub_cat = sub_cat.filter(function( element ) {
           return element !== undefined;
-       });
-       
+      });
+      
         var rest = sub_cat.map((item,index)=>{
           if(index === 0){
               return {
@@ -159,17 +172,55 @@ var RNFS = require('react-native-fs');
         setcategory(rest)
 
         CheckConnectivity(seleted.name)
+      }else{
+        try {
+          const res = await props.get_categories();
+          var posts = res?.data
+          
+          var sub_cat = posts.map((item,index)=>{
+            if(item.exist === 'yes'){
+                return item
+              }else{
+              }
+          })
+      
+          sub_cat = sub_cat.filter(function( element ) {
+            return element !== undefined;
+        });
         
+          var rest = sub_cat.map((item,index)=>{
+            if(index === 0){
+                return {
+                  ...item,
+                  selected: true,
+                }
+              }else{
+                return {
+                  ...item,
+                  selected: false,
+                }
+              }
+            
+          })
+          var first = posts[0];
+          var seleted = {...first,selected:true}
+          // alert(seleted.name);
+          setcategory(rest)
+
+          CheckConnectivity(seleted.name)
+          
 
 
-      } catch (err) {
-        setRefreshing(false);
+        } catch (err) {
+          setRefreshing(false);
 
-        console.log(err);
+          console.log(err);
+        }
       }
+      await props.get_categories()
     }
     function CheckConnectivity  (cat = '')  {
-      setisplaying(false)
+      // setisplaying(false)
       setRefreshing(true);
       // For Android devices
       NetInfo.fetch().then((state) => {
@@ -229,49 +280,31 @@ var RNFS = require('react-native-fs');
           })
         }
       })
-      // setTimeout(() => {
-      //   console.log("called ---====----->",ImagePath)
-        
-      // }, 200);
-
-      // return
+      
 
       RNFetchBlob.fs.isDir(dir).then((isDir)=>{
         if(isDir){
           RNFS.readDir(dir).then(files => {
             files.map((item)=>{
-              // console.log(item)  
-              // if(item.name.includes("_img")){
-              //   // console.log(item.name+"&&&&&&&&&&&&&&&&&&&&&&"+item.name.split("_")[0])
-              //   ImagePath.push({"name":item.name.split("_")[0],"coverPic":item.path})
-              // }else{
                 filePath.push({"trackFile":item.path,"trackName":item.name,isdownloading:true,exists:true})
-              // }
             })
             filePath.map(async(item)=>{
-              // ImagePath.map(async(img)=>{
-              //   if(item.trackName === img.name){
-                  // console.log("called iside looop ---====----->",ImagePath)
-
-                  var res = await getLocalJson(ImagePath,item,item.trackName,state,cat)
-                  // console.log("local===========>",res);
-                  meditation.push(res)
-                  // meditation.push({"trackFile":item.trackFile,"trackName":item.trackName,isdownloading:item.isdownloading,"coverPic":img.coverPic, isplaying: false,exists:true})
-              //   }
-              // })
+              var res = await getLocalJson(ImagePath,item,item.trackName,state,cat)
+              meditation.push(res)
             })
-            // meditation = [{...filePath,...ImagePath}]
-            // console.log("????????????????????????????????????????")
-            // console.log(meditation)
-            // console.log(ImagePath)
+            
             if(state.isConnected){
               // console.log(meditation)
               // alert("called internal medi")
-              setInternal(meditation)
-              let cate = cat;
-              let cover = '';
-              getMeditation(cate,cover,meditation)
-    
+              setTimeout(() => {
+                setInternal(meditation)
+                let cate = cat;
+                let cover = '';
+                let resp = []
+                getMeditation(cate,cover,meditation,resp)
+                      
+              }, 1200);
+
             }else{
               setTimeout(() => {
                 console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
@@ -297,7 +330,8 @@ var RNFS = require('react-native-fs');
           setmeditations([])
           let cate = cat;
           let cover = '';
-          getMeditation(cate,cover,meditation)
+          let resp = []
+          getMeditation(cate,cover,meditation,resp)
         }
       })
     }
@@ -355,106 +389,137 @@ var RNFS = require('react-native-fs');
         setRefreshing(false);
       }
     }
-    async function getMeditation( cate = '',cover = '' , meditation  ) {
-      // return console.log("!!!!!!!!!!!!!!!!!!^^^^^^^^^^^^^^^^^^^!!!!!!!!!!!!!!!!!!"+category)
-        // setRefreshing(true);
+    async function getMeditation( cate = '',cover = '' , meditation , resp   ) {
+      
         const params = {
             userId: props?.userData?._id
         }
-        try {
-          const res = await props.get_allmeditation(params);
-          var posts = res?.data
-          posts.map((item)=>{
-            return {
-                ...item,
-                isplaying: false,
-                progress:false,
-                showLock:false,
-              };
-          })
+        // console.log("data here",props?.meditationData);
+        if(props?.meditationData?.data != '' && props?.meditationData?.data != undefined ){
+          try{
+            // var posts = []
+            // if
+            // var posts = resp.length != 0 ? alert(1) : alert(2)
+            var posts = resp.length != 0 ? resp :  props?.meditationData?.data
+            // alert(resp)
 
-          // var subsc = posts.map((item)=>{
-          //   // console.log(item.trackName);
-          //   let subs = item.subscriptionType 
-          //   return subs.map((subId)=>{
-          //     // console.log( subId);
-          //     if(props?.userData?.subscriptionDetail?.subscriptionId === subId){
-          //         return {
-          //           // subid :props?.userData?.subscriptionDetail?.subscriptionId
-          //             ...item,
-          //             subscription  :true
-          //         }
-          //     }else{
-          //       // setshowLock(true)
-          //         return {
-          //           ...item,
-          //           // subscriptionType:false
-
-          //       }
-          //     }
-              
-          //     // console.log('false');
-          //   })
-            
-          // })
-
-          // console.log(subsc);
-          
-
-          if (posts) {
-              if(cate === ''){
-                // setmeditations(posts)
-                // setTimeout(() => {
-                  checkData(posts,meditation)
-                // }, 1000);
-              }else{
-                setmeditations([])
-
-                var filtered = []; 
-                posts.map((item)=>{
-                    filtered.push(item)
-                })
-               
-                let getFilter = [];
-                setcateEmp(false)
-
-                filtered.map((item)=>{
-                  // let str =item.trackCategory 
-                  // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
-                  // console.log(item.trackCategory.name === cate)
-                    if(item.trackCategory.name === cate){
-                        getFilter.push(item);
-                    }else{
-                      return
-                    }
-                })
-                // return console.log(getFilter)
-                if(getFilter.length < 1){
-                  
-                  setcateEmp(true)
-                  setmeditations([])
+            if (posts) {
+                if(cate === ''){
+                  // setmeditations(posts)
+                  // setTimeout(() => {
+                    alert(1)
+                    checkData(posts,meditation)
+                  // }, 1000);
                 }else{
-                  // return console.log(getFilter)
-                    checkData(getFilter,meditation)
+                  setmeditations([])
+
+                  var filtered = []; 
+                  posts.map((item)=>{
+                      filtered.push(item)
+                  })
+                
+                  let getFilter = [];
+                  setcateEmp(false)
+
+                  filtered.map((item)=>{
+                      if(item.trackCategory.name === cate){
+                          getFilter.push(item);
+                      }else{
+                        return
+                      }
+                  })
+                  if(getFilter.length < 1){
+                    
+                    setcateEmp(true)
+                    setmeditations([])
+                  }else{
+                      checkData(getFilter,meditation)
+                  }
                 }
-                // setmeditations(getFilter)
-               
+            }
 
-              }
+
+          } catch (err) {
+            setRefreshing(false);
+            // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            console.log(err);
           }
+        }else{
+          // alert('else')
+          try {
+            const res = await props.get_allmeditation(params);
+            var posts = res?.data
+            const data = posts.map((item)=>{
+              return {
+                  ...item,
+                  isplaying: false,
+                  progress:false,
+                  showLock:false,
+                };
+            })
+            // await props.storeMedidation(posts)
+            // setTimeout(() => {
+            //   data.map((item)=>{
+            //     console.log(item);
+            //   })  
+            // }, 5000);
+            
+
+            if (data) {
+                if(cate === ''){
+                  // setmeditations(posts)
+                  // setTimeout(() => {
+                    checkData(data,meditation)
+                  // }, 1000);
+                }else{
+                  setmeditations([])
+
+                  var filtered = []; 
+                  data.map((item)=>{
+                      filtered.push(item)
+                  })
+                
+                  let getFilter = [];
+                  setcateEmp(false)
+
+                  filtered.map((item)=>{
+                    // let str =item.trackCategory 
+                    // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
+                    // console.log(item.trackCategory.name === cate)
+                      if(item.trackCategory.name === cate){
+                          getFilter.push(item);
+                      }else{
+                        return
+                      }
+                  })
+                  // return console.log(getFilter)
+                  if(getFilter.length < 1){
+                    
+                    setcateEmp(true)
+                    setmeditations([])
+                  }else{
+                    // return console.log(getFilter)
+                      checkData(getFilter,meditation)
+                  }
+                  // setmeditations(getFilter)
+                
+
+                }
+            }
 
 
-        } catch (err) {
-          setRefreshing(false);
-          // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-          console.log(err);
+          } catch (err) {
+            setRefreshing(false);
+            // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            console.log(err);
+          }
         }
-       
+        await props.get_allmeditation(params)
+
       }
-    function checkData(posts,meditation){
-      console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
-      // return console.log(posts );
+    async function checkData(posts,meditation){
       if(meditation.length > 0  ){
+        
         let trueData = [];
         let fasleData = [];
         // console.log(posts._id);
@@ -486,16 +551,20 @@ var RNFS = require('react-native-fs');
         setRefreshing(false);
       }else{
         // alert("where are you")
+        // await props.storeMedidation(n)
+        // alert(2)
+
         setmeditations(posts);
         setRefreshing(false);
       }
      
 
     }
+
     async function  favourities(item){
       // alert('called')
       setofflinefav(item)
-
+      
       if(connection){
         const params = {
           trackId: item._id,
@@ -510,19 +579,41 @@ var RNFS = require('react-native-fs');
         try {
           const res = await props.set_fav(params);
           // console.log('group_data', res);
-          if (res?.data) {
-              // console.log(res?.data)
-              let cat = item.trackCategory.name;
-              let cover = '';
-              let medi = internal
-              getMeditation(cat,cover,medi)
-              // Snackbar.show({
-              //     text: res?.data,
-              //     backgroundColor: '#018CAB',
-              //     textColor: 'white',
-              //   });
-          //   setmeditations(res?.data);
+          // if (res?.data === "Done: Add to Favorites") {
+            if (res?.data) {
+              console.log(res?.data)
+              setfav('yes')
+              if(props?.meditationData?.data != '' && props?.meditationData?.data != undefined ){
+                const id = {
+                  userId: props?.userData?._id
+                }
+                var resp = await props.get_allmeditation(id)
+                // setTimeout(() => {
+                  // console.log("resp dta",resp?.data);
+                  let cat = item.trackCategory.name;
+                  
+                  let cover = '';
+                  let medi = internal
+                  getMeditation(cat,cover,medi,resp?.data)  
+                // }, 1000);
+                
+              }else{
+                // const id = {
+                //   userId: props?.userData?._id
+                // }
+                // await props.get_allmeditation(id)
+                let cat = item.trackCategory.name;
+                let cover = '';
+                let medi = internal;
+                let resp = []
+                getMeditation(cat,cover,medi,resp)
+              }
+              
           }
+          // else{
+          //   setfav('no')
+
+          // }
         //   setloadingGroup(false);
         } catch (err) {
         //   setloadingGroup(false);
@@ -541,7 +632,7 @@ var RNFS = require('react-native-fs');
 
     async function getcate(item,id){
         // console.log(item.selected)
-        setisplaying(false)
+        // setisplaying(false)
         if(item.selected){
             // alert('called if')
                 const res = category.map((item) => {
@@ -567,9 +658,10 @@ var RNFS = require('react-native-fs');
               // console.log(item._id === id);
                 if (item._id === id) {
                 let medi = internal
+                let resp = []
                 // console.log(item);
                 setRefreshing(true)
-                  getMeditation(item.name,item.coverPic,medi)
+                  getMeditation(item.name,item.coverPic,medi,resp)
                   return {
                     ...item,
                     selected: true,
@@ -590,9 +682,10 @@ var RNFS = require('react-native-fs');
 
     const setData = async (single,id) => {
         // console.log(item.trackName)
+        await props.togglePlayer(false)
         setisplaying(false)
-          setTimeout(() => {
-            if(single.isplaying){
+          setTimeout(async() => {
+            if(single.isplaying ){
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
                     if(item._id === id){
@@ -609,6 +702,7 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(false)
+                await props.togglePlayer(false)
     
             }else{
     
@@ -628,6 +722,7 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(true)
+                await props.togglePlayer(true)
     
             }    
         }, 500);
@@ -654,8 +749,9 @@ var RNFS = require('react-native-fs');
     const setOfflineData = async (single,name) => {
       // console.log(item.trackName)
       setisplaying(false)
+      await props.togglePlayer(false)
       
-        setTimeout(() => {
+        setTimeout(async() => {
           if(single.isplaying){
               const res = meditations.map((item)=>{
                   // console.log(item._id === id)
@@ -673,7 +769,7 @@ var RNFS = require('react-native-fs');
               })
               setmeditations(res)
               setisplaying(false)
-  
+              await props.togglePlayer(false)
           }else{
   
               const res = meditations.map((item)=>{
@@ -692,7 +788,7 @@ var RNFS = require('react-native-fs');
               })
               setmeditations(res)
               setisplaying(true)
-  
+              await props.togglePlayer(true)
           }    
       }, 500);
       if(!single.isplaying){
@@ -1033,7 +1129,7 @@ var RNFS = require('react-native-fs');
           // return true;
       }
       catch(exception) {
-        alert(exception)
+        console.log(exception)
           // return false;
       }
       // return
@@ -1104,7 +1200,7 @@ var RNFS = require('react-native-fs');
           let cate = ''
           CheckConnectivity(cate)
         }
-      }, 1500);
+      }, 500);
    
 
     }
@@ -1287,92 +1383,6 @@ var RNFS = require('react-native-fs');
       }
     }
 
-    async function copyToFav  (item)  {
-        
-      // setmeditations(res)
-        // const {tunes, token, currentTrackIndex} = this.state;
-        let url  = item.trackFile;
-        let name  = item.trackName;
-        let coverUrl  = item.coverPic;
-    
-        // let dis = RNFetchBlob.fs.dirs
-        // return console.log(dis.DownloadDir)
-        let originalDir = RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'
-        let destDir = RNFetchBlob.fs.dirs.DownloadDir + '/FourRelax/meditation'
-        // let destDir = RNFS.DownloadDirectoryPath + '/FourRelax/favourties'
-    
-        const FolderPAth = '/storage/emulated/0/Download/FourRelax/meditation';
-        const tracktype = '/storage/emulated/0/Download/FourRelax/favourties'
-      
-        // alert("called")
-        // RNFetchBlob.fs.cp(destDir, originalDir)
-        // .then(() => { alert('called copied data 1') })
-        // .catch((e) => { console.log(e) })
-       RNFetchBlob.fs.isDir(FolderPAth).then((isDir)=>{
-        //  return alert(isDir)
-         if(isDir){
-          //  alert('exist 1')
-           RNFetchBlob.fs.isDir(tracktype).then(async(isDir)=>{
-            //  return alert(isDir)
-            if(isDir){
-              let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
-              RNFetchBlob.fs.cp(originalDir, destDir)
-              .then(() => { })
-              .catch((e) => { alert(e) })
-              
-                // RNFS.copyFile(originalDir, destDir).then(res => {
-              //   alert(res)
-              //   // expect(res).to.be(undefined);
-              // });
-              // alert('exist medii 1')
-            }else{
-              RNFetchBlob.fs.mkdir(tracktype).then(async()=>{
-              // alert('newly create medi 1')
-              let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
-                // await ReactNativeFS.copyFile(item.path, SongDir);
-                RNFetchBlob.fs.cp(originalDir, originalDir)
-                .then(() => {})
-                .catch((e) => { alert(e) })
-                // RNFS.copyFile(originalDir, destDir).then(res => {
-                //   alert(res)
-                //   // expect(res).to.be(undefined);
-                // });
-              })
-            }
-          })
-           
-         }
-        //  else{
-        //   RNFetchBlob.fs.mkdir(FolderPAth).then(()=>{
-        //     alert('newly created 2')
-        //     RNFetchBlob.fs.isDir(tracktype).then((isDir)=>{
-        //       if(isDir){
-        //         alert('exist medii 2')
-        //         let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
-                
-        //       }else{
-        //         alert('newly create medi 2')
-        //         RNFetchBlob.fs.mkdir(tracktype).then(()=>{
-        //           alert('newly create medi 2.2')
-        //           let SongDir =RNFetchBlob.fs.dirs.DownloadDir+'/FourRelax/favourties'+ '/' + name
-        //           RNFS.copyFile(originalDir, destDir).then(res => {
-        //             alert(res)
-        //             // expect(res).to.be(undefined);
-        //           });
-        //         })
-        //       }
-        //     })
-        //  })
-        // }
-        })
-        setTimeout(() => {
-         
-          // CheckConnectivity()
-          return  
-        }, 8000);
-    
-    
-      };
   
 
 
@@ -1382,7 +1392,7 @@ var RNFS = require('react-native-fs');
                 source={cover}
                 style={styles.imgBackground}
             >
-              {/* <TouchableOpacity style={{alignItems:'center'}} onPress={()=>props.navigation.navigate('Track')} > */}
+              {/* <TouchableOpacity style={{alignItems:'center'}} onPress={async()=> await props.clearData() } > */}
                 <Text style={styles.title}>MEDITATION</Text>
               {/* </TouchableOpacity> */}
                 <View style={{height:'50%'}} />
@@ -1396,7 +1406,12 @@ var RNFS = require('react-native-fs');
                   showsHorizontalScrollIndicator={false}
                   data={category}
                   renderItem={({ item, index }) =>
-                 
+                  <Animatable.View
+                      animation={'fadeInRight'}
+                      // duration={500}
+                      delay={index*300}
+                      // style={{width:'46.8%',margin:6,alignItems:'center'}}
+                    >
                       <View style={{marginTop:responsiveHeight(1)}}>
                       {item.selected?
                       <LinearGradient
@@ -1412,7 +1427,8 @@ var RNFS = require('react-native-fs');
                             <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
                         </TouchableOpacity>
                       }
-                  </View>
+                      </View>
+                  </Animatable.View>
                   }/>
             </ImageBackground>
             {cateEmp?
@@ -1422,7 +1438,7 @@ var RNFS = require('react-native-fs');
                   :
                   <>
                     {refreshing?
-                      null
+                      <View style={{flex:1}} />
                     :
                       <>
                         { meditations.length < 1  ?
@@ -1443,130 +1459,201 @@ var RNFS = require('react-native-fs');
                             // refreshControl={
                             //   <RefreshControl refreshing={refreshing} onRefresh={CheckConnectivity} />
                             // }
-                              style={{width:'100%'}}
+                              style={{width:'100%',height:'100%',flex:1}}
                               numColumns={'2'}
                               showsVerticalScrollIndicator={false}
                               data={meditations}
                               renderItem={({ item, index }) =>
-                                  <View style={{width:'46.8%',margin:6,alignItems:'center'}}>
-                                    
-                                      <ImageBackground
-                                      source={{uri : 'file://' + localImage }}
-                                        // item.cover?
-                                        //   item.cover
-                                        // : 
-                                        //   connection?
-                                        //     item.trackCategory.coverPic 
-                                        //   :
-                                        //     'file://' + item.coverPic}}
-                                      borderRadius={4}
-                                      style={{width:'100%',height:178}}
-                                  >
-                                      <View style={{flexDirection:'row',flex:0.3}}>
-                                          <View style={{flex:0.29}}>
+                                  // <Animatable.View
+                                  //       animation={'fadeInDownBig'}
+                                  //       // duration={500}
+                                  //       delay={index*300}
+                                  //       // style={{width:'46.8%',margin:6,alignItems:'center'}}
+                                  //     >
+                                    <View style={{width:Dimensions.get('window').width / 2 - 12,margin:6,alignItems:'center'}}>
+                                      
+                                        <ImageBackground
+                                        source={{uri : 'file://' + localImage }}
+                                          // item.cover?
+                                          //   item.cover
+                                          // : 
+                                          //   connection?
+                                          //     item.trackCategory.coverPic 
+                                          //   :
+                                          //     'file://' + item.coverPic}}
+                                        borderRadius={4}
+                                        style={{width:'100%',height:178}}
+                                    >
+                                        <View style={{flexDirection:'row',flex:0.3}}>
+                                            <View style={{flex:0.29}}>
+                                              {connection?
+                                              <>
+                                              {item.subscriptionType.includes(subId)?
+                                              
+                                              <>
+                                                {item.isdownloading?
+                                                  // <TouchableOpacity onPress={()=> connection? alert('online') : alert('offonline') } 
+                                                  // <>
+                                                  // {favrt === 'no'?
+                                                    <TouchableOpacity onPress={()=> favourities(item)  } 
+                                                    // style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}
+                                                    style={{height:40}}
+                                                    >
+                                                        <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
+                                                          <Image
+                                                              source={fav}
+                                                              style={[styles.icon,{
+                                                                tintColor: item.liked === 'no'? 'white' :'#FF4040'
+                                                                // tintColor:  'white'
+                                                              }]}
+                                                          />
+                                                        </View>
+                                                        
+                                                    </TouchableOpacity>
+                                                //   :
+                                                //     <TouchableOpacity onPress={()=> favourities(item)  } 
+                                                //     // style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}
+                                                //     style={{height:40,backgroundColor:'orange'}}
+                                                //     >
+                                                //         <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
+                                                //           <Image
+                                                //               source={fav}
+                                                //               style={[styles.icon,{
+                                                //                   tintColor: '#FF4040'
+                                                //               }]}
+                                                //           />
+                                                //         </View>
+                                                        
+                                                //     </TouchableOpacity>
+                                                //   }
+                                                // </>
+                                                :
+                                                null}
+                                              
+                                              </>
+                                              :
+                                              null}
+                                              </>
+                                              :
+                                              <>
+                                              {item.isdownloading?
+                                                  <TouchableOpacity onPress={()=>  offlineFav(item)} 
+                                                  // style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}
+                                                  style={{height:40}}
+                                                  >
+                                                      <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
+                                                        <Image
+                                                            source={fav}
+                                                            style={[styles.icon,{
+                                                                tintColor: item.liked === 'no'? 'white' :'#FF4040'
+                                                            }]}
+                                                        />
+                                                      </View>
+                                                      
+                                                  </TouchableOpacity>
+                                                :
+                                                null}
+                                              </>}
+                                              
+                                                
+                                            </View>
+                                            <View style={{flex:0.8,alignItems:'flex-end'}}>
                                             {connection?
                                             <>
                                             {item.subscriptionType.includes(subId)?
-                                             
-                                            <>
-                                              {item.isdownloading?
-                                                // <TouchableOpacity onPress={()=> connection? alert('online') : alert('offonline') } 
-                                                <TouchableOpacity onPress={()=> favourities(item)  } 
-                                                // style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}
-                                                style={{height:40}}
-                                                >
-                                                    <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
-                                                      <Image
-                                                          source={fav}
-                                                          style={[styles.icon,{
-                                                              tintColor: item.liked === 'no'? 'white' :'#FF4040'
-                                                          }]}
-                                                      />
-                                                    </View>
-                                                    
-                                                </TouchableOpacity>
-                                              :
-                                              null}
-                                            
-                                            </>
-                                            :
-                                            null}
-                                            </>
-                                            :
-                                            <>
-                                            {item.isdownloading?
-                                                <TouchableOpacity onPress={()=>  offlineFav(item)} 
-                                                // style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]}
-                                                style={{height:40}}
-                                                >
-                                                    <View style={[styles.iconBackground,{left:16,top:12,marginLeft:responsiveWidth(0)}]} >
-                                                      <Image
-                                                          source={fav}
-                                                          style={[styles.icon,{
-                                                              tintColor: item.liked === 'no'? 'white' :'#FF4040'
-                                                          }]}
-                                                      />
-                                                    </View>
-                                                    
-                                                </TouchableOpacity>
-                                              :
-                                              null}
-                                            </>}
-                                            
                                               
-                                          </View>
-                                          <View style={{flex:0.8,alignItems:'flex-end'}}>
-                                          {connection?
-                                          <>
-                                          {item.subscriptionType.includes(subId)?
-                                            
+                                              <>
+                                                {item.isdownloading?
+                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                      <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
+                                                        <Image
+                                                            source={del}
+                                                            style={styles.icon}
+                                                        />
+                                                      </View>
+                                                  </TouchableOpacity>
+                                                :
+                                                null}
+                                              </>
+                                              :
+                                              null
+                                              }
+                                            </>
+                                              :
                                             <>
-                                              {item.isdownloading?
-                                                <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
-                                                    <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
-                                                      <Image
-                                                          source={del}
-                                                          style={styles.icon}
-                                                      />
-                                                    </View>
-                                                </TouchableOpacity>
-                                              :
-                                              null}
-                                            </>
-                                            :
-                                            null
-                                            }
-                                          </>
-                                            :
-                                          <>
-                                              {item.isdownloading?
-                                                <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
-                                                    <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
-                                                      <Image
-                                                          source={del}
-                                                          style={styles.icon}
-                                                      />
-                                                    </View>
-                                                </TouchableOpacity>
-                                              :
-                                              null}
-                                            </>
-                                            }
-                                              
-                                              
-                                          </View>
-                                      </View>
-                                      <View style={{flex:0.4}}><Text>{item.isdownloading}</Text></View>
-                                      <View style={{flex:0.25,alignItems:'center'}} >
-                                          {connection?
+                                                {item.isdownloading?
+                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                      <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
+                                                        <Image
+                                                            source={del}
+                                                            style={styles.icon}
+                                                        />
+                                                      </View>
+                                                  </TouchableOpacity>
+                                                :
+                                                null}
+                                              </>
+                                              }
+                                                
+                                                
+                                            </View>
+                                        </View>
+                                        <View style={{flex:0.4}}><Text>{item.isdownloading}</Text></View>
+                                        <View style={{flex:0.25,alignItems:'center'}} >
+                                            {connection?
 
-                                            <>
-                                            {item.subscriptionType.includes(subId)?
-                                            <>
+                                              <>
+                                              {item.subscriptionType.includes(subId)?
+                                              <>
+                                                  {item.isdownloading?
+                                                      <>
+                                                        {item.isplaying?
+                                                            <TouchableOpacity onPress={()=> setData(item,item._id)} 
+                                                            style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                                  <Image
+                                                                      source={pause}
+                                                                      style={[styles.icon,{width:22.67,height:22.67}]}
+                                                                  />
+                                                            </TouchableOpacity>
+                                                            :
+                                                            <TouchableOpacity onPress={()=> setData(item,item._id)}
+                                                                style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                                <Image
+                                                                    source={play}
+                                                                    style={[styles.icon,{width:22,height:22}]}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        }
+                                                      </>
+                                                    :
+                                                      <TouchableOpacity onPress={()=> {
+                                                        startDownload(item,item._id)
+                                                        }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
+                                                        <Image
+                                                            source={download}
+                                                            style={[styles.icon,{width:34,height:34,}]}
+                                                        />
+                                                      </TouchableOpacity>
+                                                  }
+                                                </>
+                                              :
+                                              <TouchableOpacity onPress={()=> 
+                                                    props.navigation.navigate('Packages')
+                                                }
+                                                style={[styles.iconBackground,{width:34,height:34,top:5}]}>
+                                                    <Image
+                                                        source={unloc}
+                                                        style={[styles.icon,{width:15,height:19}]}
+                                                    />
+                                                </TouchableOpacity> 
+                                              }
+                                              </>
+                                              :
+                                              <>
                                                 {item.isdownloading?
                                                     <>
                                                       {item.isplaying?
-                                                          <TouchableOpacity onPress={()=> setData(item,item._id)} 
+                                                          <TouchableOpacity onPress={()=> setOfflineData(item,item.trackName)} 
                                                           style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                                 <Image
                                                                     source={pause}
@@ -1574,7 +1661,7 @@ var RNFS = require('react-native-fs');
                                                                 />
                                                           </TouchableOpacity>
                                                           :
-                                                          <TouchableOpacity onPress={()=> setData(item,item._id)}
+                                                          <TouchableOpacity onPress={()=> setOfflineData(item,item.trackName)}
                                                               style={[styles.iconBackground,{width:34,height:34,top:5}]}>
                                                               <Image
                                                                   source={play}
@@ -1594,8 +1681,9 @@ var RNFS = require('react-native-fs');
                                                     </TouchableOpacity>
                                                 }
                                               </>
-                                            :
-                                            <TouchableOpacity onPress={()=> 
+                                            }
+                                          {showLock?
+                                          <TouchableOpacity onPress={()=> 
                                                   props.navigation.navigate('Packages')
                                               }
                                               style={[styles.iconBackground,{width:34,height:34,top:5}]}>
@@ -1603,68 +1691,23 @@ var RNFS = require('react-native-fs');
                                                       source={unloc}
                                                       style={[styles.icon,{width:15,height:19}]}
                                                   />
-                                              </TouchableOpacity> 
-                                            }
-                                            </>
+                                              </TouchableOpacity>  
+                                          :null}
+                                              
+                                        {item.progress?
+                                            <ActivityIndicator
+                                            size={'large'}
+                                            style={{position:'absolute',top:1,left:8,right:0,bottom:0}}
+                                            color={'white'}
+                                            />
                                             :
-                                            <>
-                                              {item.isdownloading?
-                                                  <>
-                                                    {item.isplaying?
-                                                        <TouchableOpacity onPress={()=> setOfflineData(item,item.trackName)} 
-                                                        style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                              <Image
-                                                                  source={pause}
-                                                                  style={[styles.icon,{width:22.67,height:22.67}]}
-                                                              />
-                                                        </TouchableOpacity>
-                                                        :
-                                                        <TouchableOpacity onPress={()=> setOfflineData(item,item.trackName)}
-                                                            style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                            <Image
-                                                                source={play}
-                                                                style={[styles.icon,{width:22,height:22}]}
-                                                            />
-                                                        </TouchableOpacity>
-                                                    }
-                                                  </>
-                                                :
-                                                  <TouchableOpacity onPress={()=> {
-                                                    startDownload(item,item._id)
-                                                    }} style={{justifyContent:'center',top:5,marginLeft:responsiveWidth(2)}}  >
-                                                    <Image
-                                                        source={download}
-                                                        style={[styles.icon,{width:34,height:34,}]}
-                                                    />
-                                                  </TouchableOpacity>
-                                              }
-                                            </>
-                                          }
-                                        {showLock?
-                                        <TouchableOpacity onPress={()=> 
-                                                props.navigation.navigate('Packages')
-                                            }
-                                            style={[styles.iconBackground,{width:34,height:34,top:5}]}>
-                                                <Image
-                                                    source={unloc}
-                                                    style={[styles.icon,{width:15,height:19}]}
-                                                />
-                                            </TouchableOpacity>  
-                                        :null}
-                                            
-                                      {item.progress?
-                                          <ActivityIndicator
-                                          size={'large'}
-                                          style={{position:'absolute',top:1,left:8,right:0,bottom:0}}
-                                          color={'white'}
-                                          />
-                                          :
-                                          null
-                                      }
-                                      </View>
-                                    </ImageBackground>
-                                    
-                                  </View>
+                                            null
+                                        }
+                                        </View>
+                                      </ImageBackground>
+                                      
+                                    </View>
+                                  // </Animatable.View>
                               }
                           />
                         } 
@@ -1675,8 +1718,9 @@ var RNFS = require('react-native-fs');
                   
             }  
                 
-            {isplaying?
+            {props?.val?
                 <Soundplayer navigation={props.navigation} />
+                // null
                 :
             null}   
 
@@ -1685,12 +1729,13 @@ var RNFS = require('react-native-fs');
 }
 const mapStateToProps = state => {
     const {userData} = state.auth;
-    
+    const {val} = state.validatePlayer;
+    const {meditationData,subCategories} = state.meditations
     return {
-      userData,
+      userData,val,meditationData,subCategories
     };
   };
   export default connect(mapStateToProps, {
-    get_allmeditation,set_fav,get_categories
+    get_allmeditation,set_fav,get_categories,togglePlayer,storeMedidation,clearData
   })(feed);
   

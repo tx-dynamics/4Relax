@@ -341,7 +341,8 @@ const Signin  =  props => {
                   });  
                 }else{
                   if(res?.payload?.data?._id){
-                    navigation.replace('Root');
+                    navigation.replace('Main');
+                    // navigation.replace('Root');
                     // console.log('tokens', props.message.msg);
                     Snackbar.show({
                       text: 'Sign in Succesfully',
@@ -446,7 +447,8 @@ const Signin  =  props => {
                 textColor: 'white',
               });
             }else{
-              navigation.replace('Root');
+              navigation.replace('Main');
+              // navigation.replace('Root');
               // console.log('tokens', props.token);
               Snackbar.show({
                 text: "Google login Successfull",

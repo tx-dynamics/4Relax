@@ -9,7 +9,7 @@ import {
   import LinearGradient from 'react-native-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
-import Soundplayer from './playing'
+import Soundplayer from './trackbanner'
 import {connect} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import {get_allFAVORITES,set_fav} from '../../redux/actions/favorites';
@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
 var RNFS = require('react-native-fs');
 import RNFetchBlob from 'rn-fetch-blob'
+import {togglePlayer} from '../../redux/actions/validate_player';
 
 
 const feed = (props) => {
@@ -37,7 +38,7 @@ const feed = (props) => {
     const [internal,setInternal ] =  useState([])
 
     useEffect(() => {
-        setisplaying (false)
+        // setisplaying (false)
         CheckConnectivity()
     }, [isFocused])
     
@@ -294,9 +295,9 @@ const feed = (props) => {
               };
           })
           if (posts) {
-            setTimeout(() => {
+            // setTimeout(() => {
                 checkData( posts ,fav)
-            }, 500);
+            // }, 500);
           }
         //  setRefreshing(false);
         
@@ -395,9 +396,11 @@ const feed = (props) => {
     const setData = async (single,id,name) => {
         console.log(single.trackName)
         setisplaying(false)
+       await props.togglePlayer(false)
+
         setTimeout(() => {
           if(connection){
-            setTimeout(() => {
+            setTimeout(async() => {
               if(single.isplaying){
                   const res = meditations.map((item)=>{
                       // console.log(item._id === id)
@@ -415,6 +418,7 @@ const feed = (props) => {
                   })
                   setmeditations(res)
                   setisplaying(false)
+                  await props.togglePlayer(false)
       
               }else{
       
@@ -434,11 +438,12 @@ const feed = (props) => {
                   })
                   setmeditations(res)
                   setisplaying(true)
+                  await props.togglePlayer(true)
       
               }    
           }, 500);
           }else{
-            setTimeout(() => {
+            setTimeout(async() => {
               if(single.isplaying){
                   const res = meditations.map((item)=>{
                       // console.log(item._id === id)
@@ -456,6 +461,7 @@ const feed = (props) => {
                   })
                   setmeditations(res)
                   setisplaying(false)
+                  await props.togglePlayer(false)
       
               }else{
       
@@ -475,6 +481,7 @@ const feed = (props) => {
                   })
                   setmeditations(res)
                   setisplaying(true)
+                  await props.togglePlayer(true)
       
               }    
           }, 500);
@@ -1022,7 +1029,7 @@ const feed = (props) => {
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={{flex:0.8,alignItems:'flex-end'}}>
-                                            {item.isdownloading?
+                                            {/* {item.isdownloading?
                                                 <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
                                                     <Image
                                                         source={del}
@@ -1036,7 +1043,7 @@ const feed = (props) => {
                                                       style={styles.icon}
                                                   />
                                               </TouchableOpacity>
-                                              }
+                                              } */}
                                             </View>
                                         </View>
                                         <View style={{flex:0.4}}></View>
@@ -1102,27 +1109,28 @@ const feed = (props) => {
                 </>
               }
             </>
-            {meditations.length < 1 ?
+            {/* {meditations.length < 1 ?
              null
             :
-            <>
-              {isplaying?
+            <> */}
+              {props?.val?
                   <Soundplayer navigation={props.navigation} />
                   :
               null}
-            </>
-          }   
+            {/* </>
+          }    */}
         </View>
     )
 }
 const mapStateToProps = state => {
     const {userData} = state.auth;
+    const {val} = state.validatePlayer;
     
     return {
-      userData,
+      userData,val
     };
   };
   export default connect(mapStateToProps, {
-    get_allFAVORITES,set_fav
+    get_allFAVORITES,set_fav,togglePlayer
   })(feed);
   

@@ -13,11 +13,14 @@ import {useIsFocused} from '@react-navigation/native';
 import {get_allStories,set_fav,get_categories} from '../../redux/actions/stories';
 import {connect} from 'react-redux';
 import {unloc,pause,play,download,fav,logo,del,stories} from '../../assets'
-import Soundplayer from './playing'
+import Soundplayer from './trackbanner'
 import Snackbar from 'react-native-snackbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFetchBlob from 'rn-fetch-blob'
 import NetInfo from "@react-native-community/netinfo";
+import {togglePlayer} from '../../redux/actions/validate_player';
+import * as Animatable from 'react-native-animatable'
+
 var RNFS = require('react-native-fs');
 
 
@@ -29,7 +32,7 @@ var RNFS = require('react-native-fs');
     const [item,setitem ] =  useState();
     const [meditations,setmeditations ] =  useState([]);
     const [internal,setInternal ] =  useState([])
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [category,setcategory ] =  useState([])
     const [connection,setConnect ] =  useState(false)
     const [islock,setislock ] =  useState(false)
@@ -44,7 +47,7 @@ var RNFS = require('react-native-fs');
         requestToPermissions()
         checkInternet()
 
-    }, [])
+    }, [isFocused])
     
     async function checkInternet (){
       NetInfo.fetch().then((state) => {
@@ -65,51 +68,101 @@ var RNFS = require('react-native-fs');
     }
 
     async function get_category(){
-      try {
-        const res = await props.get_categories();
-        var posts = res?.data
+      if(props?.subCategories?.data != '' && props?.subCategories?.data != undefined){
         
-        var sub_cat = posts.map((item,index)=>{
-          if(item.exist){
-            if(item.exist === 'yes'){
-              return item
-            }
-          }
-        })
-        
-        sub_cat = sub_cat.filter(function( element ) {
-          return element !== undefined;
-       });
-
-
-        var rest = sub_cat.map((item,index)=>{
-          if(index === 0){
-              return {
-                ...item,
-                selected: true,
-              }
-            }else{
-              return {
-                ...item,
-                selected: false,
-              }
-            }
+        try {
+          var posts =  props?.subCategories?.data
           
-        })
-        var first = posts[0];
-        var seleted = {...first,selected:true}
-        // alert(seleted.name);
-        setcategory(rest)
-
-        CheckConnectivity(seleted.name)
-        
-
-
-      } catch (err) {
-        setRefreshing(false);
-
-        console.log(err);
+          var sub_cat = posts.map((item,index)=>{
+            if(item.exist){
+              if(item.exist === 'yes'){
+                return item
+              }
+            }
+          })
+          
+          sub_cat = sub_cat.filter(function( element ) {
+            return element !== undefined;
+         });
+  
+  
+          var rest = sub_cat.map((item,index)=>{
+            if(index === 0){
+                return {
+                  ...item,
+                  selected: true,
+                }
+              }else{
+                return {
+                  ...item,
+                  selected: false,
+                }
+              }
+            
+          })
+          var first = posts[0];
+          var seleted = {...first,selected:true}
+          // alert(seleted.name);
+          setcategory(rest)
+  
+          CheckConnectivity(seleted.name)
+          
+  
+  
+        } catch (err) {
+          setRefreshing(false);
+  
+          console.log(err);
+        }
       }
+      else{
+        try {
+          const res = await props.get_categories();
+          var posts = res?.data
+          
+          var sub_cat = posts.map((item,index)=>{
+            if(item.exist){
+              if(item.exist === 'yes'){
+                return item
+              }
+            }
+          })
+          
+          sub_cat = sub_cat.filter(function( element ) {
+            return element !== undefined;
+         });
+  
+  
+          var rest = sub_cat.map((item,index)=>{
+            if(index === 0){
+                return {
+                  ...item,
+                  selected: true,
+                }
+              }else{
+                return {
+                  ...item,
+                  selected: false,
+                }
+              }
+            
+          })
+          var first = posts[0];
+          var seleted = {...first,selected:true}
+          // alert(seleted.name);
+          setcategory(rest)
+  
+          CheckConnectivity(seleted.name)
+          
+  
+  
+        } catch (err) {
+          setRefreshing(false);
+  
+          console.log(err);
+        }
+      }
+      await props.get_categories();
     }
 
     function CheckConnectivity  (cat = '')  {
@@ -188,10 +241,14 @@ var RNFS = require('react-native-fs');
             if(state.isConnected){
               // console.log(meditation)
               // alert("called internal medi")
+              setTimeout(() => {
+                
               setInternal(meditation)
               let cate = cat
               let cover = ''
-              getStories(cate,cover,meditation)
+              let resp = []
+              getStories(cate,cover,meditation,resp)
+            }, 1200);
     
             }else{
               // alert('Called gere')
@@ -218,7 +275,8 @@ var RNFS = require('react-native-fs');
               let cate = cat
               let cover = '';
           let meditation = []
-          getStories(cate,cover,meditation)
+          let resp = []
+          getStories(cate,cover,meditation,resp)
         }
       })
     }
@@ -277,10 +335,58 @@ var RNFS = require('react-native-fs');
       }
     }
 
-    async function getStories(cate = '',cover = '',stories) {
+    async function getStories(cate = '',cover = '',stories,resp) {
         const params = {
             userId: props?.userData?._id
         }
+      if(props?.storiesData?.data != '' && props?.storiesData?.data != undefined ){
+        try {
+          var posts = resp.length != 0 ? resp :  props?.storiesData?.data
+          // alert(resp.length)
+          if (posts) {
+            if(cate === ''){
+              // setmeditations(posts)
+              checkData(posts,stories)
+
+            }else{
+              //   alert('calling cate')
+              setmeditations([])
+
+              var filtered = []; 
+              setcateEmp(false)
+
+              posts.map((item)=>{
+                  filtered.push(item)
+              })
+             
+              var getFilter = [];
+
+              filtered.map((item)=>{
+                // console.log(item.trackCategory === cate)
+                  if(item.trackCategory.name === cate){
+                      getFilter.push(item);
+                  }else{
+                      return
+                  }
+              })
+              if(getFilter.length < 1){
+                  
+                setcateEmp(true)
+                setmeditations([])
+              }else{
+      
+                  checkData(getFilter,stories)
+              }
+
+            }
+        }
+        //   setloadingGroup(false);
+        } catch (err) {
+          setRefreshing(false);
+        //   setloadingGroup(false);
+          console.log(err);
+        }
+      }else{
         try {
           const res = await props.get_allStories(params);
           var posts = res?.data
@@ -335,6 +441,8 @@ var RNFS = require('react-native-fs');
         //   setloadingGroup(false);
           console.log(err);
         }
+      }
+      await props.get_allStories(params)
        
       }
 
@@ -394,10 +502,23 @@ var RNFS = require('react-native-fs');
             // console.log('group_data', res);
             if (res?.data) {
                 console.log(res?.data)
+              if(props?.storiesData?.data != '' && props?.storiesData?.data != undefined ){
+                const id = {
+                  userId: props?.userData?._id
+                }
+                var resp = await props.get_allStories(id)
                 let cat = item.trackCategory.name;
                 let cover = '';
                 let story = internal;
-                getStories(cat,cover,story)
+                getStories(cat,cover,story,resp?.data)
+              }else{
+                let cat = item.trackCategory.name;
+                let cover = '';
+                let story = internal;
+                let resp = [];
+                getStories(cat,cover,story,resp)
+              }
+                
                 // Snackbar.show({
                 //     text: res?.data,
                 //     backgroundColor: '#018CAB',
@@ -446,8 +567,9 @@ var RNFS = require('react-native-fs');
                   // console.log('Item-image==>',item.loadimage)
                 //   alert(item.name)
                 let story = internal
+                let resp = []
                 setRefreshing(true)
-                getStories(item.name,item.coverPic,story)
+                getStories(item.name,item.coverPic,story,resp)
                   return {
                     ...item,
                     selected: true,
@@ -468,10 +590,11 @@ var RNFS = require('react-native-fs');
 
     const setData = async (single,id,name) => {
       // console.log(item.trackName)
+      await props.togglePlayer(false)
       setisplaying(false)
       setTimeout(() => {
         if(connection){
-          setTimeout(() => {
+          setTimeout(async() => {
             if(single.isplaying){
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
@@ -489,6 +612,7 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(false)
+                await props.togglePlayer(false)
     
             }else{
     
@@ -508,11 +632,12 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(true)
+                await props.togglePlayer(true)
     
             }    
         }, 500);
         }else{
-          setTimeout(() => {
+          setTimeout(async() => {
             if(single.isplaying){
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
@@ -530,6 +655,7 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(false)
+                await props.togglePlayer(false)
     
             }else{
     
@@ -549,6 +675,7 @@ var RNFS = require('react-native-fs');
                 })
                 setmeditations(res)
                 setisplaying(true)
+                await props.togglePlayer(true)
     
             }    
         }, 500);
@@ -1149,22 +1276,29 @@ var RNFS = require('react-native-fs');
                   showsHorizontalScrollIndicator={false}
                   data={category}
                   renderItem={({ item, index }) =>
-                  <View style={{marginTop:responsiveHeight(1)}}>
-                      {item.selected?
-                       <LinearGradient
-                        colors={['rgba(0, 194, 255, 1)',  'rgba(0, 194, 255, 0.6)']}
-                       style={styles.cate}
-                       >
-                            <TouchableOpacity  onPress={()=> getcate(item,item._id) } >
-                                <Text style={{color:'black'}}>{item.name}</Text>
-                            </TouchableOpacity>
-                        </LinearGradient>
-                      :
-                      <TouchableOpacity  onPress={()=> getcate(item,item._id) } style={[styles.cate,{backgroundColor:'white'}]}>
-                            <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      }
-                  </View>
+                  <Animatable.View
+                      animation={'fadeInRight'}
+                      // duration={500}
+                      delay={index*300}
+                      // style={{width:'46.8%',margin:6,alignItems:'center'}}
+                    >
+                    <View style={{marginTop:responsiveHeight(1)}}>
+                        {item.selected?
+                        <LinearGradient
+                          colors={['rgba(0, 194, 255, 1)',  'rgba(0, 194, 255, 0.6)']}
+                        style={styles.cate}
+                        >
+                              <TouchableOpacity  onPress={()=> getcate(item,item._id) } >
+                                  <Text style={{color:'black'}}>{item.name}</Text>
+                              </TouchableOpacity>
+                          </LinearGradient>
+                        :
+                        <TouchableOpacity  onPress={()=> getcate(item,item._id) } style={[styles.cate,{backgroundColor:'white'}]}>
+                              <Text style={{color:'black',justifyContent:'center'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        }
+                    </View>
+                  </Animatable.View>
                   }/>
             </ImageBackground>
             {cateEmp?
@@ -1397,8 +1531,9 @@ var RNFS = require('react-native-fs');
                     </>
                   
             }
-            {isplaying?
+            {props?.val?
                 <Soundplayer navigation={props.navigation} />
+                // null
                 :
             null} 
 
@@ -1407,11 +1542,13 @@ var RNFS = require('react-native-fs');
 }
 const mapStateToProps = state => {
     const {userData} = state.auth;
-    
+    const {val} = state.validatePlayer;
+    const {storiesData,subCategories} = state.story
+
     return {
-      userData,
+      userData,val,storiesData,subCategories
     };
   };
   export default connect(mapStateToProps, {
-    get_allStories,set_fav,get_categories
+    get_allStories,set_fav,get_categories,togglePlayer
   })(story);

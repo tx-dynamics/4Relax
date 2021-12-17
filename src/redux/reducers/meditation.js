@@ -1,5 +1,5 @@
 import {LOADING_MEDITATION, MEDITATION_FAILED} from '../actions/meditation';
-import {DELETE_CHAT, GET_MEDITATIONS,GET_CATEGORIES, SET_FAV, UPLOAD_DOCS} from '../actions/types';
+import {DELETE_CHAT,CLEAR_MEDI, GET_MEDITATIONS,GET_MEDCATEGORIES,SAVE_MEDI, SET_FAV, UPLOAD_DOCS} from '../actions/types';
 
 const initialState = {
   userId: '',
@@ -8,7 +8,8 @@ const initialState = {
   isError: false,
   isSuccess: false,
   errMsg: null,
-  meditationData: null,
+  meditationData: '',
+  subCategories: '',
   status: '',
   msg: null,
 };
@@ -31,11 +32,12 @@ export const MeditationReducer = (state = initialState, action) => {
         isSuccess: true,
         errMsg: null,
         message: '',
-        msg: action.payload,
+        meditationData: action.payload,
 
       };
 
-      case GET_CATEGORIES:
+      case SAVE_MEDI:
+      console.log("save medi called ",action.payload)
       return {
         ...state,
         isLoading: false,
@@ -43,7 +45,20 @@ export const MeditationReducer = (state = initialState, action) => {
         isSuccess: true,
         errMsg: null,
         message: '',
-        msg: action.payload,
+        meditationData: action.payload,
+
+      };
+
+      case GET_MEDCATEGORIES:
+      // console.log("get cater here ======> ",action.payload);
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        isSuccess: true,
+        errMsg: null,
+        message: '',
+        subCategories: action.payload,
 
       };
 
@@ -58,8 +73,18 @@ export const MeditationReducer = (state = initialState, action) => {
         msg: action.payload,
 
       };
-
-    case REQUEST_FAILED:
+      case CLEAR_MEDI:
+        console.log("clear called");
+        return {
+          ...state,
+          isLoading: false,
+          isError: true,
+          isSuccess: false,
+          errMsg: null,
+          meditationData: '',
+          subCategories: '',
+        };
+    case MEDITATION_FAILED:
       return {
         ...state,
         isLoading: false,

@@ -377,7 +377,7 @@ export default class PlayerScreen extends React.Component{
             <>
             <TouchableOpacity onPress={()=> 
                 {this.pause(),
-                this.props.navigation.navigate('Track',{single:item})
+                this.props.navigation.navigate('AudiofileStack',{screen:'Track',params:{single:item}})
                 // this.props.navigation.navigate('AudioPlayer',{single:item})
                 }}>
                 <Text style={[styles.price,{fontSize:14,fontWeight:'400',color:'white',textAlign:'left',marginTop:responsiveHeight(1),marginLeft:responsiveWidth(5)}]} >{item.trackName? item.trackName : item.trackType}</Text>

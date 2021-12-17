@@ -14,14 +14,17 @@ import RNFetchBlob from 'rn-fetch-blob'
 var RNFS = require('react-native-fs');
 import styles from './styles'
 import {useIsFocused} from '@react-navigation/native';
-import Soundplayer from './playing'
+import Soundplayer from './trackbanner'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Snackbar from 'react-native-snackbar';
 import theme from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {connect} from 'react-redux';
+import {togglePlayer} from '../../redux/actions/validate_player';
+import * as Animatable from 'react-native-animatable'
 
 
-export default function downloads(props) {
+ function downloads(props) {
 
     const isFocused = useIsFocused();
     const [selected,setSelected ] =  useState(false)
@@ -42,7 +45,7 @@ export default function downloads(props) {
 
     function getfile (){
         setisplaying (false)
-        setRefreshing(true)
+        // setRefreshing(true)
         let dirs = RNFS.DownloadDirectoryPath + '/FourRelax/stories'
         let dirso = RNFS.DownloadDirectoryPath + '/FourRelax/sounds'
         let dirm = RNFS.DownloadDirectoryPath + '/FourRelax/meditation'
@@ -263,10 +266,10 @@ export default function downloads(props) {
         setmeditations(n)
         // return console.log(n)
         
-        }, 3000);
+        }, 1600);
         setTimeout(() => {
           setRefreshing(false)
-        }, 3200);
+        }, 1650);
 
     }
 
@@ -327,8 +330,9 @@ export default function downloads(props) {
 
     const setData = async (single,id) => {
         // console.log(item.trackName)
+        await props.togglePlayer(false)
         setisplaying(false)
-        setTimeout(() => {
+        setTimeout(async() => {
             if(single.isplaying){
                 const res = meditations.map((item)=>{
                     // console.log(item._id === id)
@@ -346,6 +350,7 @@ export default function downloads(props) {
                 })
                 setmeditations(res)
                 setisplaying(false)
+                await props.togglePlayer(false)
     
             }else{
     
@@ -365,6 +370,7 @@ export default function downloads(props) {
                 })
                 setmeditations(res)
                 setisplaying(true)
+                await props.togglePlayer(true)
     
             }    
         }, 500);
@@ -507,9 +513,9 @@ export default function downloads(props) {
           addRemoveFav(item)
           // favourities(item)
         }
-        setTimeout(() => {
+        // setTimeout(() => {
           getfile()
-        }, 1500);
+        // }, 1500);
      
   
       }
@@ -853,6 +859,8 @@ export default function downloads(props) {
       }
 
     return (
+      // <View style={{flex:1}}>
+
         <LinearGradient
             start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
             style={{flex:1}}>
@@ -873,7 +881,7 @@ export default function downloads(props) {
                     <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff'}} >DOWNLOADS</Text>
                 }
             /> */}
-            <View style={{flex:0.8,alignItems:'center',flexDirection:'row'}} >
+            <View style={{height:40,flex:0.8,alignItems:'center',flexDirection:'row'}} >
                 <View style={{flex:0.15,alignItems:'center'}} >
                 <TouchableOpacity style={{width:30,height:30,justifyContent:'center',alignItems:'center'}} onPress={()=> props.navigation.goBack()} >
                         <Image
@@ -888,7 +896,7 @@ export default function downloads(props) {
             </View>
             <View style={{alignItems:'center',width:'90%',height:'88%',alignSelf:'center'}}>
             {refreshing?
-                null
+              <View style={{flex:1,alignSelf:'center',alignItems:'center',justifyContent:'center'}}/>
             :
             <>
                 {meditations.length < 1?
@@ -904,6 +912,12 @@ export default function downloads(props) {
                         showsVerticalScrollIndicator={false}
                         data={meditations}
                         renderItem={({ item, index }) =>
+                          <Animatable.View
+                            animation={'fadeInRight'}
+                            duration={500}
+                            delay={index*200}
+                            // style={{width:'46.8%',margin:6,alignItems:'center'}}
+                          >
                             <LinearGradient
                                     start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                                     style={styles.setting_btn}
@@ -977,20 +991,27 @@ export default function downloads(props) {
                                   </View> 
 
                             </LinearGradient>
+                          </Animatable.View>
                         }/>
                 }
             </>
             }
-            
-            
-            {isplaying?
+            </View>
+            {props?.val?
                 <Soundplayer navigation={props.navigation} />
                 :
             null} 
-
-            
-
-            </View>
         </LinearGradient>
+        
+      // {/* </View>  */}
     )
 }
+const mapStateToProps = state => {
+  const {val} = state.validatePlayer;
+  return {
+    val
+  };
+};
+export default connect(mapStateToProps, {
+  togglePlayer
+})(downloads);

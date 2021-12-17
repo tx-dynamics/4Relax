@@ -6,8 +6,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import { StripeProvider } from '@stripe/stripe-react-native';
 
 // import Signin from '../screens/Signin';
-import Main from './main_nav';
+// import Splash from '../screens/Splash';
 import AuthenticationStack from './Auth_nav';
+import AudiofileStack from './audio_stack';
 import BottomTab from './tabbar';
 
 //redux
@@ -15,46 +16,33 @@ import BottomTab from './tabbar';
 
 const Stack = createStackNavigator();
 
-function AppNav({}) {
+function MainNav({}) {
   let initial = 'Auth';
 
   useEffect(() => {}, []);
 
   return (
-    <NavigationContainer
-      independent={true}
-    >
-      {/* <StripeProvider
-      publishableKey={publishableKey}
-      merchantIdentifier="merchant.identifier"
-    > */}
-
+    // <NavigationContainer
+    //   // independent={true}
+    // >
         <Stack.Navigator 
-          independent={true}
-          initialRouteName={initial}>
-          <Stack.Screen
-            name="Auth"
-            component={AuthenticationStack}
-            options={{
-              headerShown: false,
-            }}
-          />
-
-          {/* <Stack.Screen name="Root" options={{headerShown: false}}>
+          // independent={true}
+        //   initialRouteName={initial}
+          >
+          <Stack.Screen name="Root" options={{headerShown: false}}>
             {props => <BottomTab {...props} />}
-          </Stack.Screen> */}
-           <Stack.Screen
-            name="Main"
-            component={Main}
+          </Stack.Screen>
+          
+          <Stack.Screen
+            name="AudiofileStack"
+            component={AudiofileStack}
             options={{
               headerShown: false,
             }}
           />
       </Stack.Navigator>
-      {/* </StripeProvider> */}
-    </NavigationContainer>
   );
 }
 
 
-export default AppNav;
+export default MainNav;

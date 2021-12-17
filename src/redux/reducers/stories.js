@@ -1,5 +1,5 @@
-import {LOADING_MEDITATION, MEDITATION_FAILED} from '../actions/meditation';
-import {DELETE_CHAT, GET_STORIES,SET_FAV, GET_CATEGORIES, UPLOAD_DOCS} from '../actions/types';
+import {LOADING_STORIES, STORIES_FAILED} from '../actions/stories';
+import {DELETE_CHAT, GET_STORIES,SET_FAV, GET_STORCATEGORIES, UPLOAD_DOCS} from '../actions/types';
 
 const initialState = {
   userId: '',
@@ -8,11 +8,12 @@ const initialState = {
   isError: false,
   isSuccess: false,
   errMsg: null,
-  storiesData: null,
+  subCategories: '',
+  storiesData: '',
   status: '',
   msg: null,
 };
-export const ChatReducer = (state = initialState, action) => {
+export const storyReducer = (state = initialState, action) => {
   switch (action.type) {
     case LOADING_STORIES:
       return {
@@ -31,10 +32,11 @@ export const ChatReducer = (state = initialState, action) => {
         isSuccess: true,
         errMsg: null,
         message: '',
-        msg: action.payload,
+        storiesData: action.payload,
 
       };
-      case GET_MEDITATIONS:
+      case GET_STORCATEGORIES:
+        // console.log("get cater here ======> ",action.payload);
         return {
           ...state,
           isLoading: false,
@@ -42,7 +44,7 @@ export const ChatReducer = (state = initialState, action) => {
           isSuccess: true,
           errMsg: null,
           message: '',
-          msg: action.payload,
+          subCategories: action.payload,
   
         };
       case SET_FAV:
@@ -57,7 +59,7 @@ export const ChatReducer = (state = initialState, action) => {
 
       };
 
-    case REQUEST_FAILED:
+    case STORIES_FAILED:
       return {
         ...state,
         isLoading: false,

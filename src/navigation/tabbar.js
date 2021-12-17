@@ -39,11 +39,11 @@ const setting = () => {
         component={Setting}
         options={{headerShown: false}}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />  
+      />   */}
       <Stack.Screen
         name="Subscription"
         component={Subscription}
@@ -72,11 +72,11 @@ const setting = () => {
         component={Payment}
         options={{headerShown: false}}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
-      />
+      /> */}
       <Stack.Screen
         name="Contact"
         component={Contact}
@@ -95,16 +95,16 @@ const feed = () => {
         component={Feed}
         options={{headerShown: false}}
       />  
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />     
+      />      
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
-      />
+      />*/}
       <Stack.Screen
         name="Packages"
         component={Packages}
@@ -128,16 +128,16 @@ const explore = () => {
         component={Explore}
         options={{headerShown: false}}
       />      
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />  
+      />   
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
-      />
+      />*/}
       <Stack.Screen
         name="Packages"
         component={Packages}
@@ -162,16 +162,16 @@ const music = () => {
         component={Music}
         options={{headerShown: false}}
       />    
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
-      />    
+      />     
       <Stack.Screen
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
-      />
+      />*/}
       <Stack.Screen
         name="Packages"
         component={Packages}
@@ -196,7 +196,7 @@ const favor = () => {
         component={Fav}
         options={{headerShown: false}}
       />     
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Track"
         component={Track}
         options={{headerShown: false}}
@@ -205,7 +205,7 @@ const favor = () => {
         name="AudioPlayer"
         component={AudioPlayer}
         options={{headerShown: false}}
-      />
+      /> */}
       
 
 

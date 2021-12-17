@@ -113,7 +113,7 @@ class Splash extends Component {
           });
       }else{
         // alert('called 2')
-        this.props.navigation.replace('Root');
+        this.props.navigation.replace('Main');
 
       }
     }catch(e){
@@ -130,7 +130,7 @@ class Splash extends Component {
   validateLogin (){
     // alert("valdate login")
     setTimeout(() => {
-      this.props.navigation.replace(this.props.isLoggedIn ? 'Root' : 'Signin');
+      this.props.navigation.replace(this.props.isLoggedIn ? 'Main' : 'Signin');
       // this.props.navigation.navigate('Signin');
     }, 1200);
   }

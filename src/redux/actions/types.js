@@ -36,7 +36,9 @@ export const GET_STORIES = 'GET_STORIES';
 // export const SEND_MSG = 'SEND_MSG';
 export const GET_MEDITATIONS = 'GET_MEDITATIONS';
 export const SET_FAV = 'SET_FAV';
-export const GET_CATEGORIES = 'GET_CATEGORIES';
+export const GET_MEDCATEGORIES = 'GET_MEDCATEGORIES';
+export const GET_STORCATEGORIES = 'GET_STORCATEGORIES';
+export const GET_SOUNCATEGORIES = 'GET_SOUNCATEGORIES';
 export const GET_SUBSCRIPTION = 'GET_SUBSCRIPTION';
 export const PAYMENT = 'PAYMENT';
 export const UPDATE_USER = 'UPDATE_USER';
@@ -44,6 +46,12 @@ export const FORGOT_PASS = 'FORGOT_PASS';
 export const GET_IMAGES = 'GET_IMAGES';
 export const POST_CONTACT = 'POST_CONTACT'; 
 export const UPDATE_DATA = 'UPDATE_DATA'; 
+
+
+export const VALIDATE_PLAYER = 'VALIDATE_PLAYER'; 
+export const SAVE_MEDI = 'SAVE_MEDI'; 
+export const SAVE_MEDICAT = 'SAVE_MEDICAT'; 
+export const CLEAR_MEDI = 'CLEAR_MEDI'; 
 
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';
