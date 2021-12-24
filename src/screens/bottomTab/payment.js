@@ -80,13 +80,23 @@ const PaymentScreen = (props) => {
         const res = await props.get_paymentResponse(params);
         var subs = res?.data
         var msg = res?.data?.msg
-        // console.log("***************PAYMENT***************");
+        console.log("***************PAYMENT***************",res?.data);
         if(res?.data){
+          if(msg == 'Payment Successful'){
             Snackbar.show({
-                text: msg,
-                backgroundColor: '#018CAB',
-                textColor: 'white',
-              });
+              text: msg,
+              backgroundColor: '#018CAB',
+              textColor: 'white',
+            });
+            props.navigation.goBack()
+          }else{
+            Snackbar.show({
+              text: msg,
+              backgroundColor: '#018CAB',
+              textColor: 'white',
+            });
+          }
+            
         }
         
           setisloading(false)
@@ -161,9 +171,10 @@ const PaymentScreen = (props) => {
 
                     cardScale={1.0}
                     labelStyle={{color:'white',fontSize:12}}
-                    inputStyle={{color:'black',fontSize:16}}
-                    validColor={"black"}
-                    invalidColor={"red"}
+                    inputStyle={{color:'#CCCCCC',fontSize:16}}
+                    validColor={'#CCCCCC'}
+                    selectionColor={'#CCCCCC'}
+                    invalidColor={"tomato"}
                     placeholderColor={"darkgray"}
 
                     onFocus={_onFocus}

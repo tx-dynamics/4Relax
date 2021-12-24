@@ -52,6 +52,7 @@ export const VALIDATE_PLAYER = 'VALIDATE_PLAYER';
 export const SAVE_MEDI = 'SAVE_MEDI'; 
 export const SAVE_MEDICAT = 'SAVE_MEDICAT'; 
 export const CLEAR_MEDI = 'CLEAR_MEDI'; 
+export const CONNECTION_CHECK = 'CONNECTION_CHECK'; 
 
 // export const DELETE_CHAT = 'DELETE_CHAT';
 // export const UPDATE_CHAT = 'UPDATE_CHAT';

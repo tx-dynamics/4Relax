@@ -44,6 +44,7 @@ import * as Animatable from 'react-native-animatable'
     }, [isFocused])
 
     function getfile (){
+      
         setisplaying (false)
         // setRefreshing(true)
         let dirs = RNFS.DownloadDirectoryPath + '/FourRelax/stories'
@@ -388,7 +389,68 @@ import * as Animatable from 'react-native-animatable'
                 // console.log(JSON.parse(data).trackName) 
     }
 
-    async function deletefile(item,traname,type){
+    function setoff(state,id){
+
+      if(state === 1){
+        const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item){
+              return {
+                  ...item,
+                  isplaying: false,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+    }else if(state === 2){
+      const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item._id === id){
+              return {
+                  ...item,
+                  isplaying: true,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+      // alert('resumed')
+    }else if(state === 3){
+      const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item._id === id){
+              return {
+                  ...item,
+                  isplaying: false,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+      // alert('paused')
+    }else{
+
+    }
+      
+    } 
+
+    async function deletefile(item,traname,type,index){
       setisplaying(false)
 
       let name = item.trackName;
@@ -516,8 +578,9 @@ import * as Animatable from 'react-native-animatable'
         // setTimeout(() => {
           getfile()
         // }, 1500);
-     
-  
+        // alert(index)
+        // const res = meditations.splice(index,1)
+        //   setmeditations(res) 
       }
 
 
@@ -881,7 +944,7 @@ import * as Animatable from 'react-native-animatable'
                     <Text style={{fontFamily:'Lato',fontWeight:'700',fontSize:22,color:'#fff'}} >DOWNLOADS</Text>
                 }
             /> */}
-            <View style={{height:40,flex:0.8,alignItems:'center',flexDirection:'row'}} >
+            <View style={{height:45,alignItems:'center',flexDirection:'row'}} >
                 <View style={{flex:0.15,alignItems:'center'}} >
                 <TouchableOpacity style={{width:30,height:30,justifyContent:'center',alignItems:'center'}} onPress={()=> props.navigation.goBack()} >
                         <Image
@@ -948,7 +1011,7 @@ import * as Animatable from 'react-native-animatable'
                                                 style={{width:22,height:19,tintColor:'#FF4040',tintColor:item.liked  === 'no'? 'white' :'#FF4040'}}
                                             />
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={{width:30,height:30,borderRadius:50,alignItems:'center',marginTop:responsiveHeight(2),marginLeft:responsiveWidth(5.5)}} onPress={()=>{deletefile(item,item.trackName,item.trackType)}}>
+                                        <TouchableOpacity style={{width:30,height:30,borderRadius:50,alignItems:'center',marginTop:responsiveHeight(2),marginLeft:responsiveWidth(5.5)}} onPress={()=>{deletefile(item,item.trackName,item.trackType,index)}}>
                                             <Image
                                                 source={del}
                                                 style={{width:17,height:18}}
@@ -998,7 +1061,9 @@ import * as Animatable from 'react-native-animatable'
             }
             </View>
             {props?.val?
-                <Soundplayer navigation={props.navigation} />
+              <View style={{flex:1,bottom:responsiveHeight(6)}} >
+                <Soundplayer navigation={props.navigation} setoffpalying = {(state,id)=>setoff(state,id)} />
+              </View>
                 :
             null} 
         </LinearGradient>

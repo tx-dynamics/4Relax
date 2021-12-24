@@ -14,6 +14,7 @@ import moment from 'moment';
 import axios from 'axios';
 import {BASE_URL} from '../../redux/base-url';
 import Snackbar from 'react-native-snackbar';
+import {togglePlayer} from '../../redux/actions/validate_player';
 
 class Splash extends Component {
   constructor(props) {
@@ -25,6 +26,7 @@ class Splash extends Component {
     };
   }
   componentDidMount = () => {
+    // alert(this.props.connect)
     if(this.props.isLoggedIn){
       if(this.props?.userData?.token){
         this.checkInternet();
@@ -40,6 +42,7 @@ class Splash extends Component {
 
   async  checkInternet (){
     // alert("called 2 ")
+    await this.props.togglePlayer(false)
     NetInfo.fetch().then((state) => {
       // setConnect(state.isConnected)
       console.log("Connection type", state.type);
@@ -155,7 +158,8 @@ class Splash extends Component {
 }
 const mapStateToProps = state => {
   const {isLoggedIn,userData} = state.auth;
+  // const {connect} = state.connectionCheck;
   return {isLoggedIn,userData};
 };
 
-export default connect(mapStateToProps)(Splash);
+export default connect(mapStateToProps, {togglePlayer})(Splash);

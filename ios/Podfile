@@ -14,6 +14,10 @@ target 'Four_Relax' do
 
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
   target 'Four_RelaxTests' do
     inherit! :complete
     # Pods for testing

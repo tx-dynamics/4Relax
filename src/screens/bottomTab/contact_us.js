@@ -44,7 +44,7 @@ function contact(props) {
               });
         }else if(!emailValidate(email)){
             Snackbar.show({
-                text: 'Email is required',
+                text: 'Email is not valid',
                 backgroundColor: 'tomato',
                 textColor: 'white',
               });
@@ -139,6 +139,7 @@ function contact(props) {
 
                 <Text style={{ marginTop:25 }}></Text>
                 <TextInput
+                selectionColor={'black'}
                 placeholder={"Email*"}
                 style={{
                     width: "80%",
@@ -155,12 +156,13 @@ function contact(props) {
                     paddingVertical: 7,
                     borderWidth: 1.5,
                 }}
-                onChangeText={(text) => setEmail(text)}
+                onChangeText={(text) => setEmail(text.trim())}
                 value={email}
                 // placeholderTextColor={"#3E4143"}
                 underlineColorAndroid="transparent"
                 />
                 <TextInput
+                selectionColor={'black'}
                 placeholder={"Subject*"}
                 style={{
                 width: "80%",
@@ -183,6 +185,7 @@ function contact(props) {
                 underlineColorAndroid="transparent"
             />
             <TextInput
+            selectionColor={'black'}
             multiline={true}
             numberOfLines={4}
             placeholder={"Message*"}

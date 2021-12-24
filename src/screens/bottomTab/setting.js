@@ -15,6 +15,7 @@ import {connect} from 'react-redux';
 import theme from '../../theme';
 import Snackbar from 'react-native-snackbar';
 import Soundplayer from './trackbanner'
+import {togglePlayer} from '../../redux/actions/validate_player';
 
 
 function setting(props) {
@@ -55,8 +56,9 @@ function setting(props) {
     }
 
     async function onlogout() {
-        await props.logoOut();
-        props.navigation.navigate('Auth', {screen: 'Signin'});
+        await props.togglePlayer(false)
+        props.logoOut()
+        props.navigation.push('Auth', {screen: 'Signin'})
       }
 
     async function onShare  () {
@@ -84,6 +86,29 @@ function setting(props) {
         await Linking.openURL(url);
         // console.log('clicked');
     }
+    async function setdownload (){
+        await props.togglePlayer(false)
+        props.navigation.navigate('Downloads')
+    }
+
+    function setoff(state,id){
+        // alert('called')
+    //     const res = meditations.map((item)=>{
+    //       // console.log(item._id === id)
+    //       if(item){
+    //           return {
+    //               ...item,
+    //               isplaying: false,
+    //             };
+    //       } else {
+    //           return {
+    //               ...item,
+    //               // isplaying: false,
+    //             };
+    //       }
+    //   })
+    //   setmeditations(res)
+      }
 
     return (
         <LinearGradient
@@ -152,7 +177,9 @@ function setting(props) {
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                         style={styles.setting_btn}
                         >
-                        <TouchableOpacity onPress={()=> props.navigation.navigate('Downloads')} style={{flexDirection:'row',alignItems:'center'}}>
+                        <TouchableOpacity onPress={()=> {
+                            setdownload()
+                            }} style={{flexDirection:'row',alignItems:'center'}}>
                             <Image
                                 source={product}
                                 style={{width:16,height:16,left:10}}
@@ -265,8 +292,7 @@ function setting(props) {
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
                     >
                         <TouchableOpacity  onPress={()=> {
-                            props.logoOut()
-                            props.navigation.push('Auth', {screen: 'Signin'})
+                           onlogout()
                             // props.navigation.replace('Signin')
                         }}  style={{}}>
                             <Image
@@ -280,7 +306,7 @@ function setting(props) {
             </ScrollView>
             <>
               {props?.val?
-                  <Soundplayer navigation={props.navigation} />
+                  <Soundplayer navigation={props.navigation} setoffpalying = {(state,id)=>setoff(state,id)} />
                   :
               null}
             </>
@@ -288,9 +314,9 @@ function setting(props) {
     )
 }
 const mapStateToProps = state => {
-    const {status, message, isLoading, errMsg, isSuccess, token,userData} = state.auth;
+    const {userData} = state.auth;
     const {val} = state.validatePlayer;
 
-    return {status, message, isLoading, errMsg, isSuccess, token,userData,val};
+    return {userData,val};
   };
-  export default connect(mapStateToProps, {logoOut,switch_noification})(setting);
+  export default connect(mapStateToProps, {logoOut,switch_noification,togglePlayer})(setting);

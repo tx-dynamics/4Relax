@@ -278,7 +278,66 @@ const feed = (props) => {
           setRefreshing(false);
         }
       }
+      function setoff(state,id){
 
+        if(state === 1){
+          const res = meditations.map((item)=>{
+          // alert('closed')
+          // console.log(item._id === id)
+            if(item){
+                return {
+                    ...item,
+                    isplaying: false,
+                  };
+            } else {
+                return {
+                    ...item,
+                    // isplaying: false,
+                  };
+            }
+        })
+        setmeditations(res)
+      }else if(state === 2){
+        const res = meditations.map((item)=>{
+          // alert('closed')
+          // console.log(item._id === id)
+            if(item._id === id){
+                return {
+                    ...item,
+                    isplaying: true,
+                  };
+            } else {
+                return {
+                    ...item,
+                    // isplaying: false,
+                  };
+            }
+        })
+        setmeditations(res)
+        // alert('resumed')
+      }else if(state === 3){
+        const res = meditations.map((item)=>{
+          // alert('closed')
+          // console.log(item._id === id)
+            if(item._id === id){
+                return {
+                    ...item,
+                    isplaying: false,
+                  };
+            } else {
+                return {
+                    ...item,
+                    // isplaying: false,
+                  };
+            }
+        })
+        setmeditations(res)
+        // alert('paused')
+      }else{
+  
+      }
+        
+      } 
 
     async function getfavorites(fav) {
         const params ={
@@ -1114,7 +1173,7 @@ const feed = (props) => {
             :
             <> */}
               {props?.val?
-                  <Soundplayer navigation={props.navigation} />
+                  <Soundplayer navigation={props.navigation} setoffpalying = {(state,id)=>setoff(state,id)} />
                   :
               null}
             {/* </>

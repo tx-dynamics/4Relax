@@ -88,7 +88,11 @@ const setup = async () => {
         // Capability.SkipToPrevious,
         // Capability.Stop,
     ],
-    icon: require('../../assets/images/feed.png')
+    icon: require('../../assets/images/feed.png'),
+    // playIcon: require('../../assets/images/play.png'),
+    // pauseIcon: require('../../assets/images/pause.png'),
+    // rewindIcon: require('../../assets/images/backward_20.png'),
+    // forwardIcon:require('../../assets/images/forward_20.png'),
   })
 //   await TrackPlayer.add(tracks)
 }
@@ -117,21 +121,11 @@ await TrackPlayer.updateOptions({
     })
 }
 
-const tooglePlayback = async (playbackstate)=>{
-  const current = await TrackPlayer.getCurrentTrack();
-
-  if (current != null){
-    if(playbackstate === State.Paused){
-      await TrackPlayer.play();
-    }else{
-      await TrackPlayer.pause()
-    }
-  }
-}
 
 
 
-function trackbanner  (props)  {
+
+const trackbanner = (props) => {
 
   const playbackState = usePlaybackState()
   const progress = useProgress()
@@ -146,6 +140,7 @@ function trackbanner  (props)  {
   const [selected,setselected] = useState(false) 
   const [mainPic,setmainPic] = useState('') 
   const [type,settype] = useState('') 
+  const [id,setId] = useState('') 
   const [repeatMode,setRepeatMode] = useState('off') 
   const [animate,setanimate] = useState('slideInUp') 
 
@@ -153,6 +148,7 @@ function trackbanner  (props)  {
   
   useEffect(() => {
     setup();
+    tooglePlayback()
     // return console.log(props);
     getMain();
     // CheckConnectivity()
@@ -162,10 +158,30 @@ function trackbanner  (props)  {
     return  async () => await TrackPlayer.destroy();
   }, []);
 
+  const tooglePlayback = async (playbackstate)=>{
+    const current = await TrackPlayer.getCurrentTrack();
+  
+    if (current != null){
+      if(playbackstate === State.Paused){
+        await TrackPlayer.play();
+        if(props?.setoffpalying != undefined){
+          props?.setoffpalying(State.Paused,id)
+        }
+      }else{
+        await TrackPlayer.pause()
+        if(props?.setoffpalying != undefined){
+          props?.setoffpalying(State.Playing,id)
+        }
+      }
+    }
+  }
+
   async function getMain(){
     var data = await AsyncStorage.getItem("single_item")
     setitem(JSON.parse(data))
     var dat = JSON.parse(data)
+    setId(dat._id)
+    // alert(dat._id)
     NetInfo.fetch().then((state) => {
         // alert(JSON.stringify(state)) 
     // return console.log("track banner here $$$$$$$$$$$$$$$$$$$$$$$$$$$$$",dat.trackFile);
@@ -274,6 +290,12 @@ function trackbanner  (props)  {
       // alert(1)
       // setanimate('slideInDown')
       await props.togglePlayer(false)
+      let state = 1
+      if(props?.setoffpalying != undefined){
+        props?.setoffpalying(state,id)
+      }
+      // console.log(props.setoffpalying);
+      
     }
   }
 

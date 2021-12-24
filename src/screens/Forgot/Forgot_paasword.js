@@ -133,6 +133,7 @@ const Forgot  =  props => {
                     <View style={{width:'90%',alignSelf:'center',top:responsiveHeight(15)}}>
                         <Text style={styles.labelstyle}>Email</Text>
                         <TextInput
+                            selectionColor={'#CCCCCC'}
                             value={email}
                             onChangeText={value => setEmail(value.trim())}
                             // placeholder='Sample@gmail.com'
@@ -141,7 +142,7 @@ const Forgot  =  props => {
                             onFocus={() => setplaceholder('')}
                             placeholderTextColor={theme.colors.secondary}
                             style={[styles.input,{
-                                borderBottomColor:emailMessage !== '' ? 'tomato' : theme.colors.secondary
+                                fontSize:16,borderBottomColor:emailMessage !== '' ? 'tomato' : theme.colors.secondary
                             }]}
                         />
                         {emailMessage !== '' && <Errors errors={emailMessage} />}
@@ -155,7 +156,7 @@ const Forgot  =  props => {
                             
                         </View> 
                         <View
-                            style={{marginTop:responsiveHeight(40)}}
+                            style={{marginTop:responsiveHeight(6)}}
                         >
                             <TouchableOpacity onPress={()=>{
                                 setLoading(true),
@@ -174,7 +175,7 @@ const Forgot  =  props => {
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
-                        <View style={{top:responsiveHeight(8),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
+                        <View style={{top:responsiveHeight(5),alignItems:'center',justifyContent:'center',flexDirection:'row'}}>
                             {/* <Text style={[styles.labelstyle,{fontSize:12}]}>Don't have an account ? </Text> */}
                             <TouchableOpacity onPress={()=> props.navigation.replace('Signin')}>
                                 <Text style={[styles.labelstyle,{fontSize:14,fontWeight:'900',color:'#FF5959'}]}> Sign In</Text>

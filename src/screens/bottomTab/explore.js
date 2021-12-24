@@ -60,8 +60,10 @@ var RNFS = require('react-native-fs');
             get_category()
           } else {
             // alert(state.isConnected)
-            let cat = '';
-            CheckConnectivity(cat)
+            // let cat = '';
+            // setcategory([])
+            // CheckConnectivity(cat)
+            get_category()
           }
         
       });
@@ -242,20 +244,28 @@ var RNFS = require('react-native-fs');
               // console.log(meditation)
               // alert("called internal medi")
               setTimeout(() => {
-                
+                setTimeout(() => {
+                  console.log(meditation);                  
+                }, 3000);
               setInternal(meditation)
               let cate = cat
               let cover = ''
               let resp = []
-              getStories(cate,cover,meditation,resp)
+              getStories(state.isConnected,cate,cover,meditation,resp)
             }, 1200);
     
             }else{
               // alert('Called gere')
               setTimeout(() => {
+                // alert(meditation.length)
+                setInternal(meditation)
+                let cate = cat;
+                let cover = '';
+                let resp = []
+                getStories(state.isConnected,cate,cover,meditation,resp)
                 // console.log(meditation)
-                setmeditations(meditation)
-                setRefreshing(false);  
+                // setmeditations(meditation)
+                // setRefreshing(false);  
               }, 1000);
               
             }
@@ -271,12 +281,13 @@ var RNFS = require('react-native-fs');
           //   backgroundColor: '#018CAB',
           //   textColor: 'tomato',
           // });
+          // alert(1)
           setmeditations([])
-              let cate = cat
-              let cover = '';
-          let meditation = []
-          let resp = []
-          getStories(cate,cover,meditation,resp)
+            let cate = cat
+            let cover = '';
+            let meditation = []
+            let resp = []
+            getStories(state.isConnected,cate,cover,meditation,resp)
         }
       })
     }
@@ -335,10 +346,13 @@ var RNFS = require('react-native-fs');
       }
     }
 
-    async function getStories(cate = '',cover = '',stories,resp) {
+    async function getStories(state,cate = '',cover = '',stories,resp) {
+      // alert(cate)
         const params = {
             userId: props?.userData?._id
         }
+        // alert(connection)
+      if(state){
       if(props?.storiesData?.data != '' && props?.storiesData?.data != undefined ){
         try {
           var posts = resp.length != 0 ? resp :  props?.storiesData?.data
@@ -442,11 +456,56 @@ var RNFS = require('react-native-fs');
           console.log(err);
         }
       }
+      }else{
+        let posts = []
+        if (stories) {
+          if(cate === ''){
+            // setmeditations(posts)
+            // setTimeout(() => {
+              checkData(posts,stories)
+            // }, 1000);
+          }else{
+            setmeditations([])
+
+            var filtered = []; 
+            stories.map((item)=>{
+                filtered.push(item)
+            })
+          
+            let getFilter = [];
+            setcateEmp(false)
+
+            filtered.map((item)=>{
+              // let str =item.trackCategory 
+              // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
+              // console.log(item.cat_name , cate)
+                if(item.cat_name === cate){
+                    getFilter.push(item);
+                }else{
+                  return
+                }
+            })
+            // return console.log(getFilter)
+            if(getFilter.length < 1){
+              
+              setcateEmp(true)
+              setmeditations([])
+            }else{
+              // return console.log(getFilter)
+                checkData(getFilter,stories)
+            }
+            // setmeditations(getFilter)
+          
+
+          }
+      }
+      }
       await props.get_allStories(params)
        
       }
 
       function checkData(posts,stories){
+        // alert(JSON.stringify(posts))
         // console.log("&^&^&^&^&^&^&^&^&^&^&^&^&^^&^&^^")
         if(stories.length > 0){
           // alert('here')
@@ -473,7 +532,11 @@ var RNFS = require('react-native-fs');
           const n = merged.filter((tag, index, dub) =>
           dub.findIndex((t)=> t._id === tag._id
           ) == index);
-          setmeditations(n);
+
+          var res = posts.map(obj => n.find(o => o._id === obj._id) || obj);
+
+
+          setmeditations(res);
           setRefreshing(false);
         }else{
           setmeditations(posts);
@@ -510,13 +573,13 @@ var RNFS = require('react-native-fs');
                 let cat = item.trackCategory.name;
                 let cover = '';
                 let story = internal;
-                getStories(cat,cover,story,resp?.data)
+                getStories(connection,cat,cover,story,resp?.data)
               }else{
                 let cat = item.trackCategory.name;
                 let cover = '';
                 let story = internal;
                 let resp = [];
-                getStories(cat,cover,story,resp)
+                getStories(connection,cat,cover,story,resp)
               }
                 
                 // Snackbar.show({
@@ -569,7 +632,7 @@ var RNFS = require('react-native-fs');
                 let story = internal
                 let resp = []
                 setRefreshing(true)
-                getStories(item.name,item.coverPic,story,resp)
+                getStories(connection,item.name,item.coverPic,story,resp)
                   return {
                     ...item,
                     selected: true,
@@ -695,6 +758,68 @@ var RNFS = require('react-native-fs');
               // console.log(JSON.parse(data).trackName) 
   }
 
+
+  function setoff(state,id){
+
+    if(state === 1){
+      const res = meditations.map((item)=>{
+      // alert('closed')
+      // console.log(item._id === id)
+        if(item){
+            return {
+                ...item,
+                isplaying: false,
+              };
+        } else {
+            return {
+                ...item,
+                // isplaying: false,
+              };
+        }
+    })
+    setmeditations(res)
+  }else if(state === 2){
+    const res = meditations.map((item)=>{
+      // alert('closed')
+      // console.log(item._id === id)
+        if(item._id === id){
+            return {
+                ...item,
+                isplaying: true,
+              };
+        } else {
+            return {
+                ...item,
+                // isplaying: false,
+              };
+        }
+    })
+    setmeditations(res)
+    // alert('resumed')
+  }else if(state === 3){
+    const res = meditations.map((item)=>{
+      // alert('closed')
+      // console.log(item._id === id)
+        if(item._id === id){
+            return {
+                ...item,
+                isplaying: false,
+              };
+        } else {
+            return {
+                ...item,
+                // isplaying: false,
+              };
+        }
+    })
+    setmeditations(res)
+    // alert('paused')
+  }else{
+
+  }
+    
+  } 
+
   async function requestToPermissions ()  {
     try {
       const granted = await PermissionsAndroid.request(
@@ -721,9 +846,9 @@ var RNFS = require('react-native-fs');
   };
 
 
-  async function startDownload  (item,index)  {
+  async function startDownload  (item,id)  {
       var res = meditations.map((post)=>{
-        if(post._id === item._id){
+        if(post._id === id){
           return {
             ...post,
             progress:true
@@ -923,10 +1048,11 @@ var RNFS = require('react-native-fs');
 
       setTimeout(() => {
       const res = meditations.map((post)=>{
-          if(post._id === item._id){
+          if(post._id === id){
             return {
               ...post,
-              progress:false
+              progress:false,
+              // isdownloading:true,
             }
           }else{
             return {
@@ -948,6 +1074,7 @@ var RNFS = require('react-native-fs');
     async function deletefile(item,traname){
       setisplaying(false)
       let name = item.trackName;
+      let id = item._id;
       try {
           await AsyncStorage.removeItem(name);
           // alert('cleared item')
@@ -978,19 +1105,19 @@ var RNFS = require('react-native-fs');
             .catch((err) => {         
                 console.log(err);
             });
-            await RNFS.unlink(dirImg).then(() => {
-              console.log('2 deleted');
-              RNFS.scanFile(dirImg)
-                .then(() => {
-                  console.log('2 scanned');
-                })
-                .catch(err => {
-                  console.log(err);
-                });
-            })
-            .catch((err) => {         
-                console.log(err);
-            });
+            // await RNFS.unlink(dirImg).then(() => {
+            //   console.log('2 deleted');
+            //   RNFS.scanFile(dirImg)
+            //     .then(() => {
+            //       console.log('2 scanned');
+            //     })
+            //     .catch(err => {
+            //       console.log(err);
+            //     });
+            // })
+            // .catch((err) => {         
+            //     console.log(err);
+            // });
             // console.log(name+"Deleted");
             // Snackbar.show({
             //   text: name+' Deleted',
@@ -1015,14 +1142,30 @@ var RNFS = require('react-native-fs');
         addRemoveFav(item)
         favourities(item)
       }
-      setTimeout(() => {
+      // setTimeout(() => {
         if(connection){
+        //   const res = meditations.map((post)=>{
+        //     if(post._id === id){
+        //       return {
+        //         ...post,
+        //         isdownloading:false,
+        //       }
+        //     }else{
+        //       return {
+        //         ...post,
+        //       }
+        //     }
+        // })
+        // setmeditations(res)
+
           CheckConnectivity(item.trackCategory.name)
         }else{
           let cate = ''
           CheckConnectivity(cate)
+          // const res = meditations.splice(index,1)
+          // setmeditations(res)  
         }
-      }, 1500);
+      // }, 1500);
    
 
     }
@@ -1532,7 +1675,7 @@ var RNFS = require('react-native-fs');
                   
             }
             {props?.val?
-                <Soundplayer navigation={props.navigation} />
+                <Soundplayer navigation={props.navigation} setoffpalying = {(state,id)=>setoff(state,id)} />
                 // null
                 :
             null} 

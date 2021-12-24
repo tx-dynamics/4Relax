@@ -339,6 +339,7 @@ const SignUp = (props) => {
         <View style={{ width: '90%', alignSelf: 'center', top: responsiveHeight(10) }}>
           <Text style={[styles.labelstyle,{}]}>Full Name</Text>
           <TextInput
+            selectionColor={'#CCCCCC'}
             value={fullName}
             onChangeText={value => setfullName(value)}
             placeholder={placeholderName}
@@ -352,6 +353,7 @@ const SignUp = (props) => {
           {fNameMessage !== '' && <Errors errors={fNameMessage} />}
           <Text style={[styles.labelstyle, { marginTop: 20 }]}>Email</Text>
           <TextInput
+            selectionColor={'#CCCCCC'}
             value={email}
             onChangeText={value => setEmail(value.trim())}
             placeholder={placeholderEmail}
@@ -368,6 +370,7 @@ const SignUp = (props) => {
             borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary, borderBottomWidth: 1
           }} >
             <TextInput
+              selectionColor={'#CCCCCC'}
               value={password}
               onChangeText={value => setPassword(value)}
               placeholder={placeholderPass}
@@ -412,6 +415,7 @@ const SignUp = (props) => {
             borderBottomColor: confirmMessage !== '' ? 'tomato' : theme.colors.secondary, borderBottomWidth: 1
           }} >
             <TextInput
+              selectionColor={'#CCCCCC'}
               value={confirmpass}
               onChangeText={value => setconfirmpass(value)}
               placeholder={placeholderConPass}

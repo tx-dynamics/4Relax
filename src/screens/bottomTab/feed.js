@@ -61,15 +61,15 @@ var RNFS = require('react-native-fs');
       // favrt
     }, [isFocused])
 
-      // useEffect(() => {
+      useEffect(() => {
         
-      //   }, [props?.meditationData])
+        }, [connection])
 
     async function checkInternet (){
       // alert("called 2 ")
       NetInfo.fetch().then((state) => {
         // let current = await AsyncStorage.getItem('currentCat')
-      // alert(current)
+      // alert('called check internet')
         console.log("Connection type", state.type);
         // console.log("Is connected?", state.isConnected,state.details.ipAddress);
         //if (Platform.OS === "android") {
@@ -81,7 +81,9 @@ var RNFS = require('react-native-fs');
           } else {
             let cat = '';
             // alert("called 2 ")
-            CheckConnectivity(cat)
+            // setcategory([])
+            get_category()
+            // CheckConnectivity(cat)
           }
         
       });
@@ -109,8 +111,6 @@ var RNFS = require('react-native-fs');
 
 
     }
-
-
   
     async function requestToPermissions ()  {
       try {
@@ -136,6 +136,7 @@ var RNFS = require('react-native-fs');
         console.log(err);
       }
     }
+
     async function get_category(){
       // console.log("get sub category redux",props?.subCategories?.data);
       if(props?.subCategories?.data != '' && props?.subCategories?.data != undefined){
@@ -256,6 +257,7 @@ var RNFS = require('react-native-fs');
         
       });
     };
+
     async function getFiles(state,cat){
       // return alert(cat)
       // AsyncStorage.clear()
@@ -294,23 +296,27 @@ var RNFS = require('react-native-fs');
             })
             
             if(state.isConnected){
-              // console.log(meditation)
               // alert("called internal medi")
               setTimeout(() => {
                 setInternal(meditation)
                 let cate = cat;
                 let cover = '';
                 let resp = []
-                getMeditation(cate,cover,meditation,resp)
+                getMeditation(state.isConnected,cate,cover,meditation,resp)
                       
               }, 1200);
 
             }else{
               setTimeout(() => {
-                console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
+                setInternal(meditation)
+                let cate = cat;
+                let cover = '';
+                let resp = []
+                getMeditation(state.isConnected,cate,cover,meditation,resp)
+                // console.log("HERE++++++++++++++++++++++++++>>>>",meditation)
                 // console.log(meditation)
-                setmeditations(meditation)
-                setRefreshing(false);  
+                // setmeditations(meditation)
+                // setRefreshing(false);  
               }, 1000);
               
             }
@@ -331,10 +337,11 @@ var RNFS = require('react-native-fs');
           let cate = cat;
           let cover = '';
           let resp = []
-          getMeditation(cate,cover,meditation,resp)
+          getMeditation(state.isConnected,cate,cover,meditation,resp)
         }
       })
     }
+
     async function getLocalJson (img,item,name,state,cat){
       let meditation = {}
       let obj = await AsyncStorage.getItem(name);
@@ -343,11 +350,12 @@ var RNFS = require('react-native-fs');
       // return console.log("here=====local pared json========>",pared)
         if (pared != null){      
           // if(item.trackName === img.name){  
-            console.log('pared exists')
+            // console.log('pared exists')
             meditation = ({
               "_id":pared._id,
               "liked":pared.liked,
               "cat_name":pared.trackCategory.name,
+              // "index":pared.posindx,
               "trackType": pared.trackType,
               "trackFile":item.trackFile,
               "trackName":item.trackName,
@@ -373,6 +381,7 @@ var RNFS = require('react-native-fs');
             })
           // }
         }
+          // alert(JSON.stringify(meditation))
           return meditation
     
       if(state.isConnected){
@@ -389,144 +398,190 @@ var RNFS = require('react-native-fs');
         setRefreshing(false);
       }
     }
-    async function getMeditation( cate = '',cover = '' , meditation , resp   ) {
-      
+
+    async function getMeditation(state , cate = '',cover = '' , meditation , resp   ) {
+        // alert(JSON.stringify(meditation))
         const params = {
             userId: props?.userData?._id
         }
         // console.log("data here",props?.meditationData);
-        if(props?.meditationData?.data != '' && props?.meditationData?.data != undefined ){
-          try{
-            // var posts = []
-            // if
-            // var posts = resp.length != 0 ? alert(1) : alert(2)
-            var posts = resp.length != 0 ? resp :  props?.meditationData?.data
-            // alert(resp)
-
-            if (posts) {
-                if(cate === ''){
-                  // setmeditations(posts)
-                  // setTimeout(() => {
-                    alert(1)
-                    checkData(posts,meditation)
-                  // }, 1000);
-                }else{
-                  setmeditations([])
-
-                  var filtered = []; 
-                  posts.map((item)=>{
-                      filtered.push(item)
-                  })
-                
-                  let getFilter = [];
-                  setcateEmp(false)
-
-                  filtered.map((item)=>{
-                      if(item.trackCategory.name === cate){
-                          getFilter.push(item);
-                      }else{
-                        return
-                      }
-                  })
-                  if(getFilter.length < 1){
-                    
-                    setcateEmp(true)
-                    setmeditations([])
+        // alert(connection)
+        if(state){
+          if(props?.meditationData?.data != '' && props?.meditationData?.data != undefined ){
+            try{
+              var posts = resp.length != 0 ? resp :  props?.meditationData?.data
+              if (posts) {
+                  if(cate === ''){
+                    // setmeditations(posts)
+                    // setTimeout(() => {
+                      // alert(1)
+                      checkData(posts,meditation)
+                    // }, 1000);
                   }else{
-                      checkData(getFilter,meditation)
+                    setmeditations([])
+
+                    var filtered = []; 
+                    posts.map((item)=>{
+                        filtered.push(item)
+                    })
+                  
+                    let getFilter = [];
+                    setcateEmp(false)
+
+                    filtered.map((item)=>{
+                        if(item.trackCategory.name === cate){
+                            getFilter.push(item);
+                        }else{
+                          return
+                        }
+                    })
+                    if(getFilter.length < 1){
+                      
+                      setcateEmp(true)
+                      setmeditations([])
+                    }else{
+                        checkData(getFilter,meditation)
+                    }
                   }
-                }
+              }
+
+
+            } catch (err) {
+              setRefreshing(false);
+              // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+              console.log(err);
             }
+          }else{
+            // alert('else')
+            try {
+              const res = await props.get_allmeditation(params);
+              var posts = res?.data
+              const data = posts.map((item)=>{
+                return {
+                    ...item,
+                    isplaying: false,
+                    progress:false,
+                    showLock:false,
+                  };
+              })
+              // await props.storeMedidation(posts)
+              // setTimeout(() => {
+              //   data.map((item)=>{
+              //     console.log(item);
+              //   })  
+              // }, 5000);
+              
+
+              if (data) {
+                  if(cate === ''){
+                    // setmeditations(posts)
+                    // setTimeout(() => {
+                      checkData(data,meditation)
+                    // }, 1000);
+                  }else{
+                    setmeditations([])
+
+                    var filtered = []; 
+                    data.map((item)=>{
+                        filtered.push(item)
+                    })
+                  
+                    let getFilter = [];
+                    setcateEmp(false)
+
+                    filtered.map((item)=>{
+                      // let str =item.trackCategory 
+                      // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
+                      // console.log(item.trackCategory.name === cate)
+                        if(item.trackCategory.name === cate){
+                            getFilter.push(item);
+                        }else{
+                          return
+                        }
+                    })
+                    // return console.log(getFilter)
+                    if(getFilter.length < 1){
+                      
+                      setcateEmp(true)
+                      setmeditations([])
+                    }else{
+                      // return console.log(getFilter)
+                        checkData(getFilter,meditation)
+                    }
+                    // setmeditations(getFilter)
+                  
+
+                  }
+              }
 
 
-          } catch (err) {
-            setRefreshing(false);
-            // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-            console.log(err);
+            } catch (err) {
+              setRefreshing(false);
+              // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+              console.log(err);
+            }
           }
         }else{
-          // alert('else')
-          try {
-            const res = await props.get_allmeditation(params);
-            var posts = res?.data
-            const data = posts.map((item)=>{
-              return {
-                  ...item,
-                  isplaying: false,
-                  progress:false,
-                  showLock:false,
-                };
-            })
-            // await props.storeMedidation(posts)
-            // setTimeout(() => {
-            //   data.map((item)=>{
-            //     console.log(item);
-            //   })  
-            // }, 5000);
+          let posts = []
+          if (meditation) {
+            if(cate === ''){
+              // setmeditations(posts)
+              // setTimeout(() => {
+                checkData(posts,meditation)
+              // }, 1000);
+            }else{
+              setmeditations([])
+
+              var filtered = []; 
+              meditation.map((item)=>{
+                  filtered.push(item)
+              })
+            
+              let getFilter = [];
+              setcateEmp(false)
+
+              filtered.map((item)=>{
+                // let str =item.trackCategory 
+                // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
+                // console.log(item.trackCategory.name === cate)
+                  if(item.cat_name === cate){
+                      getFilter.push(item);
+                  }else{
+                    return
+                  }
+              })
+              // return console.log(getFilter)
+              if(getFilter.length < 1){
+                
+                setcateEmp(true)
+                setmeditations([])
+              }else{
+                // return console.log(getFilter)
+                  checkData(getFilter,meditation)
+              }
+              // setmeditations(getFilter)
             
 
-            if (data) {
-                if(cate === ''){
-                  // setmeditations(posts)
-                  // setTimeout(() => {
-                    checkData(data,meditation)
-                  // }, 1000);
-                }else{
-                  setmeditations([])
-
-                  var filtered = []; 
-                  data.map((item)=>{
-                      filtered.push(item)
-                  })
-                
-                  let getFilter = [];
-                  setcateEmp(false)
-
-                  filtered.map((item)=>{
-                    // let str =item.trackCategory 
-                    // let str2 = str.charAt(0).toUpperCase() + str.slice(1)
-                    // console.log(item.trackCategory.name === cate)
-                      if(item.trackCategory.name === cate){
-                          getFilter.push(item);
-                      }else{
-                        return
-                      }
-                  })
-                  // return console.log(getFilter)
-                  if(getFilter.length < 1){
-                    
-                    setcateEmp(true)
-                    setmeditations([])
-                  }else{
-                    // return console.log(getFilter)
-                      checkData(getFilter,meditation)
-                  }
-                  // setmeditations(getFilter)
-                
-
-                }
             }
-
-
-          } catch (err) {
-            setRefreshing(false);
-            // alert("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-            console.log(err);
-          }
+        }
+          // checkData(posts,meditation)
         }
         await props.get_allmeditation(params)
 
-      }
+    }
+
     async function checkData(posts,meditation){
+      // alert(JSON.stringify(meditation))
       if(meditation.length > 0  ){
         
         let trueData = [];
         let fasleData = [];
         // console.log(posts._id);
-        posts.map(item=>{
-          meditation.filter(child=>{
-            // console.log(item._id);
-            if(item.trackName === child.trackName){
+        posts.map((item,index)=>{
+          meditation.filter((child,indx)=>{
+            // console.log(index,key);
+            // console.log(item._id,child._id);
+            if(item._id === child._id){
               trueData.push({...item,isdownloading:true})
             }
             else{
@@ -534,20 +589,26 @@ var RNFS = require('react-native-fs');
             }
           })
         })
-       
+        // alert(JSON.stringify(trueData)) 
+      // return
+
         var ids = new Set(trueData.map(d => d._id));
         var merged = [...trueData, ...fasleData.filter(d => !ids.has(d._id))];
-
-        // console.log("id====>",merged)
+        
+        
+        // console.log("id====>",merged._id)
         // let dub=finalData;
         const n = merged.filter((tag, index, dub) =>
         dub.findIndex((t)=> t._id === tag._id
         ) == index);
 
+        
+        var res = posts.map(obj => n.find(o => o._id === obj._id) || obj);
+        // return res.map(item =>  console.log(item.posindx))
+        
+        // n.map(item =>  console.log(item.key))
 
-        // n.map(item =>  console.log('id==>',item._id,"%%%%%%%%%%% donloading=>",item.isdownloading,'\n'))
-
-        setmeditations(n);
+        setmeditations(res);
         setRefreshing(false);
       }else{
         // alert("where are you")
@@ -594,7 +655,7 @@ var RNFS = require('react-native-fs');
                   
                   let cover = '';
                   let medi = internal
-                  getMeditation(cat,cover,medi,resp?.data)  
+                  getMeditation(connection,cat,cover,medi,resp?.data)  
                 // }, 1000);
                 
               }else{
@@ -606,7 +667,7 @@ var RNFS = require('react-native-fs');
                 let cover = '';
                 let medi = internal;
                 let resp = []
-                getMeditation(cat,cover,medi,resp)
+                getMeditation(connection,cat,cover,medi,resp)
               }
               
           }
@@ -661,7 +722,7 @@ var RNFS = require('react-native-fs');
                 let resp = []
                 // console.log(item);
                 setRefreshing(true)
-                  getMeditation(item.name,item.coverPic,medi,resp)
+                  getMeditation(connection,item.name,item.coverPic,medi,resp)
                   return {
                     ...item,
                     selected: true,
@@ -679,6 +740,67 @@ var RNFS = require('react-native-fs');
         
       
     }
+
+    function setoff(state,id){
+
+      if(state === 1){
+        const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item){
+              return {
+                  ...item,
+                  isplaying: false,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+    }else if(state === 2){
+      const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item._id === id){
+              return {
+                  ...item,
+                  isplaying: true,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+      // alert('resumed')
+    }else if(state === 3){
+      const res = meditations.map((item)=>{
+        // alert('closed')
+        // console.log(item._id === id)
+          if(item._id === id){
+              return {
+                  ...item,
+                  isplaying: false,
+                };
+          } else {
+              return {
+                  ...item,
+                  // isplaying: false,
+                };
+          }
+      })
+      setmeditations(res)
+      // alert('paused')
+    }else{
+
+    }
+      
+    } 
 
     const setData = async (single,id) => {
         // console.log(item.trackName)
@@ -1093,7 +1215,8 @@ var RNFS = require('react-native-fs');
             if(post._id === id){
               return {
                 ...post,
-                progress:false
+                progress:false,
+                // isdownloading:true,
               }
             }else{
               return {
@@ -1120,9 +1243,10 @@ var RNFS = require('react-native-fs');
     }
 
 
-    async function deletefile(item,traname){
+    async function deletefile(item,traname,index){
       // return console.log(item);
       let name = item.trackName;
+      let id = item._id;
       try {
           await AsyncStorage.removeItem(name);
           // alert('cleared item')
@@ -1193,14 +1317,29 @@ var RNFS = require('react-native-fs');
         addRemoveFav(item)
         favourities(item)
       }
-      setTimeout(() => {
+      // setTimeout(() => {
         if(connection){
+        //   const res = meditations.map((post)=>{
+        //     if(post._id === id){
+        //       return {
+        //         ...post,
+        //         isdownloading:false,
+        //       }
+        //     }else{
+        //       return {
+        //         ...post,
+        //       }
+        //     }
+        // })
+        //   setmeditations(res)
           CheckConnectivity(item.trackCategory.name)
         }else{
           let cate = ''
+          // const res = meditations.splice(index,1)
+          // setmeditations(res)          
           CheckConnectivity(cate)
         }
-      }, 500);
+      // }, 500);
    
 
     }
@@ -1461,6 +1600,7 @@ var RNFS = require('react-native-fs');
                             // }
                               style={{width:'100%',height:'100%',flex:1}}
                               numColumns={'2'}
+                              // keyExtractor={(item) => item.id}
                               showsVerticalScrollIndicator={false}
                               data={meditations}
                               renderItem={({ item, index }) =>
@@ -1564,7 +1704,7 @@ var RNFS = require('react-native-fs');
                                               
                                               <>
                                                 {item.isdownloading?
-                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName,index)}}  style={{height:40}} >
                                                       <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
                                                         <Image
                                                             source={del}
@@ -1582,7 +1722,7 @@ var RNFS = require('react-native-fs');
                                               :
                                             <>
                                                 {item.isdownloading?
-                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName)}}  style={{height:40}} >
+                                                  <TouchableOpacity onPress={()=>{deletefile(item,item.trackName,index)}}  style={{height:40}} >
                                                       <View style={[styles.iconBackground,{marginRight:16,top:12,alignSelf:'center'}]}>
                                                         <Image
                                                             source={del}
@@ -1719,8 +1859,10 @@ var RNFS = require('react-native-fs');
             }  
                 
             {props?.val?
-                <Soundplayer navigation={props.navigation} />
-                // null
+                // <TouchableOpacity onPress={()=>setoff()} >
+                  <Soundplayer navigation={props.navigation} setoffpalying = {(state,id)=>setoff(state,id)} />
+                // </TouchableOpacity>
+                    // null
                 :
             null}   
 

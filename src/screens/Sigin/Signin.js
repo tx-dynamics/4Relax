@@ -511,6 +511,7 @@ const Signin  =  props => {
                     <View style={{width:'90%',alignSelf:'center',top:responsiveHeight(15)}}>
                         <Text style={[styles.labelstyle,{}]}>Email</Text>
                         <TextInput
+                            selectionColor={'#CCCCCC'}
                             value={email}
                             onChangeText={value => setEmail(value.trim())}
                             placeholder={placeholder}
@@ -528,6 +529,7 @@ const Signin  =  props => {
                           borderBottomColor: passwordMessage !== '' ? 'tomato' : theme.colors.secondary,borderBottomWidth:1
                         }} >
                           <TextInput
+                            selectionColor={'#CCCCCC'}
                             value={password}
                             onChangeText={value => setPassword(value)}
                             placeholder={placeholderPass}

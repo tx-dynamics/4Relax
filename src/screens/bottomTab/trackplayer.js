@@ -33,8 +33,8 @@ const fav = require('../../assets/images/fav.png');
 const sound_test = require('../../assets/images/gta.mp3');
 const img_pause = require('../../assets/images/pause.png');
 const img_play = require('../../assets/images/play.png');
-const img_playjumpleft = require('../../assets/images/backward.png');
-const img_playjumpright = require('../../assets/images/forward.png');
+const img_playjumpleft = require('../../assets/images/backward_20.png');
+const img_playjumpright = require('../../assets/images/forward_20.png');
 const sliderEditing = false;
 import RNFetchBlob from 'rn-fetch-blob'
 var RNFS = require('react-native-fs');
@@ -84,7 +84,11 @@ const setup = async () => {
         // Capability.SkipToPrevious,
         // Capability.Stop,
     ],
-    icon: require('../../assets/images/feed.png')
+    icon: require('../../assets/images/feed.png'),
+    // playIcon: require('../../assets/images/play.png'),
+    // pauseIcon: require('../../assets/images/pause.png'),
+    // rewindIcon: require('../../assets/images/backward_20.png'),
+    // forwardIcon:require('../../assets/images/forward_20.png'),
   })
   // await TrackPlayer.add(tracks)
 }
@@ -113,17 +117,7 @@ await TrackPlayer.updateOptions({
     })
 }
 
-const tooglePlayback = async (playbackstate)=>{
-  const current = await TrackPlayer.getCurrentTrack();
 
-  if (current != null){
-    if(playbackstate === State.Paused){
-      await TrackPlayer.play();
-    }else{
-      await TrackPlayer.pause()
-    }
-  }
-}
 
 
 
@@ -140,6 +134,7 @@ function track  (props)  {
   const [isLoading,setisLoading] = useState(true) 
   const [don,setdon] = useState(false) 
   const [selected,setselected] = useState(false) 
+  const [audiofile,setAudio] = useState({}) 
   const [mainPic,setmainPic] = useState('') 
   const [type,settype] = useState('') 
   const [repeatMode,setRepeatMode] = useState('off') 
@@ -156,6 +151,31 @@ function track  (props)  {
       // this.setState({mainPic:main})
     return  async () => await TrackPlayer.destroy();
   }, []);
+
+
+  const tooglePlayback = async (playbackstate)=>{
+    // alert(playbackstate)
+    const current = await TrackPlayer.getCurrentTrack();
+    // console.log(playbackstate , State.Paused)
+    // console.log(State)
+    if (current != null){
+      if(playbackstate === State.Paused){
+        await TrackPlayer.play();
+        // alert('if')
+      }else{
+        if(playbackstate === 1){
+          await TrackPlayer.reset()
+          let audio = audiofile;
+          let state = connection;
+          let main = mainPic;
+          // console.log(audio,state,main);  
+          setmedia(audio,state,main)
+        }else{
+          await TrackPlayer.pause()
+        } 
+      }
+    }
+  }
 
   function getMain(){
     var main = props.route.params.single.coverPic
@@ -202,6 +222,7 @@ function track  (props)  {
   }
 
   function getData (again = '',main){
+    try{
     var id = props.route.params.single._id
     var track_id = props.route.params.single.trackId
     var fav = props.route.params.single
@@ -217,11 +238,13 @@ function track  (props)  {
         getSingle(again,state,track_id,fav,type,tracktype,main);
       }else{
         getSingle(again,state,id,fav,type,tracktype,main);
-  
       }    
     });
     // this.setState({type:type})
-    
+  }catch(e){
+    alert(e)
+    // console.log();
+  }
     // alert(tracktype)
 }
 
@@ -263,6 +286,7 @@ function track  (props)  {
 
   const getSingle = async (again,state,id,fav,type,tracktype,main) => {
     // alert(again)
+
     let userId = await AsyncStorage.getItem('userId');
     // console.log("***************************",JSON.parse(userId))
     const params = {
@@ -279,12 +303,15 @@ function track  (props)  {
             'Content-Type': 'application/json',
           },
         });
+        // alert('valling get data')
         // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         // alert(JSON.stringify(res))
         if(res?.data){
           setsingle(res?.data)
           settrackCategory(res?.data?.trackCategory)
           if(again != 'true'){
+            setAudio(res?.data)
+            // alert('called')
             setmedia(res?.data,state,main)
           }
         }
@@ -304,6 +331,7 @@ function track  (props)  {
             if(res?.data){
               setsingle(res?.data)
               if(again != 'true'){
+                setAudio(res?.data)
                 setmedia(res?.data,state,main)
               }
               settrackCategory(res?.data?.trackCategory)
@@ -333,6 +361,7 @@ function track  (props)  {
               setsingle(res?.data)
               settrackCategory(res?.data?.trackCategory)
               if(again != 'true'){
+                setAudio(res?.data)
                 setmedia(res?.data,state,main)
               }
                 // this.setState({single:res?.data,trackCategory:res?.data?.trackCategory})
@@ -359,6 +388,7 @@ function track  (props)  {
             if(fav){
               setsingle(fav)
               if(again != 'true'){
+                setAudio(fav)
                 setmedia(fav,state,main)
               }
               // settrackCategory(res?.data?.trackCategory)
@@ -504,6 +534,8 @@ function track  (props)  {
           }else{
             let again = 'true';
             getData(again)
+            // alert(res?.data);
+            // alert(?.msg)
           }
             // alert(res?.data)
         } 
@@ -956,8 +988,8 @@ function track  (props)  {
                               style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}
                               minimumValue={0}
                               maximumValue={progress.duration}
-                              minimumTrackTintColor="white"
-                              maximumTrackTintColor="gray"
+                              minimumTrackTintColor="#7497FF"
+                              maximumTrackTintColor="white"
                               onSlidingComplete={async(value)=>{
                                 await TrackPlayer.seekTo(value)
                                 // await TrackPlayer.reset()
@@ -1005,9 +1037,7 @@ function track  (props)  {
                       <View style={{flex:0.8,flexDirection:'row', justifyContent:'space-around',alignItems:'center'}} >
                           <TouchableOpacity onPress={()=>{ jumpPrev20Seconds(progress.position,progress.duration)}} style={{}}>
                               <Image source={img_playjumpleft} style={{width:20.5, height:25.5}}/>
-                              <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
-                                  <Text style={{textAlign:'center' ,color:'white', fontSize:5.5}}>20</Text>
-                              </View>
+                              
                           </TouchableOpacity> 
                           <TouchableOpacity onPress={()=>{tooglePlayback(playbackState)}} style={{marginHorizontal:20}}>
                           {playbackState === State.Playing ?
@@ -1019,9 +1049,7 @@ function track  (props)  {
                           
                           <TouchableOpacity onPress={()=>{ jumpNext20Seconds(progress.position,progress.duration)}} style={{}}>
                               <Image source={img_playjumpright} style={{width:20, height:25}}/>
-                              <View style={{position:'absolute',top:responsiveHeight(1.5),bottom:0,left:0,right:0,alignSelf:'center'}} >
-                                  <Text style={{textAlign:'center' , color:'white', fontSize:5.5}}>20</Text>
-                              </View>
+                              
                           </TouchableOpacity>
                       </View>
                       <View style={{flex:0.15}} >
