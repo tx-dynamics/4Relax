@@ -83,7 +83,9 @@ select_container:{
         paddingTop:2,
         marginLeft:2,
         paddingBottom:2,
-        color:'black'
+        fontSize:16,fontWeight:'700',
+        color:'black',
+        alignSelf:'center'
     }
 })
 

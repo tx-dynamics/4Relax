@@ -17,7 +17,7 @@ import {
   GOOGLE_LOGIN,
   UPDATE_USER,
   UPDATE_DATA,
-  GOOGLE_FAIL,
+  UPDATE_ACTIVATIONUSER,
   GROUP_FAIL,
 } from '../actions/types';
 
@@ -167,6 +167,19 @@ export const authReducer = (state = initialState, action) => {
         isError: false,
         errMsg: null,
       };
+
+      case UPDATE_ACTIVATIONUSER:
+        console.log('here=============>',action.payload.data);
+        return {
+          ...state,
+          userData: action.payload.data,
+          token: action.payload.data.token,
+          isLoggedIn: true,
+          isLoading: false,
+          isSuccess: true,
+          isError: false,
+          errMsg: null,
+        };
 
       case UPDATE_DATA:
       console.log('here=============>',action.payload.data);

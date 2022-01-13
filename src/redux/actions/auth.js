@@ -13,7 +13,7 @@ import {
   GOOGLE_LOGIN,
   UPDATE_USER,
   UPDATE_DATA,
-  GOOGLE_SIGNUP,
+  UPDATE_ACTIVATIONUSER,
   GOOGLE_FAIL,
   GROUP_FAIL,
 } from './types';
@@ -204,6 +204,33 @@ export const get_paymentResponse = (params) => {
     };
   };
 
+  export const activation_code = (params,id) => {
+      console.log("inside auth redu============>",params,id);
+    
+      return async dispatch => {
+        // dispatch(chatLoading());
+        try {
+          const res = await axios.put(`${BASE_URL}api/relax/subscription/activateSubActivationCode/${id}`,
+          JSON.stringify(params)
+          // , {
+          //   headers: {
+          //     Accept: 'application/json',
+          //     'Content-Type': 'application/json',
+          //   },
+          // }
+          );
+          // if (res?.data) {
+            // console.log("HeERE======================>",res?.data);
+            dispatch(activationdone(res));
+          // }
+          // return dispatch(subsFailed(res));
+          return res;
+        } catch (err) {
+          console.log(err.response.data);
+          dispatch(authFailed(err.response));
+        }
+      };
+    };
 
   export const switch_noification = (id) => {
     console.log(id);
@@ -245,6 +272,10 @@ const logingoogle = res => ({
   //helper
   export const paymentSuccess = res => ({
     type: UPDATE_USER,
+    payload: res,
+  });
+  export const activationdone = res => ({
+    type: UPDATE_ACTIVATIONUSER,
     payload: res,
   });
 
