@@ -41,9 +41,18 @@ function activation(props) {
         setloader2(true)
         // console.log(e.);
         const check = e.data;
-        // console.log('scanned data ' + check);
-        setresult(e.data)
-        activation_api(check)
+        console.log('scanned data ' + check);
+        if(check.includes('http')){
+            Snackbar.show({
+                text: 'Activation code is not correct',
+                backgroundColor: 'tomato',
+                textColor: 'white',
+              });
+            setloader2(false)
+        }else{
+            setresult(e.data)
+            activation_api(check)
+    }
         // setScanResult(true)
         // this.setState({
         //     result: e,
@@ -82,7 +91,7 @@ function activation(props) {
             const res = await props.activation_code(params,id);
             // var subs = res?.data
             // var msg = res?.data?.msg
-            console.log("***************PAYMENT***************",res?.data);
+            // console.log("***************PAYMENT***************",res?.data);
             if(res?.data){
             //   if(msg == 'Payment Successful'){
                 Snackbar.show({
@@ -93,8 +102,8 @@ function activation(props) {
                 props.navigation.goBack()
               }else{
                 Snackbar.show({
-                  text: 'Activation code is not correct or already used',
-                  backgroundColor: '#018CAB',
+                  text: 'Activation code is not correct',
+                  backgroundColor: 'tomato',
                   textColor: 'white',
                 });
             //   }
@@ -123,7 +132,7 @@ function activation(props) {
             const res = await props.activation_code(params,id);
             // var subs = res?.data
             // var msg = res?.data?.msg
-            console.log("***************PAYMENT***************",res?.data);
+            // console.log("***************PAYMENT***************",res);
             if(res?.data){
             //   if(msg == 'Payment Successful'){
                 Snackbar.show({
@@ -134,8 +143,8 @@ function activation(props) {
                 props.navigation.goBack()
               }else{
                 Snackbar.show({
-                  text: 'Activation code is not correct or already used',
-                  backgroundColor: '#018CAB',
+                  text: 'Activation code is not correct',
+                  backgroundColor: 'tomato',
                   textColor: 'white',
                 });
             //   }

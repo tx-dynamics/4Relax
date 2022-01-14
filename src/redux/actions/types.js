@@ -11,6 +11,7 @@ export const GOOGLE_LOGIN = 'GOOGLE_LOGIN';
 export const GOOGLE_SIGNUP = 'GOOGLE_SIGNUP';
 export const GOOGLE_FAIL = 'GOOGLE_FAIL';
 export const GROUP_FAIL = 'GROUP_FAIL';
+export const SETTING_CONST = 'SETTING_CONST';
 
 //ACTIVITY
 export const CREATE_ACTIVITY = 'CREATE_ACTIVITY';

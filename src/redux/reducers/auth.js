@@ -18,7 +18,7 @@ import {
   UPDATE_USER,
   UPDATE_DATA,
   UPDATE_ACTIVATIONUSER,
-  GROUP_FAIL,
+  SETTINGS,
 } from '../actions/types';
 
 const initialState = {
@@ -32,6 +32,7 @@ const initialState = {
   errMsg: null,
   userData: null,
   status: '',
+  settings:null
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -72,6 +73,17 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         userData: action.payload.data,
         token: action.payload.data.token,
+        isLoggedIn: true,
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        errMsg: null,
+      };
+      case SETTINGS:
+      // console.log('here');
+      return {
+        ...state,
+        settings: action.payload.data,
         isLoggedIn: true,
         isLoading: false,
         isSuccess: true,
@@ -169,7 +181,7 @@ export const authReducer = (state = initialState, action) => {
       };
 
       case UPDATE_ACTIVATIONUSER:
-        console.log('here=============>',action.payload.data);
+        // console.log('here=============>',action.payload.data);
         return {
           ...state,
           userData: action.payload.data,

@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import {View,Text,ImageBackground,Linking,Image,FlatList,Share,Switch} from 'react-native'
 import {logo,settin,product,right,contact,notification,share,rate,info,policy,terms,logout} from '../../assets'
 import {
@@ -10,20 +10,33 @@ import {
   import LinearGradient from 'react-native-linear-gradient';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import styles from './styles'
-import {logoOut,switch_noification} from '../../redux/actions/auth';
+import {logoOut,switch_noification,settings} from '../../redux/actions/auth';
 import {connect} from 'react-redux';
 import theme from '../../theme';
 import Snackbar from 'react-native-snackbar';
 import Soundplayer from './trackbanner'
 import {togglePlayer} from '../../redux/actions/validate_player';
+import {allsettings} from '../../redux/actions/setting';
+import {useIsFocused} from '@react-navigation/native';
 
 
 function setting(props) {
 
-    const [selected,setSelected ] =  useState(false)
+    const [settingobj,setsettingobj ] =  useState({})
     const [isEnabled, setIsEnabled] = useState(props?.userData?.allowNotification);
+    const isFocused = useIsFocused();
     
+
+    useEffect(() => {
+        getsettings()
+    }, [isFocused])
     
+    async function getsettings(){
+        let res = await props.allsettings() 
+        setsettingobj(res?.data[0])
+        console.log(res);
+    }
+
     const toggleSwitch = async () => {
         try{
             if(props.userData.allowNotification){
@@ -81,8 +94,10 @@ function setting(props) {
     }
     };
 
-    async  function openUrl ()  {
-        const url = 'https://www.google.com/'
+    async  function openUrl (url)  {
+        // console.log(settingobj.privacyPolicyLink);
+        // const url = 'http://www.dune-trading.com'
+        // const url = 
         await Linking.openURL(url);
         // console.log('clicked');
     }
@@ -129,7 +144,7 @@ function setting(props) {
             </ImageBackground>
             <ScrollView showsVerticalScrollIndicator={false} >
                 <View style={{alignItems:'center',width:'90%',alignSelf:'center'}}>
-                    <Text style={[styles.title,{fontSize:12,top:12}]} >Version 1.0.1</Text>
+                    <Text style={[styles.title,{fontSize:12,top:12}]} >Version {settingobj.version}</Text>
                     <LinearGradient
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                         style={styles.setting_btn}
@@ -215,7 +230,7 @@ function setting(props) {
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                         style={styles.setting_btn}
                         >
-                        <TouchableOpacity onPress={()=> openUrl()} style={{flexDirection:'row',alignItems:'center'}}>
+                        <TouchableOpacity onPress={()=> openUrl(settingobj.privacyPolicyLink)} style={{flexDirection:'row',alignItems:'center'}}>
                             <Image
                                 source={policy}
                                 style={{width:16,height:16,left:10}}
@@ -234,7 +249,7 @@ function setting(props) {
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#018CAB',  '#000A0D']} 
                         style={styles.setting_btn}
                         >
-                        <TouchableOpacity onPress={()=> openUrl() } style={{flexDirection:'row',alignItems:'center'}}>
+                        <TouchableOpacity onPress={()=> openUrl(settingobj.termsOfUseLink) } style={{flexDirection:'row',alignItems:'center'}}>
                             <Image
                                 source={terms}
                                 style={{width:16,height:16,left:10}}
@@ -255,7 +270,7 @@ function setting(props) {
                         style={{width:51.3,height:51.3,borderRadius:100,alignItems:'center',justifyContent:'center'}}
                         start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#00647A',  '#072931']} 
                     >
-                        <TouchableOpacity onPress={()=>{alert('Any info provided by client')}} style={{}}>
+                        <TouchableOpacity onPress={()=>{openUrl(settingobj.termsOfUseLink)}} style={{}}>
                             <Image 
                                 source={info}
                                 style={{width:13.92,height:21.6}}
@@ -316,7 +331,8 @@ function setting(props) {
 const mapStateToProps = state => {
     const {userData} = state.auth;
     const {val} = state.validatePlayer;
+    const {settobj} = state.setting;
 
     return {userData,val};
   };
-  export default connect(mapStateToProps, {logoOut,switch_noification,togglePlayer})(setting);
+  export default connect(mapStateToProps, {logoOut,switch_noification,togglePlayer,allsettings})(setting);

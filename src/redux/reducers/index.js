@@ -7,6 +7,7 @@ import {connectionReducer} from './connectin_check';
 import {MeditationReducer} from './meditation';
 import {storyReducer} from './stories';
 import {soundReducer} from './music';
+import {settingReducer} from './setting';
 
 export default combineReducers({
   auth: authReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
   connectionCheck:connectionReducer,
   meditations:MeditationReducer,
   story:storyReducer,
-  sound:soundReducer
+  sound:soundReducer,
+  setting:settingReducer
 });

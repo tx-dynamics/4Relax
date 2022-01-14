@@ -8,7 +8,7 @@ import {
   REGISTER_USER,
   LOGOUT_USER,
   FORGOT_PASS,
-  CONFIRM_CODE,
+  SETTING,
   CREATE_GROUP,
   GOOGLE_LOGIN,
   UPDATE_USER,
@@ -211,7 +211,7 @@ export const get_paymentResponse = (params) => {
         // dispatch(chatLoading());
         try {
           const res = await axios.put(`${BASE_URL}api/relax/subscription/activateSubActivationCode/${id}`,
-          JSON.stringify(params)
+          params
           // , {
           //   headers: {
           //     Accept: 'application/json',
@@ -220,7 +220,7 @@ export const get_paymentResponse = (params) => {
           // }
           );
           // if (res?.data) {
-            // console.log("HeERE======================>",res?.data);
+            console.log("HeERE======================>",res);
             dispatch(activationdone(res));
           // }
           // return dispatch(subsFailed(res));
@@ -261,13 +261,47 @@ export const get_paymentResponse = (params) => {
     };
 
 
+    export const settings = () => {
+      // console.log(id);
+      alert('settings')
+        // console.log(`${BASE_URL}api/relax/user/updateNotification/${id}`);
+        return async dispatch => {
+          // dispatch(chatLoading());
+          try {
+            const res = await axios.get(`${BASE_URL}api/relax/settings/all`
+             ,{
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+            }
+            )
+            // .then(response => console.log(response));
+            // console.log(res);
+            // if (res?.data) {
+              console.log("HeERE======================>",res);
+              dispatch(getsettings(res));
+            // }
+            // return dispatch(subsFailed(res));
+            return res;
+          } catch (err) {
+            // console.log(err.response.data);
+            dispatch(authFailed(err.response));
+          }
+        };
+      };
+
 //helper Functions
 
-const logingoogle = res => ({
-  type: GOOGLE_LOGIN,
-  payload: res,
-});
+  const logingoogle = res => ({
+    type: GOOGLE_LOGIN,
+    payload: res,
+  });
 
+  export const getsettings = res => ({
+    type: SETTING,
+    payload: res,
+  });
 
   //helper
   export const paymentSuccess = res => ({
@@ -284,36 +318,36 @@ const logingoogle = res => ({
     payload: res,
   });
 
-const authLoading = () => ({
-  type: AUTH_LOADING,
-});
-const googleFailed = err => ({
+  const authLoading = () => ({
+    type: AUTH_LOADING,
+  });
+  const googleFailed = err => ({
   type: GOOGLE_FAIL,
   payload: err,
-});
-export const authFailed = err => ({
-  type: AUTH_FAILED,
-  payload: err,
-});
-export const loginSuccess = res => ({
-  type: LOGIN_USER,
-  payload: res,
-});
+  });
+  export const authFailed = err => ({
+    type: AUTH_FAILED,
+    payload: err,
+  });
+  export const loginSuccess = res => ({
+    type: LOGIN_USER,
+    payload: res,
+  });
 
-export const forgotSuccess = res => ({
-  type: FORGOT_PASS,
-  payload: res,
-});
+  export const forgotSuccess = res => ({
+    type: FORGOT_PASS,
+    payload: res,
+  });
 
-const registerSuccess = res => ({
-  type: REGISTER_USER,
-  payload: res,
-});
-const registerFAILED = err => ({
-  type: REG_FAILED,
-  payload: err,
-});
+  const registerSuccess = res => ({
+    type: REGISTER_USER,
+    payload: res,
+  });
+  const registerFAILED = err => ({
+    type: REG_FAILED,
+    payload: err,
+  });
 
-export const logoutUserSuccess = () => ({
-  type: LOGOUT_USER,
-});
+  export const logoutUserSuccess = () => ({
+    type: LOGOUT_USER,
+  });
